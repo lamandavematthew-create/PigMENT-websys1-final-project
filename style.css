@@ -824,6 +824,15 @@ h3 { font-size: 16px; }
 .map-layout { display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 16px; margin-bottom: 16px; }
 .map-panel, .map-controls, .report-form-panel, .report-detail-panel { padding: 18px; }
 .disease-map { min-height: 480px; border-radius: var(--radius-small); }
+.map-legend { display: flex; flex-wrap: wrap; gap: 8px 14px; margin-top: 12px; color: var(--color-muted); font-size: 12px; }
+.map-legend strong { flex-basis: 100%; color: var(--color-ink); }
+.map-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.legend-swatch { display: inline-block; width: 14px; height: 14px; border: 2px solid currentColor; border-radius: 3px; }
+.legend-confirmed { color: #b42318; background: #dc2626; }
+.legend-monitoring { color: #c2410c; background: #f97316; }
+.legend-resolved { color: #15803d; background: #22c55e; }
+.legend-suspected { color: #a16207; border-radius: 50%; background: #facc15; }
+.empty-map-message { margin: 14px 0 0; padding: 10px; border: 1px solid var(--color-border); border-radius: var(--radius-small); color: var(--color-muted); background: var(--color-surface-muted); font-size: 12px; }
 .map-attribution { margin: 8px 0 0; color: var(--color-muted); font-size: 10px; }
 .map-controls { display: grid; align-content: start; gap: 14px; }
 .map-controls .panel-heading { margin-bottom: 2px; }
@@ -843,6 +852,13 @@ h3 { font-size: 16px; }
 .admin-layout { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(280px, .7fr); gap: 16px; }
 .disease-page .table-wrap { display: block; }
 .report-detail-panel { align-self: start; }
+.zone-management { margin-top: 18px; }
+.admin-zone-layout { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(300px, .7fr); gap: 16px; }
+.admin-zone-map { min-height: 430px; margin-top: 12px; }
+.zone-form { align-content: start; padding: 16px; border: 1px solid var(--color-border); border-radius: var(--radius-small); background: var(--color-surface-muted); }
+.zone-table-wrap { margin-top: 16px; overflow-x: auto; }
+.zone-actions { display: flex; flex-wrap: wrap; gap: 5px; }
+.zone-actions .button { margin: 0; }
 .detail-list { display: grid; gap: 12px; margin: 18px 0; }
 .detail-list div { display: grid; gap: 2px; }
 .detail-list dt { color: var(--color-muted); font-size: 10px; font-weight: 700; text-transform: uppercase; }
@@ -858,7 +874,7 @@ h3 { font-size: 16px; }
 .leaflet-popup-content { font-family: var(--font-body); font-size: 12px; line-height: 1.55; }
 
 @media (max-width: 900px) {
-  .map-layout, .admin-layout { grid-template-columns: 1fr; }
+  .map-layout, .admin-layout, .admin-zone-layout { grid-template-columns: 1fr; }
   .map-controls { grid-template-columns: repeat(2, 1fr); }
   .map-controls .panel-heading, .map-controls .record-count, .map-controls .small-muted { grid-column: 1 / -1; }
 }
@@ -866,7 +882,7 @@ h3 { font-size: 16px; }
 @media (max-width: 600px) {
   .disease-page .page-heading { display: grid; }
   .disease-page .page-heading .button { width: 100%; }
-  .disease-map { min-height: 370px; }
+  .disease-map, .admin-zone-map { min-height: 370px; }
   .awareness-columns { grid-template-columns: 1fr; gap: 14px; }
   .map-controls { grid-template-columns: 1fr; }
   .form-span-2 { grid-column: auto; }
