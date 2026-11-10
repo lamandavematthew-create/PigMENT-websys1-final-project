@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -213,3 +214,220 @@
   </div>
 </body>
 </html>
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Browse pig listings from farmers in Marinduque.">
+  <title>Pig Marketplace | PigMENT</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="index.html" aria-label="PigMENT dashboard">
+        <span class="brand-mark" aria-hidden="true">P</span>
+        <span>Pig<span class="brand-accent">MENT</span><small>Farm management</small></span>
+      </a>
+      <p class="nav-caption">MAIN MENU</p>
+      <nav class="side-nav" aria-label="Main navigation">
+        <a class="nav-link" href="index.html">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          <span>Home</span>
+        </a>
+        <a class="nav-link" href="my-pigs.html">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 13v-2a2 2 0 0 1 2-2h1l2-3h6l2 3h1a2 2 0 0 1 2 2v2"/><path d="M5 13h14l1 3a2 2 0 0 1-2 2h-1"/><path d="M6 17H5a2 2 0 0 1-2-2l1-2"/><circle cx="8" cy="15" r="1"/><circle cx="16" cy="15" r="1"/></svg>
+          <span>My Pigs</span>
+        </a>
+        <a class="nav-link active" href="marketplace.html" aria-current="page">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 9 12 4l9 5"/><path d="M5 10v9M9 10v9M15 10v9M19 10v9M3 20h18M2 9h20"/></svg>
+          <span>Marketplace</span>
+        </a>
+        <button class="nav-link nav-link-disabled" type="button" disabled>
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 21s8-4 8-11V5l-8-3-8 3v5c0 7 8 11 8 11Z"/><path d="M9 12h6M12 9v6"/></svg>
+          <span>Pig Health</span><span class="nav-soon">Soon</span>
+        </button>
+      </nav>
+      <div class="sidebar-bottom">
+        <p class="nav-caption">MORE</p>
+        <button class="nav-link nav-link-disabled" type="button" disabled>
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 19V5M4 19h17"/><path d="m7 15 4-4 3 2 5-6"/><path d="M16 7h3v3"/></svg>
+          <span>Reports</span><span class="nav-soon">Soon</span>
+        </button>
+        <button class="nav-link nav-link-disabled" type="button" disabled>
+          <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+          <span>Profile</span><span class="nav-soon">Soon</span>
+        </button>
+        <div class="sidebar-note"><strong>Your farm workspace</strong><span>Manage pig records, pens, and local listings in one place.</span></div>
+      </div>
+    </aside>
+
+    <div class="page-area">
+      <header class="topbar">
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">
+          <span class="sr-only">Toggle navigation</span><span></span><span></span><span></span>
+        </button>
+        <div class="topbar-context"><span class="topbar-label">Farm workspace</span><span class="topbar-location">Marinduque, Philippines</span></div>
+        <div class="topbar-actions">
+          <button class="notification-button" type="button" aria-label="Notifications (visual placeholder)" disabled>
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>
+            <span class="notification-dot" aria-hidden="true"></span>
+          </button>
+          <span class="topbar-divider" aria-hidden="true"></span>
+          <div class="user-summary"><span class="user-avatar" aria-hidden="true">F</span><span class="user-copy"><strong>Farm account</strong><small>Marinduque</small></span></div>
+        </div>
+      </header>
+
+      <main class="main-content marketplace-main" id="marketplace">
+        <section class="market-view" id="list-view" aria-labelledby="market-title">
+          <header class="market-hero">
+            <div class="market-hero-copy">
+              <p class="market-eyebrow">The local farmers' exchange</p>
+              <h1 id="market-title">Pig Marketplace</h1>
+              <p>Browse pigs for sale from local farmers.</p>
+            </div>
+            <button class="button button-primary market-post-button" id="post-listing" type="button"><span aria-hidden="true">＋</span> Post a Listing</button>
+            <div class="market-hero-foot"><span>MARINDUQUE, PHILIPPINES</span><span class="market-hero-separator" aria-hidden="true"></span><span>FARMER TO FARMER</span></div>
+            <span class="market-hero-orbit" aria-hidden="true"></span>
+          </header>
+
+          <section class="market-filter-panel" aria-label="Search and filter pig listings">
+            <label class="market-search-field">
+              <span class="market-search-mark" aria-hidden="true">⌕</span>
+              <span class="sr-only">Search by pig type, breed, or location</span>
+              <input id="market-search" type="search" placeholder="Search by pig type, breed, or location">
+            </label>
+            <div class="market-filter-row">
+              <label class="market-filter-field">Pig type
+                <select id="type-filter">
+                  <option value="all">All pig types</option>
+                  <option value="piglet">Piglet</option>
+                  <option value="grower">Grower</option>
+                  <option value="gilt">Gilt</option>
+                  <option value="sow">Sow</option>
+                  <option value="boar">Boar</option>
+                </select>
+              </label>
+              <label class="market-filter-field">Breed
+                <select id="breed-filter"><option value="all">All breeds</option></select>
+              </label>
+              <label class="market-filter-field">Estimated weight
+                <select id="weight-filter">
+                  <option value="all">Any weight</option>
+                  <option value="under-40">Under 40 kg</option>
+                  <option value="40-80">40–80 kg</option>
+                  <option value="80-120">80–120 kg</option>
+                  <option value="over-120">Over 120 kg</option>
+                </select>
+              </label>
+              <label class="market-filter-field">Location
+                <select id="location-filter"><option value="all">All locations</option></select>
+              </label>
+              <button class="market-reset-button" id="reset-filters" type="button">Reset filters</button>
+            </div>
+          </section>
+
+          <div class="market-results-heading">
+            <div><p class="market-section-kicker">For sale near you</p><h2>Listings from around Marinduque</h2></div>
+            <p class="market-result-count" id="listing-count" aria-live="polite"></p>
+          </div>
+          <p class="market-message" id="market-message" role="status" hidden></p>
+          <div class="market-listing-grid" id="listing-grid" aria-live="polite"></div>
+          <div class="market-empty-state" id="market-empty" hidden>
+            <span class="market-empty-mark" aria-hidden="true">⌕</span>
+            <h2>No listings match those filters</h2>
+            <p>Try a different search or reset your filters to see all pigs for sale.</p>
+            <button class="button button-secondary" id="empty-reset" type="button">Show all listings</button>
+          </div>
+          <footer class="page-footer"><span>PigMENT · Farm management</span><span>Marinduque, Philippines</span></footer>
+        </section>
+
+        <section class="market-view market-detail-view" id="detail-view" aria-labelledby="detail-title" hidden>
+          <button class="market-back-button" id="detail-back" type="button"><span aria-hidden="true">←</span> Back to Listings</button>
+          <div class="market-detail-layout" id="detail-content"></div>
+        </section>
+
+        <section class="market-view market-form-view" id="form-view" aria-labelledby="form-title" hidden>
+          <button class="market-back-button" id="form-back" type="button"><span aria-hidden="true">←</span> Back to Listings</button>
+          <header class="market-form-heading">
+            <p class="market-section-kicker">Share your farm's next sale</p>
+            <h1 id="form-title">Post a Listing</h1>
+            <p>Add a few details to help nearby farmers find the right pig.</p>
+          </header>
+          <div class="market-prototype-note"><strong>Session-only listing.</strong> Your listing will appear on this page until you leave. It will not be published.</div>
+          <p class="market-form-message" id="form-message" role="alert" hidden></p>
+          <form id="listing-form" novalidate>
+            <section class="market-form-section" aria-labelledby="pig-info-title">
+              <div class="market-form-section-heading"><span class="market-step-number">1</span><div><h2 id="pig-info-title">About the pig</h2><p>Start with the details buyers look for first.</p></div></div>
+              <div class="market-form-grid">
+                <label class="market-field market-field-wide">Listing title <span class="required-mark" aria-hidden="true">*</span>
+                  <input name="title" type="text" maxlength="60" placeholder="e.g. Healthy young native pig" required>
+                </label>
+                <label class="market-field">Pig type <span class="required-mark" aria-hidden="true">*</span>
+                  <select name="type" required><option value="">Choose a pig type</option><option value="Piglet">Piglet</option><option value="Grower">Grower</option><option value="Gilt">Gilt</option><option value="Sow">Sow</option><option value="Boar">Boar</option></select>
+                </label>
+                <label class="market-field">Breed <span class="required-mark" aria-hidden="true">*</span>
+                  <input name="breed" type="text" maxlength="40" placeholder="e.g. Native cross" required>
+                </label>
+                <label class="market-field">Sex <span class="required-mark" aria-hidden="true">*</span>
+                  <select name="sex" required><option value="">Choose sex</option><option value="Female">Female</option><option value="Male">Male</option><option value="Not sure">Not sure</option></select>
+                </label>
+                <label class="market-field">Age <span class="required-mark" aria-hidden="true">*</span>
+                  <input name="age" type="text" maxlength="30" placeholder="e.g. 5 months" required>
+                </label>
+                <label class="market-field">Estimated weight (kg) <span class="required-mark" aria-hidden="true">*</span>
+                  <input name="weight" type="number" min="0.1" max="1000" step="0.1" placeholder="e.g. 45" required>
+                  <small>An estimate is fine. Please label it as an estimate.</small>
+                </label>
+                <label class="market-field">Asking price (PHP) <span class="required-mark" aria-hidden="true">*</span>
+                  <input name="price" type="number" min="1" step="1" placeholder="e.g. 8,500" required>
+                </label>
+              </div>
+            </section>
+            <section class="market-form-section" aria-labelledby="seller-info-title">
+              <div class="market-form-section-heading"><span class="market-step-number">2</span><div><h2 id="seller-info-title">Where and a little more</h2><p>Share a general location and what makes this pig a good fit.</p></div></div>
+              <div class="market-form-grid">
+                <label class="market-field market-field-wide">Municipality or barangay <span class="required-mark" aria-hidden="true">*</span>
+                  <input name="location" type="text" maxlength="60" placeholder="e.g. Boac or Laylay, Boac" required>
+                  <small>A general location is enough. Do not include your home address.</small>
+                </label>
+                <label class="market-field market-field-wide">Description <span class="required-mark" aria-hidden="true">*</span>
+                  <textarea name="description" rows="4" maxlength="500" placeholder="Tell buyers about the pig's health, temperament, or care." required></textarea>
+                </label>
+              </div>
+            </section>
+            <section class="market-form-section market-image-section" aria-labelledby="image-title">
+              <div class="market-form-section-heading"><span class="market-step-number">3</span><div><h2 id="image-title">Add a photo <span class="market-optional-label">Optional</span></h2><p>A clear photo helps buyers see what you are offering.</p></div></div>
+              <label class="market-upload-area" id="upload-area">
+                <input id="listing-image" name="image" type="file" accept="image/*">
+                <span class="market-upload-icon" aria-hidden="true">↑</span>
+                <span class="market-upload-copy"><strong>Choose a photo</strong><span>Image files only · up to 5 MB</span></span>
+                <span class="market-upload-preview" id="upload-preview" hidden></span>
+              </label>
+            </section>
+            <div class="market-form-actions">
+              <button class="button button-secondary" id="cancel-listing" type="button">Cancel</button>
+              <button class="button button-primary" type="submit">Preview Listing <span aria-hidden="true">→</span></button>
+            </div>
+          </form>
+        </section>
+
+        <section class="market-view market-preview-view" id="preview-view" aria-labelledby="preview-title" hidden>
+          <button class="market-back-button" id="preview-back" type="button"><span aria-hidden="true">←</span> Back to editing</button>
+          <header class="market-form-heading"><p class="market-section-kicker">One last look</p><h1 id="preview-title">Preview your listing</h1><p>Check your details before adding this listing to the page.</p></header>
+          <div class="market-prototype-note"><strong>Session-only listing.</strong> Adding it here does not publish or share it.</div>
+          <div id="listing-preview"></div>
+          <div class="market-form-actions">
+            <button class="button button-secondary" id="edit-listing" type="button">Edit details</button>
+            <button class="button button-primary" id="save-listing" type="button">Add to Listings</button>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+</body>
+</html>
+>>>>>>> 36500ad6b618e26b6dd785fc4243f705f66be5c0

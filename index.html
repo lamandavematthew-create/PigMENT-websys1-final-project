@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -142,3 +143,135 @@
   </div>
 </body>
 </html>
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="PigMENT farm management dashboard for pig farmers in Marinduque.">
+  <title>Home | PigMENT</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="index.html" aria-label="PigMENT dashboard">
+        <span class="brand-mark" aria-hidden="true">P</span>
+        <span>Pig<span class="brand-accent">MENT</span><small>Farm management</small></span>
+      </a>
+      <p class="nav-caption">MAIN MENU</p>
+      <nav class="side-nav" aria-label="Main navigation">
+        <a class="nav-link active" href="index.html" aria-current="page">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          <span>Home</span>
+        </a>
+        <a class="nav-link" href="my-pigs.html">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 13v-2a2 2 0 0 1 2-2h1l2-3h6l2 3h1a2 2 0 0 1 2 2v2"/><path d="M5 13h14l1 3a2 2 0 0 1-2 2h-1"/><path d="M6 17H5a2 2 0 0 1-2-2l1-2"/><circle cx="8" cy="15" r="1"/><circle cx="16" cy="15" r="1"/></svg>
+          <span>My Pigs</span>
+        </a>
+        <a class="nav-link" href="marketplace.html">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 9 12 4l9 5"/><path d="M5 10v9M9 10v9M15 10v9M19 10v9M3 20h18M2 9h20"/></svg>
+          <span>Marketplace</span>
+        </a>
+        <button class="nav-link nav-link-disabled" type="button" disabled>
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 21s8-4 8-11V5l-8-3-8 3v5c0 7 8 11 8 11Z"/><path d="M9 12h6M12 9v6"/></svg>
+          <span>Pig Health</span><span class="nav-soon">Soon</span>
+        </button>
+      </nav>
+      <div class="sidebar-bottom">
+        <p class="nav-caption">MORE</p>
+        <button class="nav-link nav-link-disabled" type="button" disabled>
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 19V5M4 19h17"/><path d="m7 15 4-4 3 2 5-6"/><path d="M16 7h3v3"/></svg>
+          <span>Reports</span><span class="nav-soon">Soon</span>
+        </button>
+        <button class="nav-link nav-link-disabled" type="button" disabled>
+          <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+          <span>Profile</span><span class="nav-soon">Soon</span>
+        </button>
+        <div class="sidebar-note"><strong>Your farm workspace</strong><span>Manage pig records, pens, and local listings in one place.</span></div>
+      </div>
+    </aside>
+
+    <div class="page-area">
+      <header class="topbar">
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">
+          <span class="sr-only">Toggle navigation</span><span></span><span></span><span></span>
+        </button>
+        <div class="topbar-context"><span class="topbar-label">Farm workspace</span><span class="topbar-location">Marinduque, Philippines</span></div>
+        <div class="topbar-actions">
+          <button class="notification-button" type="button" aria-label="Notifications (visual placeholder)" disabled>
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>
+            <span class="notification-dot" aria-hidden="true"></span>
+          </button>
+          <span class="topbar-divider" aria-hidden="true"></span>
+          <div class="user-summary"><span class="user-avatar" aria-hidden="true">F</span><span class="user-copy"><strong>Farm account</strong><small>Marinduque</small></span></div>
+        </div>
+      </header>
+
+      <main class="main-content dashboard-main" id="dashboard">
+        <div class="page-heading dashboard-hero">
+          <div class="dashboard-hero-copy"><p class="eyebrow">Farm overview</p><h1>Welcome to your farm</h1><p class="page-description">Your farm at a glance. Choose what you would like to do.</p></div>
+          <div class="dashboard-hero-actions">
+            <a class="button button-primary hero-register-button" href="my-pigs.html#register-pig">Register a Pig <span aria-hidden="true">→</span></a>
+          </div>
+        </div>
+        <aside class="panel quick-actions-panel" aria-labelledby="quick-actions-title">
+          <div class="panel-heading"><div><p class="eyebrow">Quick actions</p><h2 id="quick-actions-title">What would you like to do?</h2></div></div>
+          <p class="quick-actions-intro">Start with a common farm task.</p>
+          <div class="quick-actions">
+            <a class="action-button" href="my-pigs.html#register-pig"><span class="action-icon" aria-hidden="true">＋</span><span><strong>Register a Pig</strong><small>Add a pig to your records</small></span><span class="action-arrow" aria-hidden="true">→</span></a>
+            <a class="action-button" href="my-pigs.html#pig-pens"><span class="action-icon" aria-hidden="true">▦</span><span><strong>Manage Pig Pens</strong><small>See your pens and pigs</small></span><span class="action-arrow" aria-hidden="true">→</span></a>
+            <a class="action-button" href="marketplace.html"><span class="action-icon" aria-hidden="true">▤</span><span><strong>Browse Marketplace</strong><small>See pigs for sale or post a listing</small></span><span class="action-arrow" aria-hidden="true">→</span></a>
+          </div>
+        </aside>
+        <section aria-labelledby="farm-snapshot-title">
+          <div class="summary-heading">
+            <div><h2 id="farm-snapshot-title">Farm snapshot</h2></div>
+          </div>
+          <div class="summary-grid" aria-label="Farm summary">
+          <article class="summary-card">
+            <div class="summary-card-heading"><span>Total pigs</span><span class="summary-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 13v-2a2 2 0 0 1 2-2h1l2-3h6l2 3h1a2 2 0 0 1 2 2v2"/><path d="M5 13h14l1 3a2 2 0 0 1-2 2h-1M6 17H5a2 2 0 0 1-2-2l1-2"/><circle cx="8" cy="15" r="1"/><circle cx="16" cy="15" r="1"/></svg></span></div>
+            <p class="summary-value">24</p><p class="summary-footnote"><span class="status-dot status-dot-green"></span> Pigs on your farm</p>
+          </article>
+          <article class="summary-card">
+            <div class="summary-card-heading"><span>Being monitored</span><span class="summary-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 12s3-6 9-6 9 6 9 6-3 6-9 6-9-6-9-6Z"/><circle cx="12" cy="12" r="2.5"/></svg></span></div>
+            <p class="summary-value">18</p><p class="summary-footnote"><span class="status-dot status-dot-green"></span> Under monitoring</p>
+          </article>
+          <article class="summary-card">
+            <div class="summary-card-heading"><span>Active marketplace listings</span><span class="summary-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 9 12 4l9 5"/><path d="M5 10v9M9 10v9M15 10v9M19 10v9M3 20h18M2 9h20"/></svg></span></div>
+            <p class="summary-value">6</p><p class="summary-footnote"><span class="status-dot status-dot-gray"></span> Available listings</p>
+          </article>
+          <article class="summary-card">
+            <div class="summary-card-heading"><span>Recent health reports</span><span class="summary-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21s8-4 8-11V5l-8-3-8 3v5c0 7 8 11 8 11Z"/><path d="M9 12h6M12 9v6"/></svg></span></div>
+            <p class="summary-value">2</p><p class="summary-footnote"><span class="status-dot status-dot-amber"></span> Recent reports</p>
+          </article>
+          </div>
+        </section>
+        <aside class="farm-reminder" aria-labelledby="farm-reminder-title">
+          <span class="reminder-icon" aria-hidden="true">!</span>
+          <div class="reminder-copy">
+            <p class="eyebrow">Farm reminder</p>
+            <h2 id="farm-reminder-title">Pig to check</h2>
+            <p>PG-011 is marked “Needs review.”</p>
+          </div>
+          <a class="button button-secondary" href="my-pigs.html">View My Pigs</a>
+        </aside>
+
+          <section class="panel activity-panel" aria-labelledby="activity-title">
+            <div class="panel-heading"><div><p class="eyebrow">Farm log</p><h2 id="activity-title">Recent activity</h2></div></div>
+            <div class="activity-list">
+              <article class="activity-item"><span class="activity-mark activity-mark-green" aria-hidden="true">+</span><div class="activity-details"><h3>Pig record added</h3><p>Pig ID PG-024 · Boac</p></div><div class="activity-meta"><time datetime="2026-11-04">Nov 4, 2026</time><span class="status-label status-label-success">Recorded</span></div></article>
+              <article class="activity-item"><span class="activity-mark activity-mark-earth" aria-hidden="true">↗</span><div class="activity-details"><h3>Marketplace listing posted</h3><p>Weaners · Gasan</p></div><div class="activity-meta"><time datetime="2026-11-02">Nov 2, 2026</time><span class="status-label status-label-neutral">Listed</span></div></article>
+              <article class="activity-item"><span class="activity-mark activity-mark-amber" aria-hidden="true">+</span><div class="activity-details"><h3>Health note submitted</h3><p>Health note · Mogpog</p></div><div class="activity-meta"><time datetime="2026-10-30">Oct 30, 2026</time><span class="status-label status-label-warning">Recorded</span></div></article>
+              <article class="activity-item"><span class="activity-mark activity-mark-gray" aria-hidden="true">↗</span><div class="activity-details"><h3>Weight estimate updated</h3><p>Pig ID PG-011 · 56.1 kg</p></div><div class="activity-meta"><time datetime="2026-10-28">Oct 28, 2026</time><span class="status-label status-label-neutral">Estimate</span></div></article>
+            </div>
+          </section>
+        <footer class="page-footer"><span>PigMENT · Farm management</span><span>Marinduque, Philippines</span></footer>
+      </main>
+    </div>
+  </div>
+</body>
+</html>
+>>>>>>> 36500ad6b618e26b6dd785fc4243f705f66be5c0
