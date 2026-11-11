@@ -5,7 +5,7 @@
   const detailContent = document.querySelector("#detail-content");
   const detailEmpty = document.querySelector("#detail-empty");
   const detailTitle = document.querySelector("#detail-title");
-  const confirmationStatus = document.querySelector("#detail-confirmation-status");
+  const adminRemarks = document.querySelector("#detail-admin-remarks");
   const confirmationDetails = document.querySelector("#detail-confirmation-details");
   const message = document.querySelector("#admin-message");
   const adminCount = document.querySelector("#admin-count");
@@ -18,6 +18,7 @@
   let selectedId = null;
   let zoneMap;
   let draftLayer;
+  let savedLayers;
 
   function dateLabel(value) {
     return value ? new Date(`${value}T00:00:00`).toLocaleDateString("en-PH", { year: "numeric", month: "short", day: "numeric" }) : "Not provided";
@@ -32,10 +33,11 @@
     return { type: "Polygon", coordinates: [coordinates] };
   }
 
+  function escapeHtml(value) { return String(value ?? "").replace(/[&<>"']/g, (ch) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch])); }
   function renderReports() {
     list.replaceChildren(...reports.map((report) => {
       const row = document.createElement("tr");
-      row.innerHTML = `<td><button class="table-link" type="button" data-report-id="${report.report_id}">Report #${report.report_id}</button></td><td>${report.municipality}, ${report.barangay}</td><td>${dateLabel(report.incident_date)}</td><td><span class="status-label">${statusLabel(report.report_status)}</span></td><td><button class="button button-secondary button-small" type="button" data-report-id="${report.report_id}">Inspect</button></td>`;
+      row.innerHTML = `<td><button class="table-link" type="button" data-report-id="${report.report_id}">Report #${report.report_id}</button></td><td>${escapeHtml(report.municipality)}, ${escapeHtml(report.barangay)}</td><td>${dateLabel(report.incident_date)}</td><td><span class="status-label">${statusLabel(report.report_status)}</span></td><td><button class="button button-secondary button-small" type="button" data-report-id="${report.report_id}">Inspect</button></td>`;
       return row;
     }));
     adminCount.textContent = `${reports.length} submitted report${reports.length === 1 ? "" : "s"}`;
@@ -52,7 +54,7 @@
     document.querySelector("#detail-date").textContent = dateLabel(report.incident_date);
     document.querySelector("#detail-reporter").textContent = report.reporter_name || "Farmer";
     document.querySelector("#detail-description").textContent = report.description;
-    confirmationStatus.value = report.report_status === "confirmed" ? "confirmed" : "pending";
+    adminRemarks.value = report.admin_remarks || "";
     confirmationDetails.value = "";
   }
 
@@ -61,6 +63,16 @@
       [reports, zones] = await Promise.all([window.PigmentDiseaseStore.loadReports("admin"), window.PigmentDiseaseStore.loadZones("admin")]);
       renderReports();
       renderZones();
+      if (zoneMap && window.L) {
+        if (savedLayers) savedLayers.remove();
+        savedLayers = L.geoJSON(zones.filter(z=>z.geometry).map(z=>({type:'Feature',geometry:z.geometry,properties:{zone_id:z.zone_id}})), {onEachFeature: (feature, layer) => layer.on('click',()=>loadZone(zones.find(z=>z.zone_id===feature.properties.zone_id)))});
+        savedLayers.addTo(zoneMap);
+      }
+      const select=zoneForm.elements.incidentReportId;
+      const current=select.value;
+      select.replaceChildren(new Option('None', ''));
+      reports.filter(r=>r.report_status==='confirmed').forEach(r=>select.add(new Option(`Report #${r.report_id} · ${r.municipality}`,r.report_id)));
+      select.value=current;
     } catch (error) {
       message.textContent = error.message;
     }
@@ -76,23 +88,33 @@
     if (!action || !selectedId) return;
     const report = reports.find((item) => item.report_id === selectedId);
     if (!report) return;
-    const isConfirmed = confirmationStatus.value === "confirmed";
-    const confirmation = isConfirmed ? {
-      confirmed_by_name: prompt("Confirming personnel or office:") || "",
-      designation: prompt("Professional designation:") || "",
-      organization: prompt("Confirming organization:") || "",
-      confirmation_date: new Date().toISOString().slice(0, 10),
-      confirmation_notes: confirmationDetails.value.trim()
-    } : null;
-    const status = action === "approved" ? "confirmed" : action === "under_review" ? "under_review" : "rejected";
+    const status = action === "publish" || action === "confirmed" ? "confirmed" : action === "under_review" ? "under_review" : "rejected";
+    const remarks = adminRemarks.value.trim();
+    if (action === "rejected" && remarks.length < 5) { message.textContent = "Provide a reason for rejection (at least five characters)."; return; }
+    if (!window.confirm(`Apply ${action.replaceAll('_', ' ')} to Report #${selectedId}?`)) return;
+    let confirmation = null;
+    if (action === "confirmed") {
+      confirmation = {
+        confirmed_by_name: document.querySelector("#confirmed-by").value.trim(),
+        designation: document.querySelector("#confirmation-designation").value.trim(),
+        organization: document.querySelector("#confirmation-organization").value.trim(),
+        confirmation_date: document.querySelector("#confirmation-date").value,
+        reference_number: document.querySelector("#confirmation-reference").value.trim(),
+        confirmation_notes: confirmationDetails.value.trim()
+      };
+      if (!confirmation.confirmed_by_name || !confirmation.designation || !confirmation.organization || !confirmation.confirmation_date) {
+        message.textContent = "Enter complete authorized veterinary confirmation details."; return;
+      }
+    }
+    if (action === "publish" && report.report_status !== "confirmed") { message.textContent = "Record verified confirmation before publishing."; return; }
     try {
       await window.PigmentDiseaseStore.updateReport(selectedId, {
         report_status: status,
-        admin_remarks: confirmationDetails.value.trim(),
+        admin_remarks: remarks,
         confirmation,
-        is_published: action === "approved"
+        is_published: action === "publish"
       });
-      message.textContent = action === "approved" ? "Report confirmed and published." : `Report marked ${statusLabel(status)}.`;
+      message.textContent = action === "publish" ? "Verified report published." : `Report marked ${statusLabel(status)}.`;
       await refresh();
       showReport(selectedId);
     } catch (error) {
@@ -100,6 +122,7 @@
     }
   });
 
+  function buttonZone(cell, text, handler) { const button=document.createElement('button'); button.type='button'; button.className='button button-secondary button-small'; button.textContent=text; button.addEventListener('click',handler); cell.append(button); }
   function renderZones() {
     zoneList.replaceChildren(...zones.map((zone) => {
       const row = document.createElement("tr");
@@ -115,16 +138,27 @@
         publish.className = "button button-primary button-small";
         publish.type = "button";
         publish.textContent = "Publish";
-        publish.addEventListener("click", () => updateZone(zone, true));
+        publish.addEventListener("click", () => { if (window.confirm('Publish this zone? An officially confirmed linked incident is required.')) updateZone(zone, true); });
         cell.append(publish);
       }
-      row.innerHTML = `<td><strong>${zone.zone_name}</strong></td><td>${zone.municipality}, ${zone.barangay || ""}</td><td>${zone.disease_type}</td><td>${zone.severity}</td><td>${zone.is_published ? "Published" : "Unpublished"}</td>`;
+      row.innerHTML = `<td><strong>${escapeHtml(zone.zone_name)}</strong></td><td>${escapeHtml(zone.municipality)}, ${escapeHtml(zone.barangay || "")}</td><td>${escapeHtml(zone.disease_type)}</td><td>${escapeHtml(zone.severity)}</td><td>${zone.is_published ? "Published" : "Unpublished"}</td>`;
+      if (zone.is_published) { buttonZone(cell, 'Unpublish', () => updateZone(zone, false)); }
+      buttonZone(cell, 'Resolve', () => updateZone(zone, false, 'resolved'));
       row.append(cell);
       return row;
     }));
   }
 
   function loadZone(zone) {
+    if (!zone) return;
+    if (zoneMap && window.L && zone.geometry) {
+      if (draftLayer) zoneMap.removeLayer(draftLayer);
+      draftLayer = L.geoJSON(zone.geometry).getLayers()[0];
+      draftLayer.addTo(zoneMap);
+      if (draftLayer.pm) draftLayer.pm.enable();
+      draftLayer.on('pm:edit',()=>{zoneForm.elements.geometry.value=JSON.stringify(geometryFromLayer(draftLayer));});
+      zoneMap.fitBounds(draftLayer.getBounds());
+    }
     zoneForm.hidden = false;
     zoneForm.elements.zoneId.value = zone.zone_id;
     zoneForm.elements.name.value = zone.zone_name;
@@ -135,7 +169,8 @@
     zoneForm.elements.status.value = zone.zone_status === "suspected" ? "monitoring" : zone.zone_status;
     zoneForm.elements.description.value = zone.description || "";
     zoneForm.elements.geometry.value = JSON.stringify(zone.geometry);
-    zoneForm.dataset.published = zone.is_published ? "true" : "false";
+    zoneForm.elements.isPublished.checked = Boolean(zone.is_published);
+    zoneForm.elements.incidentReportId.value = zone.report_id || "";
     zoneMessage.textContent = "Update the zone details or draw a new boundary before saving.";
   }
 
@@ -176,7 +211,8 @@
         zone_status: values.status,
         description: values.description,
         geometry: JSON.parse(values.geometry || "null"),
-        is_published: zoneForm.dataset.published === "true"
+        report_id: values.incidentReportId || null,
+        is_published: Boolean(zoneForm.elements.isPublished.checked)
       });
       zoneForm.hidden = true;
       zoneMessage.textContent = "Zone saved.";
