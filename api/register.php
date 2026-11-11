@@ -1,32 +1,25 @@
 
 <?php
 
-header('Content-Type: application/json; charset=utf-8');
+require_once __DIR__ . '/config.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Allow: POST');
-    http_response_code(405);
-    echo json_encode([
-        'status' => 'error',
-        'message' => 'Method not allowed.'
-    ]);
-    exit;
+    sendResponse(405, 'error', 'Method not allowed.');
 }
 
-session_start();
+requireCsrf();
 
 try {
     require_once __DIR__ . '/../database/db.php';
 
-    $data = json_decode(file_get_contents('php://input'), true);
+    $data = json_decode(
+        file_get_contents('php://input'),
+        true
+    );
 
     if (!is_array($data)) {
-        http_response_code(400);
-        echo json_encode([
-            'status' => 'error',
-            'message' => 'Invalid JSON request.'
-        ]);
-        exit;
+        sendResponse(400, 'error', 'Invalid JSON request.');
     }
 
     $firstName = trim($data['first_name'] ?? '');
@@ -38,6 +31,7 @@ try {
     $barangay = trim($data['barangay'] ?? '');
     $address = trim($data['address'] ?? '');
 
+    // Check required fields
     if (
         $firstName === '' ||
         $lastName === '' ||
@@ -47,34 +41,69 @@ try {
         $municipality === '' ||
         $barangay === ''
     ) {
-        http_response_code(422);
-        echo json_encode([
-            'status' => 'error',
-            'message' => 'Please complete all required fields.'
-        ]);
-        exit;
+        sendResponse(
+            422,
+            'error',
+            'Please complete all required fields.'
+        );
     }
 
+    // Validate email
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        http_response_code(422);
-        echo json_encode([
-            'status' => 'error',
-            'message' => 'Please enter a valid email address.'
-        ]);
-        exit;
+        sendResponse(422, 'error', 'Invalid email address.');
     }
 
-    if (strlen($password) < 8) {
-        http_response_code(422);
-        echo json_encode([
-            'status' => 'error',
-            'message' => 'Password must contain at least 8 characters.'
-        ]);
-        exit;
+    // Validate password
+    if (!is_string($password) || strlen($password) < 8) {
+        sendResponse(
+            422,
+            'error',
+            'Password must contain at least 8 characters.'
+        );
     }
 
-    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+    if (strlen($password) > 72) {
+        sendResponse(
+            422,
+            'error',
+            'Password must not exceed 72 bytes.'
+        );
+    }
 
+    // Check field lengths
+    if (
+        strlen($firstName) > 100 ||
+        strlen($lastName) > 100 ||
+        strlen($email) > 150 ||
+        strlen($phoneNumber) > 20 ||
+        strlen($municipality) > 100 ||
+        strlen($barangay) > 100
+    ) {
+        sendResponse(422, 'error', 'One or more fields are too long.');
+    }
+
+    // Check whether the email exists
+    $stmt = $pdo->prepare(
+        "SELECT user_id FROM users WHERE email = ?"
+    );
+
+    $stmt->execute([$email]);
+
+    if ($stmt->fetch()) {
+        sendResponse(
+            409,
+            'error',
+            'This email is already registered.'
+        );
+    }
+
+    // Hash password
+    $hashedPassword = password_hash(
+        $password,
+        PASSWORD_DEFAULT
+    );
+
+    // Insert farmer account
     $stmt = $pdo->prepare(
         "INSERT INTO users (
             first_name,
@@ -87,58 +116,40 @@ try {
             barangay,
             role,
             account_status
-        ) VALUES (
-            :first_name,
-            :last_name,
-            :email,
-            :password,
-            :phone_number,
-            :address,
-            :municipality,
-            :barangay,
-            'farmer',
-            'active'
-        )"
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'farmer', 'active')"
     );
 
     $stmt->execute([
-        ':first_name' => $firstName,
-        ':last_name' => $lastName,
-        ':email' => $email,
-        ':password' => $hashedPassword,
-        ':phone_number' => $phoneNumber,
-        ':address' => $address ?: null,
-        ':municipality' => $municipality,
-        ':barangay' => $barangay
+        $firstName,
+        $lastName,
+        $email,
+        $hashedPassword,
+        $phoneNumber,
+        $address ?: null,
+        $municipality,
+        $barangay
     ]);
 
-    http_response_code(201);
-
-    echo json_encode([
-        'status' => 'success',
-        'message' => 'Account registered successfully.'
-    ]);
+    sendResponse(
+        201,
+        'success',
+        'Account registered successfully.'
+    );
 
 } catch (PDOException $e) {
+    error_log($e->getMessage());
+
     if ($e->getCode() === '23000') {
-        http_response_code(409);
-        echo json_encode([
-            'status' => 'error',
-            'message' => 'This email address is already registered.'
-        ]);
-    } else {
-        error_log($e->getMessage());
-        http_response_code(500);
-        echo json_encode([
-            'status' => 'error',
-            'message' => 'Registration failed.'
-        ]);
+        sendResponse(
+            409,
+            'error',
+            'This email is already registered.'
+        );
     }
+
+    sendResponse(500, 'error', 'Registration failed.');
+
 } catch (Throwable $e) {
     error_log($e->getMessage());
-    http_response_code(500);
-    echo json_encode([
-        'status' => 'error',
-        'message' => 'An unexpected error occurred.'
-    ]);
+    sendResponse(500, 'error', 'An unexpected error occurred.');
 }

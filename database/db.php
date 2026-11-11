@@ -1,10 +1,18 @@
-<?php
-declare(strict_types=1);
 
-$host = 'localhost';
-$dbname = 'pigment_db';
-$username = 'root';
-$password = ''; // Local XAMPP default only
+<?php
+
+$host = getenv('DB_HOST') ?: 'localhost';
+$dbname = getenv('DB_NAME') ?: 'pigment_db';
+$username = getenv('DB_USER');
+$password = getenv('DB_PASSWORD');
+
+if ($username === false) {
+    $username = 'root'; // Local XAMPP only
+}
+
+if ($password === false) {
+    $password = ''; // Local XAMPP only
+}
 
 try {
     $pdo = new PDO(
@@ -17,11 +25,13 @@ try {
             PDO::ATTR_EMULATE_PREPARES => false
         ]
     );
+
 } catch (PDOException $e) {
     error_log($e->getMessage());
+
     http_response_code(500);
 
     throw new RuntimeException(
-        'Database connection unavailable.'
+        'Database connection failed.'
     );
 }

@@ -1,39 +1,23 @@
 
 <?php
 
-header('Content-Type: application/json; charset=utf-8');
+require_once __DIR__ . '/config.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Allow: POST');
-    http_response_code(405);
-
-    echo json_encode([
-        'status' => 'error',
-        'message' => 'Method not allowed.'
-    ]);
-    exit;
+    sendResponse(405, 'error', 'Method not allowed.');
 }
 
-ini_set('session.use_strict_mode', '1');
-ini_set('session.use_only_cookies', '1');
-ini_set('session.cookie_httponly', '1');
+requireCsrf();
 
-session_start();
-
-if (!isset($_SESSION['user_id'])) {
-    http_response_code(401);
-
-    echo json_encode([
-        'status' => 'error',
-        'message' => 'Not authenticated.'
-    ]);
-    exit;
+if (empty($_SESSION['user_id'])) {
+    sendResponse(401, 'error', 'Not authenticated.');
 }
 
-// Clear session data
+// Clear all session information
 $_SESSION = [];
 
-// Remove the session cookie
+// Delete the session cookie
 if (ini_get('session.use_cookies')) {
     $params = session_get_cookie_params();
 
@@ -47,10 +31,11 @@ if (ini_get('session.use_cookies')) {
     ]);
 }
 
-// Destroy the server-side session
+// Destroy the session
 session_destroy();
 
-echo json_encode([
-    'status' => 'success',
-    'message' => 'Logged out successfully.'
-]);
+sendResponse(
+    200,
+    'success',
+    'Logged out successfully.'
+);
