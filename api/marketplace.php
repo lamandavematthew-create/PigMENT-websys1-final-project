@@ -32,10 +32,17 @@ try {
             $ownerId = (int) $user['user_id'];
 
             $stmt = $pdo->prepare(
-                "SELECT *
-                 FROM marketplace_listings
-                 WHERE seller_id = ?
-                 ORDER BY created_at DESC, listing_id DESC"
+                "SELECT m.*,
+                        (
+                            SELECT li.image_path
+                            FROM listing_images li
+                            WHERE li.listing_id = m.listing_id
+                            ORDER BY li.is_primary DESC, li.image_id ASC
+                            LIMIT 1
+                        ) AS primary_image
+                 FROM marketplace_listings m
+                 WHERE m.seller_id = ?
+                 ORDER BY m.created_at DESC, m.listing_id DESC"
             );
 
             $stmt->execute([$ownerId]);
@@ -81,6 +88,35 @@ try {
 
         $params = [];
 
+        if (isset($_GET['search']) && $_GET['search'] !== '') {
+            if (!is_string($_GET['search']) || strlen($_GET['search']) > 100) {
+                sendResponse(422, 'error', 'Invalid search term.');
+            }
+            $term = '%' . trim($_GET['search']) . '%';
+            $sql .= " AND (m.listing_title LIKE ? OR m.pig_type LIKE ? OR m.breed LIKE ? OR m.municipality LIKE ? OR m.barangay LIKE ?)";
+            array_push($params, $term, $term, $term, $term, $term);
+        }
+
+        if (isset($_GET['pig_type']) && $_GET['pig_type'] !== '') {
+            $sql .= " AND m.pig_type = ?";
+            $params[] = trim((string) $_GET['pig_type']);
+        }
+
+        if (isset($_GET['breed']) && $_GET['breed'] !== '') {
+            $sql .= " AND m.breed = ?";
+            $params[] = trim((string) $_GET['breed']);
+        }
+
+        if (isset($_GET['weight_min']) && $_GET['weight_min'] !== '') {
+            $sql .= " AND m.estimated_weight >= ?";
+            $params[] = (float) $_GET['weight_min'];
+        }
+
+        if (isset($_GET['weight_max']) && $_GET['weight_max'] !== '') {
+            $sql .= " AND m.estimated_weight <= ?";
+            $params[] = (float) $_GET['weight_max'];
+        }
+
         // Optional municipality filter
         if (isset($_GET['municipality']) &&
             $_GET['municipality'] !== '') {
@@ -114,7 +150,9 @@ try {
 
         // Limit public browsing results
         if (!isset($_GET['id'])) {
-            $sql .= " LIMIT 50";
+            $limit = filter_var($_GET['limit'] ?? 50, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => 50]]);
+            $offset = filter_var($_GET['offset'] ?? 0, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]]);
+            $sql .= " LIMIT " . ($limit ?: 50) . " OFFSET " . ($offset ?: 0);
         }
 
         $stmt = $pdo->prepare($sql);
