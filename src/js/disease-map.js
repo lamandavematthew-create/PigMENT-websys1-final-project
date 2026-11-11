@@ -55,6 +55,15 @@
     if (showDisease) window.setTimeout(() => map.invalidateSize(), 0);
   }
 
+  function shouldShowDiseaseView(hash) {
+    const target = (hash || window.location.hash || "").replace(/^#/, "");
+    return ["disease-awareness", "health-guide", "disease-map-section", "submit-report", "my-reports"].includes(target);
+  }
+
+  function syncDiseaseViewFromHash() {
+    showView(shouldShowDiseaseView(window.location.hash) ? "disease" : "dashboard");
+  }
+
   healthNavLink?.addEventListener("click", (event) => {
     event.preventDefault();
     window.history.replaceState(null, "", "#disease-awareness");
@@ -65,7 +74,8 @@
     window.history.replaceState(null, "", "#dashboard");
     showView("dashboard");
   });
-  if (window.location.hash === "#disease-awareness") showView("disease");
+  window.addEventListener("hashchange", syncDiseaseViewFromHash);
+  syncDiseaseViewFromHash();
 
   function matchesFilters(item, isZone) {
     return (!municipalityFilter.value || item.municipality === municipalityFilter.value) &&

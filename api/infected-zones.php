@@ -36,7 +36,7 @@ try {
         $sql = "SELECT z.*, r.report_status FROM infected_zones z LEFT JOIN disease_reports r ON r.report_id = z.report_id";
         $params = [];
         if ($scope === 'public') {
-            $sql .= " WHERE z.is_published = 1 AND z.zone_status IN ('confirmed', 'monitoring', 'resolved')";
+            $sql .= " WHERE z.is_published = 1 AND z.zone_status IN ('confirmed', 'monitoring', 'resolved') AND z.report_id IS NOT NULL AND EXISTS (SELECT 1 FROM disease_reports dr JOIN disease_confirmations dc ON dc.report_id=dr.report_id WHERE dr.report_id=z.report_id AND dr.report_status='confirmed')";
         } else {
             requireAdmin($pdo);
         }
@@ -80,6 +80,13 @@ try {
         if (!$stmt->fetch()) {
             sendResponse(422, 'error', 'Confirmed zones require a report with authorized confirmation.');
         }
+    }
+    if ($published) {
+        $reportId = filter_var($data['report_id'] ?? null, FILTER_VALIDATE_INT, ['options'=>['min_range'=>1]]);
+        if (!$reportId || !in_array($data['zone_status'], ['confirmed','monitoring','resolved'], true)) sendResponse(422,'error','Publication requires an eligible zone and a verified report.');
+        $check = $pdo->prepare("SELECT r.report_id FROM disease_reports r JOIN disease_confirmations c ON c.report_id=r.report_id WHERE r.report_id=? AND r.report_status='confirmed'");
+        $check->execute([$reportId]);
+        if (!$check->fetch()) sendResponse(422,'error','Publication requires an officially confirmed associated incident.');
     }
     if ($zoneId) {
         $stmt = $pdo->prepare(

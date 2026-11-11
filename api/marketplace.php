@@ -86,6 +86,12 @@ try {
             AND u.account_status = 'active'
         ";
 
+        // Keep admin-hidden listings out of public browsing, independent of seller status.
+        $moderationTable = $pdo->query("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=DATABASE() AND table_name='listing_moderation'")->fetchColumn();
+        if ($moderationTable) {
+            $sql .= " AND NOT EXISTS (SELECT 1 FROM listing_moderation lm WHERE lm.listing_id = m.listing_id AND lm.is_hidden = 1)";
+        }
+
         $params = [];
 
         if (isset($_GET['search']) && $_GET['search'] !== '') {

@@ -160,9 +160,9 @@
   }
 
   function getAuthenticatedDestination(user) {
-    if (user.role === "admin") return "pages/admin-disease-reports.html";
+    if (user.role === "admin") return "pages/admin-dashboard.html";
     const next = getSafeNext();
-    return next && !next.includes("admin-disease-reports.html") ? next : "index.html";
+    return next && !next.includes("admin-") ? next : "index.html";
   }
 
   async function redirectIfAuthenticated() {
