@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Review a summary of your PigMENT farm records.">
+  <title>My Farm Reports | PigMENT</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/script.js" defer></script>
+  <script src="../js/auth.js" defer></script>
+  <script src="../js/reports.js" defer></script>
+</head>
+<body data-requires-auth="true" data-auth-pending="true">
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="../index.html" aria-label="PigMENT dashboard">
+        <img class="brand-logo" src="../../public/assets/pigment-logo.png" alt="">
+        <span>Pig<span class="brand-accent">MENT</span><small>Farm management</small></span>
+      </a>
+      <p class="nav-caption">MAIN MENU</p>
+      <nav class="side-nav" aria-label="Main navigation">
+        <a class="nav-link" href="../index.html"><span aria-hidden="true">▦</span><span>Home</span></a>
+        <a class="nav-link" href="my-pigs.html"><span aria-hidden="true">◉</span><span>My Pigs</span></a>
+        <a class="nav-link" href="marketplace.html"><span aria-hidden="true">▤</span><span>Marketplace</span></a>
+        <a class="nav-link" href="../index.html#disease-awareness"><span aria-hidden="true">⌖</span><span>Pig Health</span></a>
+      </nav>
+      <div class="sidebar-bottom">
+        <p class="nav-caption">MORE</p>
+        <a class="nav-link active" href="reports.html" aria-current="page"><span aria-hidden="true">▥</span><span>Reports</span></a>
+        <a class="nav-link" href="profile.html"><span aria-hidden="true">◎</span><span>Profile</span></a>
+        <div class="sidebar-note"><strong>Your farm workspace</strong><span>Review actual livestock and marketplace records in one place.</span></div>
+      </div>
+    </aside>
+
+    <div class="page-area">
+      <header class="topbar">
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar"><span class="sr-only">Toggle navigation</span><span></span><span></span><span></span></button>
+        <div class="topbar-context"><span class="topbar-label">Farm workspace</span><span class="topbar-location">My Farm Reports</span></div>
+        <div class="topbar-actions">
+          <div class="user-summary"><span class="user-avatar" aria-hidden="true">F</span><span class="user-copy"><strong>Farm account</strong><small>Farmer account</small></span><button class="button button-secondary auth-logout" type="button">Log out</button></div>
+        </div>
+      </header>
+
+      <main class="main-content reports-page">
+        <div class="page-heading">
+          <div><p class="eyebrow">Farm overview</p><h1>My Farm Reports</h1><p class="page-description">A summary of records saved to your authenticated farm account.</p></div>
+          <button class="button button-primary" id="print-report" type="button">Print Report</button>
+        </div>
+        <p class="form-message" id="reports-message" role="status" hidden></p>
+
+        <section aria-labelledby="farm-summary-title">
+          <div class="section-heading"><div><p class="eyebrow">Livestock</p><h2 id="farm-summary-title">Farm Summary</h2></div></div>
+          <div class="report-card-grid">
+            <article class="report-stat-card"><span>Total registered pigs</span><strong id="total-pigs">—</strong></article>
+            <article class="report-stat-card"><span>Active pigs</span><strong id="active-pigs">—</strong></article>
+            <article class="report-stat-card"><span>Sold pigs</span><strong id="sold-pigs">—</strong></article>
+            <article class="report-stat-card"><span>Deceased pigs</span><strong id="deceased-pigs">—</strong></article>
+          </div>
+        </section>
+
+        <section class="report-section" aria-labelledby="pens-summary-title">
+          <div class="section-heading"><div><p class="eyebrow">Housing</p><h2 id="pens-summary-title">Pig Pen Summary</h2></div></div>
+          <p class="small-muted" id="pen-summary-note">Occupancy counts current active pig assignments only.</p>
+          <div class="report-card-grid report-card-grid-compact">
+            <article class="report-stat-card"><span>Total active pens</span><strong id="active-pen-count">—</strong><small>Active pen records</small></article>
+          </div>
+          <div class="report-card-grid report-card-grid-compact" id="pen-summary"></div>
+        </section>
+
+        <section class="report-section" aria-labelledby="growth-summary-title">
+          <div class="section-heading"><div><p class="eyebrow">Monitoring</p><h2 id="growth-summary-title">Growth Summary</h2></div></div>
+          <p class="small-muted">Weights shown are the latest recorded estimates; no new estimates are calculated here.</p>
+          <div class="report-table-wrap"><table class="data-table report-table"><thead><tr><th>Pig</th><th>Estimated weight</th><th>Measurement date</th></tr></thead><tbody id="growth-summary"></tbody></table></div>
+        </section>
+
+        <section class="report-section report-two-column" aria-labelledby="litter-summary-title">
+          <div><p class="eyebrow">Breeding records</p><h2 id="litter-summary-title">Litter Summary</h2><p class="report-big-number" id="total-litters">—</p><p class="small-muted">Total recorded litters</p></div>
+          <div id="litter-summary" class="litter-summary"></div>
+        </section>
+
+        <section class="report-section" aria-labelledby="marketplace-summary-title">
+          <div class="section-heading"><div><p class="eyebrow">Selling activity</p><h2 id="marketplace-summary-title">Marketplace Summary</h2></div><a class="button button-secondary" href="marketplace.html">Open Marketplace</a></div>
+          <div class="report-card-grid report-card-grid-compact">
+            <article class="report-stat-card"><span>Active listings</span><strong id="active-listings">—</strong></article>
+            <article class="report-stat-card"><span>Sold listings</span><strong id="sold-listings">—</strong></article>
+            <article class="report-stat-card"><span>Inactive listings</span><strong id="inactive-listings">—</strong></article>
+          </div>
+        </section>
+
+        <p class="report-health-link">Looking for submitted disease reports? Open <a href="../index.html#my-reports">Pig Health → My Reports</a>.</p>
+        <footer class="page-footer"><span>PigMENT · My Farm Reports</span><span>Summary generated from your current records.</span></footer>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

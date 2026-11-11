@@ -16,15 +16,16 @@
   const emptyMessage = document.querySelector("#map-empty");
   const reportForm = document.querySelector("#disease-report-form");
   const reportMessage = document.querySelector("#report-form-message");
+  const reportLocation = document.querySelector("#selected-report-location");
+  const reportLatitude = reportForm?.elements.namedItem("latitude");
+  const reportLongitude = reportForm?.elements.namedItem("longitude");
   const map = L.map(mapElement).setView([13.43, 121.96], 10);
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    maxZoom: 18,
-    attribution: "&copy; OpenStreetMap contributors"
-  }).addTo(map);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18, attribution: "&copy; OpenStreetMap contributors" }).addTo(map);
   const markerLayer = L.layerGroup().addTo(map);
   const zoneLayer = L.layerGroup().addTo(map);
   let reports = [];
   let zones = [];
+  let selectedLocationMarker = null;
 
   const zoneStyles = {
     confirmed: { color: "#b42318", fillColor: "#dc2626", fillOpacity: 0.34 },
@@ -33,155 +34,145 @@
   };
 
   function escapeHtml(value) {
-    return String(value || "").replace(/[&<>"']/g, (character) => ({
-      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
-    }[character]));
+    return String(value || "").replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[character]));
   }
 
   function dateLabel(date) {
-    if (!date) return "Not provided";
-    return new Date(`${date}T00:00:00`).toLocaleDateString("en-PH", {
-      year: "numeric", month: "short", day: "numeric"
-    });
+    return date ? new Date(`${date}T00:00:00`).toLocaleDateString("en-PH", { year: "numeric", month: "short", day: "numeric" }) : "Not provided";
   }
 
   function statusLabel(status) {
-    return { confirmed: "Officially confirmed", monitoring: "Under monitoring", resolved: "Resolved" }[status] || status;
+    return { pending: "Pending Review", under_review: "Under Review", confirmed: "Confirmed", rejected: "Rejected" }[status] || status;
   }
 
   function showView(view) {
     const showDisease = view === "disease";
     if (dashboardView) dashboardView.hidden = showDisease;
     if (diseaseView) diseaseView.hidden = !showDisease;
-    if (healthNavLink) {
-      healthNavLink.classList.toggle("active", showDisease);
-      healthNavLink.setAttribute("aria-current", showDisease ? "page" : "false");
-    }
-    if (homeNavLink) {
-      homeNavLink.classList.toggle("active", !showDisease);
-      homeNavLink.setAttribute("aria-current", showDisease ? "false" : "page");
-    }
+    healthNavLink?.classList.toggle("active", showDisease);
+    homeNavLink?.classList.toggle("active", !showDisease);
     if (workspaceLabel) workspaceLabel.textContent = showDisease ? "Pig Health" : "Farm workspace";
     if (showDisease) window.setTimeout(() => map.invalidateSize(), 0);
   }
 
-  if (healthNavLink && dashboardView && diseaseView) {
-    healthNavLink.addEventListener("click", (event) => {
-      event.preventDefault();
-      window.history.replaceState(null, "", "#disease-awareness");
-      showView("disease");
-    });
-    homeNavLink.addEventListener("click", (event) => {
-      event.preventDefault();
-      window.history.replaceState(null, "", "#dashboard");
-      showView("dashboard");
-    });
-    if (window.location.hash === "#disease-awareness") showView("disease");
-  }
+  healthNavLink?.addEventListener("click", (event) => {
+    event.preventDefault();
+    window.history.replaceState(null, "", "#disease-awareness");
+    showView("disease");
+  });
+  homeNavLink?.addEventListener("click", (event) => {
+    event.preventDefault();
+    window.history.replaceState(null, "", "#dashboard");
+    showView("dashboard");
+  });
+  if (window.location.hash === "#disease-awareness") showView("disease");
 
   function matchesFilters(item, isZone) {
     return (!municipalityFilter.value || item.municipality === municipalityFilter.value) &&
-      (!diseaseFilter.value || item.diseaseType === diseaseFilter.value) &&
-      (!isZone || !zoneStatusFilter.value || item.status === zoneStatusFilter.value);
+      (!diseaseFilter.value || item.disease_type === diseaseFilter.value) &&
+      (!isZone || !zoneStatusFilter.value || item.zone_status === zoneStatusFilter.value);
   }
 
   function populateFilters() {
-    const municipalities = [...new Set(reports.concat(zones).map((item) => item.municipality))].sort();
-    const diseases = [...new Set(reports.concat(zones).map((item) => item.diseaseType))].sort();
-    municipalityFilter.innerHTML = '<option value="">All municipalities</option>' +
-      municipalities.map((item) => `<option value="${escapeHtml(item)}">${escapeHtml(item)}</option>`).join("");
-    diseaseFilter.innerHTML = '<option value="">All disease types</option>' +
-      diseases.map((item) => `<option value="${escapeHtml(item)}">${escapeHtml(item)}</option>`).join("");
-  }
-
-  function zonePopup(zone) {
-    return `<strong>${escapeHtml(zone.name)}</strong><br>
-      Municipality: ${escapeHtml(zone.municipality)}<br>
-      Affected location: ${escapeHtml(zone.barangay)}<br>
-      Disease: ${escapeHtml(zone.diseaseType)}<br>
-      Severity: ${escapeHtml(zone.severity)}<br>
-      Date reported: ${escapeHtml(dateLabel(zone.dateReported))}<br>
-      Status: ${escapeHtml(statusLabel(zone.status))}<br>
-      ${zone.confirmationDetails ? `Confirmation: ${escapeHtml(zone.confirmationDetails)}<br>` : ""}
-      <small>FICTIONAL DEMONSTRATION DATA</small>`;
+    const municipalities = [...new Set(reports.concat(zones).map((item) => item.municipality).filter(Boolean))].sort();
+    const diseases = [...new Set(reports.concat(zones).map((item) => item.disease_type).filter(Boolean))].sort();
+    municipalityFilter.innerHTML = '<option value="">All municipalities</option>' + municipalities.map((item) => `<option value="${escapeHtml(item)}">${escapeHtml(item)}</option>`).join("");
+    diseaseFilter.innerHTML = '<option value="">All disease types</option>' + diseases.map((item) => `<option value="${escapeHtml(item)}">${escapeHtml(item)}</option>`).join("");
   }
 
   function renderMap() {
     markerLayer.clearLayers();
     zoneLayer.clearLayers();
-    const visibleZones = zones.filter((zone) => window.PigmentDiseaseStore.isZoneVisible(zone))
-      .filter((zone) => matchesFilters(zone, true));
-    const visibleReports = reports.filter((report) => window.PigmentDiseaseStore.isPublished(report))
-      .filter((report) => matchesFilters(report, false));
-
-    visibleZones.forEach((zone) => {
-      const style = zoneStyles[zone.status] || zoneStyles.monitoring;
-      L.geoJSON({ type: "Feature", properties: zone, geometry: zone.geometry }, {
-        style,
-        onEachFeature: (feature, layer) => layer.bindPopup(zonePopup(feature.properties))
-      }).addTo(zoneLayer);
-    });
-    visibleReports.forEach((report) => {
-      const isSuspected = report.confirmationStatus !== "confirmed";
-      const marker = L.circleMarker([report.latitude, report.longitude], {
-        radius: 8,
-        color: isSuspected ? "#a16207" : "#b42318",
-        fillColor: isSuspected ? "#facc15" : "#dc2626",
-        fillOpacity: 0.95,
-        weight: 2
-      });
-      marker.bindPopup(`<strong>${escapeHtml(report.diseaseType)}</strong><br>
-        Location: ${escapeHtml(report.municipality)}, ${escapeHtml(report.barangay)}<br>
-        Incident date: ${escapeHtml(dateLabel(report.incidentDate))}<br>
-        Publication: Published fictional report<br><small>FICTIONAL DEMONSTRATION DATA</small>`);
-      marker.addTo(markerLayer);
-    });
-
+    const visibleZones = zones.filter(window.PigmentDiseaseStore.isZoneVisible).filter((item) => matchesFilters(item, true));
+    const visibleReports = reports.filter(window.PigmentDiseaseStore.isPublished).filter((item) => matchesFilters(item, false));
+    visibleZones.forEach((zone) => L.geoJSON({ type: "Feature", properties: zone, geometry: zone.geometry }, { style: zoneStyles[zone.zone_status] || zoneStyles.monitoring, onEachFeature: (feature, layer) => layer.bindPopup(`<strong>${escapeHtml(zone.zone_name)}</strong><br>Municipality: ${escapeHtml(zone.municipality)}<br>Disease: ${escapeHtml(zone.disease_type)}<br>Status: ${escapeHtml(zone.zone_status)}`) }).addTo(zoneLayer));
+    visibleReports.forEach((report) => L.circleMarker([report.latitude, report.longitude], { radius: 8, color: "#b42318", fillColor: "#dc2626", fillOpacity: 0.95, weight: 2 }).bindPopup(`<strong>${escapeHtml(report.disease_type)}</strong><br>Location: ${escapeHtml(report.municipality)}, ${escapeHtml(report.barangay)}<br>Incident date: ${escapeHtml(dateLabel(report.incident_date))}<br>Status: Confirmed`).addTo(markerLayer));
     const total = visibleZones.length + visibleReports.length;
     mapCount.textContent = `${visibleZones.length} zone${visibleZones.length === 1 ? "" : "s"} and ${visibleReports.length} incident marker${visibleReports.length === 1 ? "" : "s"} shown`;
     emptyMessage.hidden = total !== 0;
   }
 
-  function refresh() {
-    reports = window.PigmentDiseaseStore.loadReports();
-    zones = window.PigmentDiseaseStore.loadZones();
-    populateFilters();
-    renderMap();
+  async function refresh() {
+    try {
+      [reports, zones] = await Promise.all([window.PigmentDiseaseStore.loadReports(), window.PigmentDiseaseStore.loadZones()]);
+      populateFilters();
+      renderMap();
+    } catch (error) {
+      mapCount.textContent = error.message;
+      emptyMessage.hidden = false;
+    }
+
+  }
+
+  async function loadMyReports() {
+    const list = document.querySelector("#my-reports-list");
+    if (!list) return;
+    try {
+      const user = await window.PigmentAuth.getSession();
+      if (!user) return;
+      const ownReports = await window.PigmentDiseaseStore.loadReports("mine");
+      list.replaceChildren(...(ownReports.length ? ownReports.map((report) => {
+        const item = document.createElement("article");
+        item.className = "report-summary-card";
+        item.innerHTML = `<strong>Report #${report.report_id}</strong><span>${escapeHtml(report.disease_type)} · ${escapeHtml(report.municipality)}, ${escapeHtml(report.barangay)}</span><span>${escapeHtml(statusLabel(report.report_status))} · ${escapeHtml(dateLabel(report.incident_date))}</span>`;
+        return item;
+      }) : [Object.assign(document.createElement("p"), { className: "small-muted", textContent: "You have not submitted any reports." })]));
+    } catch (error) {
+      list.textContent = error.message;
+    }
+  }
+
+  function setSelectedLocation(event) {
+    const latitude = event.latlng.lat;
+    const longitude = event.latlng.lng;
+    if (latitude < 13.10 || latitude > 13.65 || longitude < 121.65 || longitude > 122.25) {
+      reportMessage.textContent = "Select a point within the Marinduque reporting area.";
+      return;
+    }
+    reportLatitude.value = latitude.toFixed(7);
+    reportLongitude.value = longitude.toFixed(7);
+    reportLocation.textContent = `Selected general location: ${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
+    if (selectedLocationMarker) map.removeLayer(selectedLocationMarker);
+    selectedLocationMarker = L.marker([latitude, longitude], { title: "Selected report location" }).addTo(map);
   }
 
   municipalityFilter.addEventListener("change", renderMap);
   diseaseFilter.addEventListener("change", renderMap);
   zoneStatusFilter.addEventListener("change", renderMap);
-  window.addEventListener("pigment:disease-data-updated", refresh);
-  window.addEventListener("storage", (event) => {
-    if (event.key === window.PigmentDiseaseStore.storageKey || event.key === window.PigmentDiseaseStore.zonesKey) refresh();
-  });
+  map.on("click", setSelectedLocation);
   refresh();
+  loadMyReports();
 
   if (reportForm) {
-    reportForm.addEventListener("submit", (event) => {
+    reportForm.addEventListener("submit", async (event) => {
       event.preventDefault();
       if (!reportForm.reportValidity()) return;
-      const formData = new FormData(reportForm);
-      const updatedReports = window.PigmentDiseaseStore.loadReports();
-      updatedReports.push({
-        id: `report-${Date.now()}`,
-        diseaseType: formData.get("diseaseType"),
-        municipality: formData.get("municipality"),
-        barangay: formData.get("barangay"),
-        incidentDate: formData.get("incidentDate"),
-        submittedDate: new Date().toISOString().slice(0, 10),
-        publicationStatus: "submitted",
-        confirmationStatus: "pending",
-        confirmationDetails: "",
-        description: formData.get("description"),
-        reporter: "Fictional farmer submission",
-        latitude: 13.43,
-        longitude: 121.96
-      });
-      window.PigmentDiseaseStore.saveReports(updatedReports);
-      reportForm.reset();
-      reportMessage.textContent = "Demonstration report submitted for admin review.";
+      const submit = reportForm.querySelector("button[type=submit]");
+      submit.disabled = true;
+      reportMessage.textContent = "Submitting report...";
+      try {
+        const values = Object.fromEntries(new FormData(reportForm).entries());
+        await window.PigmentDiseaseStore.createReport({
+          disease_type: values.diseaseType,
+          municipality: values.municipality,
+          barangay: values.barangay,
+          incident_date: values.incidentDate,
+          description: values.description,
+          latitude: values.latitude,
+          longitude: values.longitude
+        });
+        reportForm.reset();
+        reportLocation.textContent = "No location selected.";
+        reportMessage.textContent = "Report submitted for review. Submission does not mean the disease is officially confirmed.";
+        if (selectedLocationMarker) {
+          map.removeLayer(selectedLocationMarker);
+          selectedLocationMarker = null;
+        }
+      } catch (error) {
+        reportMessage.textContent = error.message;
+      } finally {
+        submit.disabled = false;
+      }
     });
   }
 }());

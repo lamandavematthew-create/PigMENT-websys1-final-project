@@ -17,4 +17,12 @@ The static application entry point is [`src/index.html`](src/index.html). Serve 
 python -m http.server 8000 --directory src
 ```
 
-The project does not include a package manager, build step, backend, or database. The pages use browser storage for demonstration data.
+For the authenticated PHP/MySQL features, use XAMPP instead of opening an HTML file directly:
+
+```text
+http://localhost/PigMENT/src/
+```
+
+Apache must serve the project from `C:\xampp\htdocs`, and MySQL must be running. Do not use a `file:///...` URL; browser security and PHP requests will not work correctly from a local file.
+
+The public weight tool is available at [`src/pages/weight-calculator.html`](src/pages/weight-calculator.html). It uses the documented girth-and-length estimate locally and does not save guest inputs.

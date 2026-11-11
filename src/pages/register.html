@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Create a farmer account on PigMENT.">
+  <title>Create Account | PigMENT</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/auth.js" defer></script>
+</head>
+<body class="auth-page">
+  <main class="auth-layout">
+    <section class="auth-card auth-card-wide" aria-labelledby="register-title">
+      <a class="brand auth-brand" href="../index.html" aria-label="PigMENT home"><img class="brand-logo" src="../../public/assets/pigment-logo.png" alt=""><span>Pig<span class="brand-accent">MENT</span><small>Farm management</small></span></a>
+      <p class="eyebrow">Get started</p>
+      <h1 id="register-title">Create your farmer account</h1>
+      <p class="page-description">Set up your workspace to manage pigs and connect with local farmers.</p>
+      <p id="auth-page-message" class="form-message auth-message" role="status" hidden></p>
+      <form id="register-form" class="auth-form auth-form-grid">
+        <label>First name<input name="first_name" autocomplete="given-name" maxlength="100" required></label>
+        <label>Last name<input name="last_name" autocomplete="family-name" maxlength="100" required></label>
+        <label>Email address<input name="email" type="email" autocomplete="email" maxlength="150" required></label>
+        <label>Phone number<input name="phone_number" type="tel" autocomplete="tel" maxlength="20" required></label>
+        <label>Municipality<input name="municipality" maxlength="100" required></label>
+        <label>Barangay<input name="barangay" maxlength="100" required></label>
+        <label>Password<div class="password-field"><input id="register-password" name="password" type="password" autocomplete="new-password" required><button type="button" class="password-toggle" data-password-toggle="register-password">Show</button></div></label>
+        <label>Confirm password<div class="password-field"><input id="confirm-password" name="confirm_password" type="password" autocomplete="new-password" required><button type="button" class="password-toggle" data-password-toggle="confirm-password">Show</button></div></label>
+        <label class="form-span-2">Address <span class="optional">(optional)</span><textarea name="address" rows="2" autocomplete="street-address"></textarea></label>
+        <div class="form-span-2"><button class="button button-primary auth-submit" type="submit">Create account</button></div>
+      </form>
+      <p class="auth-switch">Already have an account? <a href="login.html">Sign in</a></p>
+    </section>
+  </main>
+</body>
+</html>

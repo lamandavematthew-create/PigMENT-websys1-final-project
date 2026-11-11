@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Sign in to your PigMENT farm workspace.">
+  <title>Sign In | PigMENT</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/auth.js" defer></script>
+</head>
+<body class="auth-page">
+  <main class="auth-layout">
+    <section class="auth-card" aria-labelledby="login-title">
+      <a class="brand auth-brand" href="../index.html" aria-label="PigMENT home"><img class="brand-logo" src="../../public/assets/pigment-logo.png" alt=""><span>Pig<span class="brand-accent">MENT</span><small>Farm management</small></span></a>
+      <p class="eyebrow">Welcome back</p>
+      <h1 id="login-title">Sign in to PigMENT</h1>
+      <p class="page-description">Access your farm records and local marketplace.</p>
+      <p id="auth-page-message" class="form-message auth-message" role="status" hidden></p>
+      <form id="login-form" class="auth-form">
+        <label>Email address<input name="email" type="email" autocomplete="email" required></label>
+        <label>Password<div class="password-field"><input id="login-password" name="password" type="password" autocomplete="current-password" required><button type="button" class="password-toggle" data-password-toggle="login-password">Show</button></div></label>
+        <button class="button button-primary auth-submit" type="submit">Sign in</button>
+      </form>
+      <p class="auth-switch">New to PigMENT? <a href="register.html">Create an account</a></p>
+    </section>
+  </main>
+</body>
+</html>

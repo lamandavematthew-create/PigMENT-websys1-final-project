@@ -24,7 +24,7 @@ document.addEventListener("keydown", (event) => {
 
 const pigList = document.querySelector("#pig-list");
 
-if (pigList) {
+if (pigList && !document.body.dataset.apiFarmPage) {
   const storageKey = "pigment-farm-records-v1";
   const storageWarning = document.querySelector("#storage-warning");
   const sampleState = {
@@ -855,7 +855,7 @@ if (pigList) {
 
 const listingGrid = document.querySelector("#listing-grid");
 
-if (listingGrid) {
+if (listingGrid && !document.body.dataset.apiMarketplacePage) {
   const listings = [
     { id: "sample-01", title: "Healthy native cross grower", type: "Grower", breed: "Native cross", sex: "Male", age: "6 months", weight: 52, price: 8200, location: "Laylay, Boac", municipality: "Boac", seller: "Aling Nena", description: "A healthy, active young grower raised on our family farm. Eating well and used to being around people.", art: "green" },
     { id: "sample-02", title: "Pair of sturdy weaners", type: "Piglet", breed: "Landrace cross", sex: "Female", age: "10 weeks", weight: 18, price: 4600, location: "Pangi, Gasan", municipality: "Gasan", seller: "Mang Lito", description: "Two lively weaners from a healthy litter. Both are eating well and ready for a new home.", art: "teal" },

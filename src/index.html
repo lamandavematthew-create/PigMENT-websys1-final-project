@@ -8,15 +8,17 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
   <script src="js/script.js" defer></script>
-  <script src="js/disease-data.js" defer></script>
+  <script src="js/auth.js" defer></script>
+  <script src="js/weight-estimator.js" defer></script>
+  <script src="js/disease-data.js?v=3" defer></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
-  <script src="js/disease-map.js" defer></script>
+  <script src="js/disease-map.js?v=3" defer></script>
 </head>
-<body>
+<body data-requires-auth="true" data-auth-pending="true">
   <div class="app-shell">
     <aside class="sidebar" id="sidebar">
       <a class="brand" href="index.html" aria-label="PigMENT dashboard">
-        <span class="brand-mark" aria-hidden="true">P</span>
+        <img class="brand-logo" src="../public/assets/pigment-logo.png" alt="">
         <span>Pig<span class="brand-accent">MENT</span><small>Farm management</small></span>
       </a>
       <p class="nav-caption">MAIN MENU</p>
@@ -40,14 +42,14 @@
       </nav>
       <div class="sidebar-bottom">
         <p class="nav-caption">MORE</p>
-        <button class="nav-link nav-link-disabled" type="button" disabled>
+        <a class="nav-link" href="pages/reports.html">
           <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 19V5M4 19h17"/><path d="m7 15 4-4 3 2 5-6"/><path d="M16 7h3v3"/></svg>
-          <span>Reports</span><span class="nav-soon">Soon</span>
-        </button>
-        <button class="nav-link nav-link-disabled" type="button" disabled>
+          <span>Reports</span>
+        </a>
+        <a class="nav-link" href="pages/profile.html">
           <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
-          <span>Profile</span><span class="nav-soon">Soon</span>
-        </button>
+          <span>Profile</span>
+        </a>
         <div class="sidebar-note"><strong>Your farm workspace</strong><span>Manage pig records, pens, and local listings in one place.</span></div>
       </div>
     </aside>
@@ -64,7 +66,7 @@
             <span class="notification-dot" aria-hidden="true"></span>
           </button>
           <span class="topbar-divider" aria-hidden="true"></span>
-          <div class="user-summary"><span class="user-avatar" aria-hidden="true">F</span><span class="user-copy"><strong>Farm account</strong><small>Marinduque</small></span></div>
+          <div class="user-summary"><span class="user-avatar" aria-hidden="true">F</span><span class="user-copy"><strong>Farm account</strong><small>Marinduque</small></span><button class="button button-secondary auth-logout" type="button">Log out</button></div>
         </div>
       </header>
 
@@ -81,8 +83,9 @@
           <p class="quick-actions-intro">Start with a common farm task.</p>
           <div class="quick-actions">
             <a class="action-button" href="pages/my-pigs.html#register-pig"><span class="action-icon" aria-hidden="true">＋</span><span><strong>Register a Pig</strong><small>Add a pig to your records</small></span><span class="action-arrow" aria-hidden="true">→</span></a>
-            <a class="action-button" href="pages/my-pigs.html#pig-pens"><span class="action-icon" aria-hidden="true">▦</span><span><strong>Manage Pig Pens</strong><small>See your pens and pigs</small></span><span class="action-arrow" aria-hidden="true">→</span></a>
-            <a class="action-button" href="pages/marketplace.html"><span class="action-icon" aria-hidden="true">▤</span><span><strong>Browse Marketplace</strong><small>See pigs for sale or post a listing</small></span><span class="action-arrow" aria-hidden="true">→</span></a>
+            <a class="action-button" href="pages/my-pigs.html#pig-pens"><span class="action-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 20V8l8-5 8 5v12M8 20v-6h8v6M3 20h18"/></svg></span><span><strong>Manage Pig Pens</strong><small>See your pens and pigs</small></span><span class="action-arrow" aria-hidden="true">→</span></a>
+            <a class="action-button" href="pages/weight-calculator.html"><span class="action-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 4h12M6 20h12M8 4v16M16 4v16M8 8h8M8 16h8"/><path d="m10 12 2-2 2 2"/></svg></span><span><strong>Try Weight Calculator</strong><small>Estimate weight and selling value</small></span><span class="action-arrow" aria-hidden="true">→</span></a>
+            <a class="action-button" href="pages/marketplace.html"><span class="action-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 9h16v11H4zM3 9l2-5h14l2 5M8 13h8M8 17h5"/></svg></span><span><strong>Browse Marketplace</strong><small>See pigs for sale or post a listing</small></span><span class="action-arrow" aria-hidden="true">→</span></a>
           </div>
         </aside>
         <section aria-labelledby="farm-snapshot-title">
@@ -130,12 +133,15 @@
         <footer class="page-footer"><span>PigMENT · Farm management</span><span>Marinduque, Philippines</span></footer>
         </div>
         <section id="disease-awareness" class="disease-view" hidden aria-labelledby="map-title">
-          <div class="page-heading"><div><p class="eyebrow">Farmer interface</p><h1>Disease awareness map</h1><p class="page-description">View fictional demonstration records and practical ASF awareness guidance for Marinduque.</p></div><a class="button button-primary" href="#submit-report">Submit a suspected report <span aria-hidden="true">→</span></a></div>
-          <div class="prototype-note"><span class="note-icon" aria-hidden="true">i</span><p><strong>Fictional demonstration data:</strong> Map records are for prototype testing only. PigMENT does not automatically detect or diagnose disease. Contact your municipal or provincial veterinary office for official assessment.</p></div>
-          <section class="map-layout" aria-labelledby="map-title"><div class="map-panel"><div class="panel-heading"><div><p class="eyebrow">Local awareness</p><h2 id="map-title">Marinduque incident map</h2></div><span class="status-label status-label-success">OpenStreetMap</span></div><div id="disease-map" class="disease-map" aria-label="Interactive disease awareness map"></div><div class="map-legend" aria-label="Map legend"><strong>Map legend</strong><span><i class="legend-swatch legend-confirmed"></i>Confirmed infected zone</span><span><i class="legend-swatch legend-monitoring"></i>Area under monitoring</span><span><i class="legend-swatch legend-resolved"></i>Resolved zone</span><span><i class="legend-swatch legend-suspected"></i>Suspected report</span></div><p class="map-attribution">Map data © OpenStreetMap contributors. All records are FICTIONAL DEMONSTRATION DATA. Markers show published reports only.</p></div><aside class="map-controls panel" aria-label="Map filters"><div class="panel-heading"><div><p class="eyebrow">Filter records</p><h2>Show incidents</h2></div></div><label class="filter-field" for="municipality-filter">Municipality<select id="municipality-filter"><option value="">All municipalities</option></select></label><label class="filter-field" for="disease-filter">Disease type<select id="disease-filter"><option value="">All disease types</option></select></label><label class="filter-field" for="zone-status-filter">Zone status<select id="zone-status-filter"><option value="">All zone statuses</option><option value="confirmed">Confirmed infected</option><option value="monitoring">Under monitoring</option><option value="resolved">Resolved</option></select></label><p class="record-count" id="map-count" role="status"></p><p class="empty-map-message" id="map-empty" hidden>No published zones or incident reports match these filters.</p><p class="small-muted">Only published demonstration data appears here. A suspected report never automatically becomes an infected zone.</p></aside></section>
+          <div class="page-heading"><div><p class="eyebrow">Farmer interface</p><h1>Pig Health</h1><p class="page-description">Read practical guidance and view published disease information for Marinduque.</p></div><a class="button button-primary" href="#submit-report">Report an illness <span aria-hidden="true">→</span></a></div>
+          <nav class="health-tabs" aria-label="Pig Health sections"><a href="#health-guide">Health Guide</a><a href="#disease-map-section">Disease Awareness Map</a><a href="#submit-report">Report an Illness</a><a href="#my-reports">My Reports</a></nav>
+          <section class="health-guide panel" id="health-guide"><div class="panel-heading"><div><p class="eyebrow">Practical guidance</p><h2>Health Guide</h2></div></div><details open><summary>African Swine Fever</summary><p>ASF is a serious viral disease of pigs. Fever, weakness, loss of appetite, vomiting, diarrhea, skin discoloration, or sudden deaths can be warning signs, but they do not confirm ASF. Contact a veterinary authority for assessment.</p></details><details><summary>General pig health</summary><p>Monitor behavior, appetite, breathing, movement, and body condition. Seek veterinary guidance when changes persist, several pigs become ill, or deaths occur.</p></details><details><summary>Biosecurity basics</summary><p>Clean and disinfect equipment, limit visitors, isolate new or sick pigs, avoid sharing tools between pens, and keep records of pig movement.</p></details><p class="small-muted">Educational guidance only. Sources: FAO, WOAH, and Philippine veterinary authorities. Review with a local veterinary professional.</p></section>
+          <div class="prototype-note"><span class="note-icon" aria-hidden="true">i</span><p><strong>Public records only:</strong> PigMENT does not automatically detect or diagnose disease. Contact your municipal or provincial veterinary office for official assessment.</p></div>
+          <section class="map-layout" id="disease-map-section" aria-labelledby="map-title"><div class="map-panel"><div class="panel-heading"><div><p class="eyebrow">Local awareness</p><h2 id="map-title">Marinduque disease awareness map</h2></div><span class="status-label status-label-success">OpenStreetMap</span></div><div id="disease-map" class="disease-map" aria-label="Interactive disease awareness map"></div><div class="map-legend" aria-label="Map legend"><strong>Map legend</strong><span><i class="legend-swatch legend-confirmed"></i>Confirmed infected zone</span><span><i class="legend-swatch legend-monitoring"></i>Area under monitoring</span><span><i class="legend-swatch legend-resolved"></i>Resolved zone</span><span><i class="legend-swatch legend-suspected"></i>Confirmed incident</span></div><p class="map-attribution">Map data © OpenStreetMap contributors. Published records only; locations are shown at public precision.</p></div><aside class="map-controls panel" aria-label="Map filters"><div class="panel-heading"><div><p class="eyebrow">Filter records</p><h2>Show incidents</h2></div></div><label class="filter-field" for="municipality-filter">Municipality<select id="municipality-filter"><option value="">All municipalities</option></select></label><label class="filter-field" for="disease-filter">Disease type<select id="disease-filter"><option value="">All disease types</option></select></label><label class="filter-field" for="zone-status-filter">Zone status<select id="zone-status-filter"><option value="">All zone statuses</option><option value="confirmed">Confirmed infected</option><option value="monitoring">Under monitoring</option><option value="resolved">Resolved</option></select></label><p class="record-count" id="map-count" role="status"></p><p class="empty-map-message" id="map-empty" hidden>No published zones or incident reports match these filters.</p><p class="small-muted">A suspected report never automatically becomes an infected zone.</p></aside></section>
           <section class="awareness-grid" aria-labelledby="awareness-title"><div class="panel"><div class="panel-heading"><div><p class="eyebrow">Know the signs</p><h2 id="awareness-title">ASF awareness essentials</h2></div></div><div class="awareness-columns"><div><h3>Possible symptoms</h3><ul><li>High fever, weakness, or loss of appetite</li><li>Red or bluish skin, especially on ears or legs</li><li>Vomiting, diarrhea, coughing, or sudden death</li></ul></div><div><h3>Prevention</h3><ul><li>Limit visitors and avoid bringing pork products into the farm</li><li>Do not move pigs without following local veterinary guidance</li><li>Report unusual illness promptly to authorities</li></ul></div><div><h3>Biosecurity habits</h3><ul><li>Use dedicated footwear, clothing, and clean tools</li><li>Clean and disinfect pens, vehicles, and equipment</li><li>Keep new or returning pigs separated and monitored</li></ul></div></div></div></section>
-          <section class="panel report-form-panel" id="submit-report" aria-labelledby="submit-report-title"><div class="panel-heading"><div><p class="eyebrow">Farmer action</p><h2 id="submit-report-title">Submit a suspected disease report</h2></div></div><p class="small-muted">This sends a fictional prototype report for admin review; it is not a diagnosis or emergency reporting channel.</p><form id="disease-report-form" class="form-grid"><label>Suspected disease<select name="diseaseType" required><option value="Suspected ASF">Suspected ASF</option><option value="Other swine illness">Other swine illness</option></select></label><label>Municipality<select name="municipality" required><option value="">Choose municipality</option><option>Boac</option><option>Mogpog</option><option>Gasan</option><option>Buenavista</option><option>Santa Cruz</option><option>Torrijos</option></select></label><label>Barangay<input name="barangay" required placeholder="e.g., Isok I"></label><label>Incident date<input name="incidentDate" type="date" required></label><label class="form-span-2">What did you observe?<textarea name="description" rows="3" required placeholder="Describe signs observed without attempting to diagnose."></textarea></label><div class="form-span-2 form-actions"><button class="button button-primary" type="submit">Send report for review</button><span id="report-form-message" class="form-message" role="status"></span></div></form></section>
-          <footer class="page-footer"><span>PigMENT · Disease awareness prototype</span><span>Fictional records for demonstration</span></footer>
+          <section class="panel report-form-panel" id="submit-report" aria-labelledby="submit-report-title"><div class="panel-heading"><div><p class="eyebrow">Farmer action</p><h2 id="submit-report-title">Report an Illness</h2></div></div><p class="small-muted">Share what you observed for administrative review. This is not a diagnosis or emergency reporting channel.</p><form id="disease-report-form" class="form-grid"><label>Suspected disease<select name="diseaseType" required><option value="Suspected ASF">Suspected ASF</option><option value="Other swine illness">Other swine illness</option></select></label><label>Municipality<select name="municipality" required><option value="">Choose municipality</option><option>Boac</option><option>Mogpog</option><option>Gasan</option><option>Buenavista</option><option>Santa Cruz</option><option>Torrijos</option></select></label><label>Barangay<input name="barangay" required placeholder="e.g., Isok I"></label><label>Incident date<input name="incidentDate" type="date" required></label><label class="form-span-2">What did you observe?<textarea name="description" rows="3" required placeholder="Describe signs observed without attempting to diagnose."></textarea></label><div class="form-span-2"><p class="small-muted">Click the map to select the general incident location. Click again to adjust it. Exact private farm locations are not automatically shown publicly.</p><input type="hidden" name="latitude" required><input type="hidden" name="longitude" required><p id="selected-report-location" class="small-muted">No location selected.</p></div><div class="form-span-2 form-actions"><button class="button button-primary" type="submit">Send report for review</button><span id="report-form-message" class="form-message" role="status"></span></div></form></section>
+          <section class="panel" id="my-reports" aria-labelledby="my-reports-title"><div class="panel-heading"><div><p class="eyebrow">Your submissions</p><h2 id="my-reports-title">My Reports</h2></div></div><div id="my-reports-list"><p class="small-muted">Sign in to view your submitted reports.</p></div></section>
+          <footer class="page-footer"><span>PigMENT · Disease awareness</span><span>Educational information only</span></footer>
         </section>
       </main>
     </div>
