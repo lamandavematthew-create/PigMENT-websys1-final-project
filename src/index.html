@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="PigMENT farm management dashboard for pig farmers in Marinduque.">
   <title>Home | PigMENT</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
-  <script src="script.js" defer></script>
-  <script src="disease-data.js" defer></script>
+  <script src="js/script.js" defer></script>
+  <script src="js/disease-data.js" defer></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
-  <script src="disease-map.js" defer></script>
+  <script src="js/disease-map.js" defer></script>
 </head>
 <body>
   <div class="app-shell">
@@ -25,11 +25,11 @@
           <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
           <span>Home</span>
         </a>
-        <a class="nav-link" href="my-pigs.html">
+        <a class="nav-link" href="pages/my-pigs.html">
           <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 13v-2a2 2 0 0 1 2-2h1l2-3h6l2 3h1a2 2 0 0 1 2 2v2"/><path d="M5 13h14l1 3a2 2 0 0 1-2 2h-1"/><path d="M6 17H5a2 2 0 0 1-2-2l1-2"/><circle cx="8" cy="15" r="1"/><circle cx="16" cy="15" r="1"/></svg>
           <span>My Pigs</span>
         </a>
-        <a class="nav-link" href="marketplace.html">
+        <a class="nav-link" href="pages/marketplace.html">
           <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 9 12 4l9 5"/><path d="M5 10v9M9 10v9M15 10v9M19 10v9M3 20h18M2 9h20"/></svg>
           <span>Marketplace</span>
         </a>
@@ -73,16 +73,16 @@
         <div class="page-heading dashboard-hero">
           <div class="dashboard-hero-copy"><p class="eyebrow">Farm overview</p><h1>Welcome to your farm</h1><p class="page-description">Your farm at a glance. Choose what you would like to do.</p></div>
           <div class="dashboard-hero-actions">
-            <a class="button button-primary hero-register-button" href="my-pigs.html#register-pig">Register a Pig <span aria-hidden="true">→</span></a>
+            <a class="button button-primary hero-register-button" href="pages/my-pigs.html#register-pig">Register a Pig <span aria-hidden="true">→</span></a>
           </div>
         </div>
         <aside class="panel quick-actions-panel" aria-labelledby="quick-actions-title">
           <div class="panel-heading"><div><p class="eyebrow">Quick actions</p><h2 id="quick-actions-title">What would you like to do?</h2></div></div>
           <p class="quick-actions-intro">Start with a common farm task.</p>
           <div class="quick-actions">
-            <a class="action-button" href="my-pigs.html#register-pig"><span class="action-icon" aria-hidden="true">＋</span><span><strong>Register a Pig</strong><small>Add a pig to your records</small></span><span class="action-arrow" aria-hidden="true">→</span></a>
-            <a class="action-button" href="my-pigs.html#pig-pens"><span class="action-icon" aria-hidden="true">▦</span><span><strong>Manage Pig Pens</strong><small>See your pens and pigs</small></span><span class="action-arrow" aria-hidden="true">→</span></a>
-            <a class="action-button" href="marketplace.html"><span class="action-icon" aria-hidden="true">▤</span><span><strong>Browse Marketplace</strong><small>See pigs for sale or post a listing</small></span><span class="action-arrow" aria-hidden="true">→</span></a>
+            <a class="action-button" href="pages/my-pigs.html#register-pig"><span class="action-icon" aria-hidden="true">＋</span><span><strong>Register a Pig</strong><small>Add a pig to your records</small></span><span class="action-arrow" aria-hidden="true">→</span></a>
+            <a class="action-button" href="pages/my-pigs.html#pig-pens"><span class="action-icon" aria-hidden="true">▦</span><span><strong>Manage Pig Pens</strong><small>See your pens and pigs</small></span><span class="action-arrow" aria-hidden="true">→</span></a>
+            <a class="action-button" href="pages/marketplace.html"><span class="action-icon" aria-hidden="true">▤</span><span><strong>Browse Marketplace</strong><small>See pigs for sale or post a listing</small></span><span class="action-arrow" aria-hidden="true">→</span></a>
           </div>
         </aside>
         <section aria-labelledby="farm-snapshot-title">
@@ -115,7 +115,7 @@
             <h2 id="farm-reminder-title">Pig to check</h2>
             <p>PG-011 is marked “Needs review.”</p>
           </div>
-          <a class="button button-secondary" href="my-pigs.html">View My Pigs</a>
+          <a class="button button-secondary" href="pages/my-pigs.html">View My Pigs</a>
         </aside>
 
           <section class="panel activity-panel" aria-labelledby="activity-title">
