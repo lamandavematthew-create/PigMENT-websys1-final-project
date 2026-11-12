@@ -1,0 +1,154 @@
+/* PigMENT Login: full viewport scenic art, live interactive HTML, desktop/mobile art direction. */
+html{min-height:100%}
+html body.sunrise-page{margin:0;min-height:100vh;min-height:100dvh;overflow-x:hidden;background:#f9f6ed;color:#163b2d;font-family:Inter,system-ui,-apple-system,'Segoe UI',sans-serif}
+.sunrise-page *{box-sizing:border-box}
+.sunrise-shell{position:relative;display:grid;grid-template-columns:minmax(0,55%) minmax(400px,45%);min-height:100vh;min-height:100dvh;isolation:isolate;overflow:hidden}
+.sunrise-shell::before{content:"";position:absolute;inset:0;z-index:-2;background-image:url('../../public/assets/pigment-login-desktop.webp');background-size:cover;background-position:center center;background-repeat:no-repeat;pointer-events:none}
+.sunrise-shell::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(255,252,241,.72) 0%,rgba(255,252,241,.36) 32%,rgba(255,251,234,.07) 55%,rgba(255,248,228,.12) 100%);pointer-events:none}
+.sunrise-story{position:relative;min-width:0;display:flex;flex-direction:column;justify-content:flex-start;padding:clamp(42px,6.5vh,76px) clamp(28px,3.7vw,70px) 48px clamp(35px,6vw,112px)}
+.sunrise-story-inner{position:relative;z-index:2;max-width:760px}
+.sunrise-eyebrow{font-size:clamp(11px,.9vw,14px);font-weight:850;letter-spacing:.24em;text-transform:uppercase;margin:0 0 18px;color:#183a2b}
+.sunrise-story h1{font-weight:850;font-size:clamp(37px,3.35vw,61px);line-height:1.10;letter-spacing:-.045em;color:#123b2b;margin:0;max-width:780px;text-wrap:balance}
+.sunrise-story h1 span{position:relative;white-space:nowrap}
+.sunrise-story h1 span::after{content:"";position:absolute;left:3%;right:6%;height:5px;bottom:-9px;border-radius:50%;background:#edac2a;transform:rotate(-2deg)}
+.sunrise-intro{max-width:610px;margin:28px 0 26px;font-size:clamp(16px,1.1vw,19px);line-height:1.48;color:#263e34;font-weight:500}
+.sunrise-feature-composition{position:relative;display:grid;grid-template-columns:minmax(0,48%) minmax(255px,52%);align-items:start;min-height:clamp(330px,42vh,480px);max-width:780px}
+.sunrise-mascot{display:block;align-self:end;justify-self:start;max-height:clamp(275px,42vh,460px);width:auto;max-width:100%;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 9px 12px rgba(7,31,16,.18));animation:pigment-bob 6s ease-in-out infinite}
+.sunrise-features{display:grid;gap:12px;align-self:start;padding-top:6px;position:relative;z-index:3}
+.sunrise-feature{display:flex;align-items:center;gap:12px;padding:11px 13px;min-height:83px;border:1.5px solid rgba(255,255,255,.95);border-radius:22px;background:rgba(255,252,246,.92);box-shadow:0 9px 25px rgba(15,58,34,.12);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);transition:transform .22s,box-shadow .22s}
+.sunrise-feature:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(15,58,34,.18)}
+.sunrise-feature.health-feature{background:rgba(248,220,224,.94)}
+.sunrise-feature-icon{flex:0 0 54px;height:54px;display:grid;place-items:center;border-radius:16px;color:#0c6640;background:#e4eee5}
+.sunrise-feature-icon svg{width:31px;height:31px}
+.sunrise-feature strong{display:block;font-size:clamp(15px,1vw,17px);font-weight:850;color:#123a2b;line-height:1.2}
+.sunrise-feature small{display:block;margin-top:3px;font-size:12px;line-height:1.3;color:#33473c}
+.sunrise-auth{display:flex;justify-content:center;align-items:center;min-width:0;padding:clamp(22px,3vw,55px);position:relative;z-index:2}
+.sunrise-auth-card{width:min(100%,555px);padding:clamp(28px,3.15vw,55px);border:3px solid rgba(132,171,125,.7);border-radius:clamp(25px,2.7vw,42px);background:rgba(255,253,248,.96);box-shadow:0 24px 60px rgba(21,51,37,.24);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.sunrise-brand{display:flex;justify-content:center;align-items:center;gap:11px;margin:0 auto clamp(24px,4vh,40px);color:#102e22;text-decoration:none;font-weight:900;font-size:clamp(28px,2.55vw,42px);line-height:1;letter-spacing:-.04em}
+.sunrise-brand img{width:clamp(51px,4vw,65px);height:clamp(51px,4vw,65px);object-fit:contain;flex:none}
+.sunrise-brand-accent{color:#13866a}
+.sunrise-auth-heading{position:relative;text-align:left}
+.sunrise-auth-heading h2{font-weight:850;color:#14382c;font-size:clamp(32px,3.05vw,49px);letter-spacing:-.045em;line-height:1.1;margin:0 0 8px}
+.sunrise-auth-heading p{font-size:clamp(14px,1vw,18px);color:#3f5048;margin:0}
+.sunrise-spark{position:absolute;right:0;top:-21px;color:#e9a62b;font-size:30px}
+.sunrise-form{display:grid;gap:23px;margin-top:32px}
+.sunrise-form label{display:grid;gap:9px;color:#1d3429;font-weight:750;font-size:15px}
+.sunrise-field-label{display:flex;align-items:center;gap:10px}
+.sunrise-field-label svg{width:23px;height:23px;color:#13553c;flex-shrink:0}
+.sunrise-form input{width:100%;height:57px;min-height:57px;padding:12px 16px;background:#fffefa;border:1.5px solid #aebdb4;border-radius:13px;font-size:16px;color:#123a2e;outline:none;box-shadow:none;transition:border-color .2s,box-shadow .2s}
+.sunrise-form input::placeholder{color:#76847a}
+.sunrise-form input:focus{border-color:#1d7551;box-shadow:0 0 0 4px rgba(36,119,72,.16)}
+.sunrise-password{display:flex;align-items:center;position:relative}
+.sunrise-password input{padding-right:90px}
+.sunrise-visibility{position:absolute;right:8px;top:50%;transform:translateY(-50%);min-width:70px;min-height:39px;display:grid;place-items:center;border:0;border-radius:8px;background:transparent;color:#14543c;font-weight:800;cursor:pointer}
+.sunrise-visibility:hover{background:#e7efe8}
+.sunrise-visibility:focus-visible{outline:3px solid #dfa42e}
+html body.sunrise-page .sunrise-submit{display:flex;align-items:center;justify-content:center;gap:16px;width:100%;height:62px;margin-top:12px;border:1px solid #d58d18;border-radius:14px;background:#efa52d;color:#163628;font-size:22px;font-weight:850;box-shadow:0 5px 0 #fad47a,0 10px 18px rgba(126,77,15,.15);cursor:pointer;transition:transform .18s,filter .18s}
+html body.sunrise-page .sunrise-submit:hover{background:#ffbb44;transform:translateY(-2px)}
+html body.sunrise-page .sunrise-submit:disabled{opacity:.68;cursor:wait;transform:none}
+.sunrise-divider{height:1px;background:#dedbd1;margin:38px 0 23px}
+.sunrise-switch{margin:0;text-align:center;color:#2e4038;font-size:16px}
+.sunrise-switch a{color:#096a46;font-weight:850;text-decoration:underline;text-underline-offset:4px}
+.sunrise-message{margin:16px 0 -12px;font-size:13px;border-radius:10px}
+@keyframes pigment-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@media(min-width:1600px) and (min-height:850px){.sunrise-feature-composition{min-height:400px}.sunrise-story{padding-top:7vh}.sunrise-mascot{max-height:46vh}}
+@media(max-width:1250px){.sunrise-shell{grid-template-columns:minmax(0,52%) minmax(390px,48%)}.sunrise-story{padding:44px 24px 30px 40px}.sunrise-story h1{font-size:clamp(32px,3.7vw,47px)}.sunrise-intro{font-size:16px}.sunrise-feature-composition{grid-template-columns:38% 62%;min-height:340px}.sunrise-mascot{max-height:330px}.sunrise-feature{padding:9px 10px}.sunrise-auth{padding:22px}.sunrise-auth-card{padding:30px}}
+@media(max-width:900px){.sunrise-shell{display:flex;flex-direction:column;overflow:visible;min-height:100dvh}.sunrise-shell::before{position:absolute;background-image:url('../../public/assets/pigment-login-mobile.webp');background-size:cover;background-position:center top}.sunrise-shell::after{background:linear-gradient(180deg,rgba(255,251,240,.68),rgba(255,251,240,.30) 43%,rgba(19,48,33,.18) 100%)}.sunrise-story{padding:34px 25px 5px;min-height:auto}.sunrise-story-inner{max-width:680px}.sunrise-story h1{font-size:clamp(31px,5.4vw,44px)}.sunrise-intro{font-size:15px;max-width:510px;margin:20px 0 15px}.sunrise-feature-composition{grid-template-columns:1fr;min-height:0}.sunrise-mascot,.sunrise-features{display:none}.sunrise-auth{flex:1;min-height:0;padding:18px 20px 45px;align-items:flex-start}.sunrise-auth-card{max-width:550px;padding:30px 35px;background:rgba(255,253,248,.97)}.sunrise-brand{margin-bottom:21px}.sunrise-form{margin-top:23px;gap:18px}.sunrise-divider{margin:27px 0 18px}}
+@media(max-width:480px){.sunrise-story{padding:25px 20px 0}.sunrise-eyebrow{font-size:10px;letter-spacing:.14em;margin-bottom:12px}.sunrise-story h1{font-size:clamp(28px,8vw,36px);max-width:350px}.sunrise-intro{max-width:350px;font-size:13.5px;line-height:1.42;margin:18px 0 12px}.sunrise-auth{padding:12px 13px 30px}.sunrise-auth-card{padding:26px 22px 28px;border-radius:27px;border-width:2px}.sunrise-brand{font-size:27px;margin-bottom:22px}.sunrise-brand img{width:45px;height:45px}.sunrise-auth-heading h2{font-size:32px}.sunrise-auth-heading p{font-size:14px}.sunrise-form{gap:17px;margin-top:24px}.sunrise-form input{height:52px;min-height:52px;font-size:15px}.sunrise-form label{font-size:14px}.sunrise-submit{min-height:56px}.sunrise-divider{margin:25px 0 17px}.sunrise-switch{font-size:14px}}
+@media(max-height:730px) and (min-width:901px){.sunrise-story{padding-top:25px}.sunrise-eyebrow{margin-bottom:10px}.sunrise-story h1{font-size:clamp(32px,3vw,49px)}.sunrise-intro{margin:18px 0}.sunrise-feature-composition{min-height:280px}.sunrise-mascot{max-height:290px}.sunrise-feature{min-height:72px}.sunrise-auth-card{padding:25px 32px}.sunrise-brand{margin-bottom:19px}.sunrise-form{margin-top:22px;gap:16px}.sunrise-form input{height:49px;min-height:49px}.sunrise-divider{margin:25px 0 18px}}
+@media(prefers-reduced-motion:reduce){.sunrise-page *,.sunrise-page *::before,.sunrise-page *::after{animation:none!important;transition:none!important}}
+
+
+/* Revision: approved full-body mascot and more prominent PigMENT brand lockup.
+   Keep artwork as a proportional transparent PNG, not a stretched background. */
+@media (min-width: 901px) {
+  .sunrise-feature-composition {
+    display: block;
+    min-height: clamp(435px, 56vh, 640px);
+    max-width: 900px;
+  }
+  .sunrise-mascot {
+    display: block;
+    position: absolute;
+    left: clamp(-56px, -2.4vw, -16px);
+    bottom: -20px;
+    height: clamp(390px, 60vh, 630px);
+    max-height: none;
+    width: auto;
+    max-width: none;
+    object-fit: contain;
+    transform-origin: center bottom;
+    z-index: 2;
+  }
+  .sunrise-features {
+    position: relative;
+    margin-left: auto;
+    width: min(51%, 370px);
+    padding-top: 4px;
+    z-index: 3;
+  }
+  .sunrise-brand {
+    gap: 14px;
+    font-size: clamp(34px, 2.9vw, 48px);
+    margin-bottom: clamp(17px, 2.7vh, 30px);
+  }
+  .sunrise-brand img {
+    width: clamp(74px, 5.6vw, 94px);
+    height: clamp(74px, 5.6vw, 94px);
+  }
+}
+@media (min-width: 901px) and (max-width: 1250px) {
+  .sunrise-feature-composition { min-height: clamp(350px, 50vh, 490px); }
+  .sunrise-mascot { height: clamp(310px, 53vh, 480px); left: -20px; bottom: -8px; }
+  .sunrise-features { width: 55%; }
+  .sunrise-brand img { width: 72px; height: 72px; }
+}
+@media (min-width: 901px) and (max-height: 750px) {
+  .sunrise-feature-composition { min-height: 360px; }
+  .sunrise-mascot { height: clamp(315px, 52vh, 415px); bottom: -16px; }
+  .sunrise-brand img { width: 68px; height: 68px; }
+  .sunrise-brand { margin-bottom: 15px; }
+}
+@media (max-width: 900px) {
+  /* Mobile stays login-first; avoid squeezing the tall mascot into the form. */
+  .sunrise-brand { gap: 9px; font-size: clamp(28px, 5vw, 35px); }
+  .sunrise-brand img { width: clamp(54px, 8vw, 68px); height: clamp(54px, 8vw, 68px); }
+}
+@media (max-width: 480px) {
+  .sunrise-brand { font-size: 27px; margin-bottom: 18px; }
+  .sunrise-brand img { width: 56px; height: 56px; }
+}
+
+/* Layout refinement — keep the mascot and benefit cards in separate visual columns,
+   and match the approved reference's more generous authentication panel. */
+@media (min-width: 1451px) {
+  .sunrise-shell { grid-template-columns: minmax(0, 51%) minmax(0, 49%); }
+  .sunrise-story { padding-left: clamp(72px, 5.4vw, 112px); padding-right: 20px; }
+  .sunrise-story-inner { max-width: 890px; }
+  .sunrise-feature-composition { max-width: 875px; min-height: clamp(490px, 57vh, 600px); }
+  .sunrise-mascot {
+    left: -24px;
+    bottom: -10px;
+    height: clamp(430px, 55vh, 550px);
+    max-height: none;
+    width: auto;
+    max-width: none;
+  }
+  .sunrise-features { width: 44%; margin-left: auto; margin-right: 2%; padding-top: 12px; }
+  .sunrise-auth { padding: 28px 24px; }
+  .sunrise-auth-card { width: min(100%, 680px); max-width: 680px; padding: clamp(40px, 3vw, 56px); }
+}
+@media (min-width: 901px) and (max-width: 1450px) {
+  .sunrise-shell { grid-template-columns: minmax(0, 51%) minmax(0, 49%); }
+  .sunrise-story { padding-left: clamp(30px, 4vw, 58px); padding-right: 12px; }
+  .sunrise-feature-composition { min-height: clamp(335px, 50vh, 495px); }
+  .sunrise-mascot { left: -12px; bottom: -8px; height: clamp(280px, 48vh, 450px); width: auto; max-width: none; }
+  .sunrise-features { width: 45%; padding-top: 4px; margin-right: 0; }
+  .sunrise-auth { padding: 18px 18px; }
+  .sunrise-auth-card { width: min(100%, 610px); max-width: 610px; padding: clamp(25px, 2.6vw, 42px); }
+}
+@media (min-width: 901px) and (max-height: 760px) {
+  .sunrise-feature-composition { min-height: 345px; }
+  .sunrise-mascot { height: min(48vh, 385px); bottom: -6px; }
+  .sunrise-feature { min-height: 72px; }
+}
