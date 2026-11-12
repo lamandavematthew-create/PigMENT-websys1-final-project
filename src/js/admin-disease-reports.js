@@ -2,6 +2,7 @@
   "use strict";
   const list = document.querySelector("#report-list");
   if (!list || !window.PigmentDiseaseStore) return;
+  const dialog = document.querySelector("#report-detail");
   const detailContent = document.querySelector("#detail-content");
   const detailEmpty = document.querySelector("#detail-empty");
   const detailTitle = document.querySelector("#detail-title");
@@ -48,6 +49,13 @@
     if (!report) return;
     selectedId = id;
     detailTitle.textContent = `Report #${id} · ${report.disease_type}`;
+    const status = document.querySelector("#detail-status");
+    status.textContent = statusLabel(report.report_status);
+    status.dataset.status = report.report_status;
+    list.querySelectorAll("tr").forEach(row => row.classList.toggle("is-selected", Number(row.querySelector("[data-report-id]")?.dataset.reportId) === id));
+    document.querySelector("#confirmation-section").open = false;
+    document.querySelectorAll("#confirmation-section input, #confirmation-section textarea").forEach(field => field.value = "");
+    dialog.showModal();
     detailEmpty.hidden = true;
     detailContent.hidden = false;
     document.querySelector("#detail-location").textContent = `${report.municipality}, ${report.barangay}`;
@@ -55,8 +63,21 @@
     document.querySelector("#detail-reporter").textContent = report.reporter_name || "Farmer";
     document.querySelector("#detail-description").textContent = report.description;
     adminRemarks.value = report.admin_remarks || "";
+    message.textContent = "";
     confirmationDetails.value = "";
+    const buttons = document.querySelectorAll(".admin-actions [data-action]");
+    buttons.forEach(button => {
+      const action = button.dataset.action;
+      button.disabled = action === "under_review" ? report.report_status !== "pending"
+        : action === "confirmed" ? !["pending", "under_review", "confirmed"].includes(report.report_status)
+        : action === "publish" ? report.report_status !== "confirmed" || Boolean(report.is_published)
+        : report.report_status === "rejected";
+    });
   }
+
+  document.querySelector("#close-report-detail").addEventListener("click", () => dialog.close());
+  dialog.addEventListener("click", (event) => { if (event.target === dialog) dialog.close(); });
+  dialog.addEventListener("close", () => list.querySelectorAll("tr").forEach(row => row.classList.remove("is-selected")));
 
   async function refresh() {
     try {
@@ -91,6 +112,12 @@
     const status = action === "publish" || action === "confirmed" ? "confirmed" : action === "under_review" ? "under_review" : "rejected";
     const remarks = adminRemarks.value.trim();
     if (action === "rejected" && remarks.length < 5) { message.textContent = "Provide a reason for rejection (at least five characters)."; return; }
+    if (action === "under_review" && !["pending", "under_review"].includes(report.report_status)) {
+      message.textContent = "Only pending reports can be accepted for review."; return;
+    }
+    if (action === "confirmed" && !["pending", "under_review", "confirmed"].includes(report.report_status)) {
+      message.textContent = "Rejected reports cannot be confirmed without reopening review."; return;
+    }
     if (!window.confirm(`Apply ${action.replaceAll('_', ' ')} to Report #${selectedId}?`)) return;
     let confirmation = null;
     if (action === "confirmed") {
@@ -103,6 +130,7 @@
         confirmation_notes: confirmationDetails.value.trim()
       };
       if (!confirmation.confirmed_by_name || !confirmation.designation || !confirmation.organization || !confirmation.confirmation_date) {
+        document.querySelector("#confirmation-section").open = true;
         message.textContent = "Enter complete authorized veterinary confirmation details."; return;
       }
     }
@@ -114,9 +142,9 @@
         confirmation,
         is_published: action === "publish"
       });
-      message.textContent = action === "publish" ? "Verified report published." : `Report marked ${statusLabel(status)}.`;
       await refresh();
       showReport(selectedId);
+      message.textContent = action === "publish" ? "Verified report published." : `Report marked ${statusLabel(status)}.`;
     } catch (error) {
       message.textContent = error.message;
     }
@@ -248,5 +276,11 @@
       });
     }
   }
-  refresh();
+  window.PigmentAuth.requireAuth({adminOnly:true}).then((user) => {
+    if (!user) return;
+    refresh().then(() => {
+      const requested = Number(new URLSearchParams(window.location.search).get('report'));
+      if (requested && reports.some(r => r.report_id === requested)) showReport(requested);
+    });
+  });
 }());

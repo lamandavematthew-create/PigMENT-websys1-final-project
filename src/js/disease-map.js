@@ -2,7 +2,14 @@
   "use strict";
 
   const mapElement = document.querySelector("#disease-map");
-  if (!mapElement || !window.PigmentDiseaseStore || !window.L) return;
+  if (!mapElement || !window.PigmentDiseaseStore) return;
+  if (!window.L) {
+    const message = document.querySelector("#report-form-message");
+    const submit = document.querySelector('#disease-report-form button[type="submit"]');
+    if (message) message.textContent = "The location map could not load. Check your internet connection and reload the page to report an illness.";
+    if (submit) submit.disabled = true;
+    return;
+  }
 
   const dashboardView = document.querySelector("#dashboard-view");
   const diseaseView = document.querySelector("#disease-awareness");
@@ -20,12 +27,16 @@
   const reportLatitude = reportForm?.elements.namedItem("latitude");
   const reportLongitude = reportForm?.elements.namedItem("longitude");
   const map = L.map(mapElement).setView([13.43, 121.96], 10);
+  const pickerElement = document.querySelector("#report-location-map");
+  const pickerMap = pickerElement ? L.map(pickerElement).setView([13.43, 121.96], 10) : null;
+  if (pickerMap) L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18, attribution: "&copy; OpenStreetMap contributors" }).addTo(pickerMap);
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18, attribution: "&copy; OpenStreetMap contributors" }).addTo(map);
   const markerLayer = L.layerGroup().addTo(map);
   const zoneLayer = L.layerGroup().addTo(map);
   let reports = [];
   let zones = [];
   let selectedLocationMarker = null;
+  let pickerLocationMarker = null;
 
   const zoneStyles = {
     confirmed: { color: "#b42318", fillColor: "#dc2626", fillOpacity: 0.34 },
@@ -52,7 +63,10 @@
     healthNavLink?.classList.toggle("active", showDisease);
     homeNavLink?.classList.toggle("active", !showDisease);
     if (workspaceLabel) workspaceLabel.textContent = showDisease ? "Pig Health" : "Farm workspace";
-    if (showDisease) window.setTimeout(() => map.invalidateSize(), 0);
+    if (showDisease) window.setTimeout(() => {
+      map.invalidateSize();
+      pickerMap?.invalidateSize();
+    }, 0);
   }
 
   function shouldShowDiseaseView(hash) {
@@ -142,21 +156,43 @@
     reportLatitude.value = latitude.toFixed(7);
     reportLongitude.value = longitude.toFixed(7);
     reportLocation.textContent = `Selected general location: ${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
+    reportMessage.textContent = "";
     if (selectedLocationMarker) map.removeLayer(selectedLocationMarker);
     selectedLocationMarker = L.marker([latitude, longitude], { title: "Selected report location" }).addTo(map);
+    if (pickerMap) {
+      if (pickerLocationMarker) pickerMap.removeLayer(pickerLocationMarker);
+      pickerLocationMarker = L.marker([latitude, longitude], { title: "Selected incident location" }).addTo(pickerMap);
+    }
   }
 
   municipalityFilter.addEventListener("change", renderMap);
   diseaseFilter.addEventListener("change", renderMap);
   zoneStatusFilter.addEventListener("change", renderMap);
   map.on("click", setSelectedLocation);
+  pickerMap?.on("click", setSelectedLocation);
   refresh();
   loadMyReports();
+  const incidentDateInput = reportForm?.elements.namedItem("incidentDate");
+  if (incidentDateInput) {
+    const now = new Date();
+    const localToday = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+    incidentDateInput.max = localToday;
+  }
 
   if (reportForm) {
     reportForm.addEventListener("submit", async (event) => {
       event.preventDefault();
       if (!reportForm.reportValidity()) return;
+      if (!reportLatitude?.value || !reportLongitude?.value) {
+        reportMessage.textContent = "Please select the incident location using the map in this form.";
+        pickerElement?.scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
+      const incidentDate = reportForm.elements.namedItem("incidentDate");
+      if (incidentDate?.value && incidentDate.max && incidentDate.value > incidentDate.max) {
+        reportMessage.textContent = "The incident date cannot be in the future.";
+        return;
+      }
       const submit = reportForm.querySelector("button[type=submit]");
       submit.disabled = true;
       reportMessage.textContent = "Submitting report...";
@@ -172,11 +208,17 @@
           longitude: values.longitude
         });
         reportForm.reset();
-        reportLocation.textContent = "No location selected.";
-        reportMessage.textContent = "Report submitted for review. Submission does not mean the disease is officially confirmed.";
+        reportLocation.textContent = "No location selected. A map point is required.";
+        reportMessage.textContent = "Report sent successfully. It is now pending administrator review and will appear in My Reports.";
+        await loadMyReports().catch(() => {});
+        document.dispatchEvent(new Event("pigment:farm-activity-updated"));
         if (selectedLocationMarker) {
           map.removeLayer(selectedLocationMarker);
           selectedLocationMarker = null;
+        }
+        if (pickerLocationMarker && pickerMap) {
+          pickerMap.removeLayer(pickerLocationMarker);
+          pickerLocationMarker = null;
         }
       } catch (error) {
         reportMessage.textContent = error.message;

@@ -122,16 +122,33 @@ try {
         if (!in_array($status, ['pending', 'under_review', 'confirmed', 'rejected'], true)) {
             sendResponse(422, 'error', 'Invalid report status.');
         }
+        $remarks = trim((string) ($data['admin_remarks'] ?? ''));
+        if (strlen($remarks) > 1000) sendResponse(422, 'error', 'Admin remarks are too long.');
+        if ($status === 'rejected' && strlen($remarks) < 5) sendResponse(422, 'error', 'Please provide a rejection reason.');
+        $pdo->beginTransaction();
+        $check = $pdo->prepare('SELECT report_status FROM disease_reports WHERE report_id = ? FOR UPDATE');
+        $check->execute([$reportId]);
+        $previous = $check->fetchColumn();
+        if ($previous === false) { $pdo->rollBack(); sendResponse(404, 'error', 'Report not found.'); }
+        if ($status === 'under_review' && !in_array($previous, ['pending', 'under_review'], true)) {
+            $pdo->rollBack(); sendResponse(409, 'error', 'Only pending reports can be accepted for review.');
+        }
+        if ($status === 'confirmed' && $previous === 'rejected') {
+            $pdo->rollBack(); sendResponse(409, 'error', 'A rejected report must be reopened for review first.');
+        }
         $confirmation = $data['confirmation'] ?? null;
-        $hasConfirmation = false;
         $stmt = $pdo->prepare('SELECT confirmation_id FROM disease_confirmations WHERE report_id = ?');
         $stmt->execute([$reportId]);
         $hasConfirmation = (bool) $stmt->fetchColumn();
         if ($status === 'confirmed' && is_array($confirmation)) {
             foreach (['confirmed_by_name', 'designation', 'organization', 'confirmation_date'] as $field) {
                 if (!is_string($confirmation[$field] ?? null) || trim($confirmation[$field]) === '') {
-                    sendResponse(422, 'error', 'Complete the authorized confirmation details.');
+                    $pdo->rollBack(); sendResponse(422, 'error', 'Complete the authorized veterinary confirmation details.');
                 }
+            }
+            $verifiedDate = DateTime::createFromFormat('!Y-m-d', $confirmation['confirmation_date']);
+            if (!$verifiedDate || $verifiedDate->format('Y-m-d') !== $confirmation['confirmation_date'] || $confirmation['confirmation_date'] > date('Y-m-d')) {
+                $pdo->rollBack(); sendResponse(422, 'error', 'Enter a valid confirmation date.');
             }
             $stmt = $pdo->prepare(
                 "INSERT INTO disease_confirmations
@@ -149,21 +166,20 @@ try {
             ]);
             $hasConfirmation = true;
         }
-        if ($data['is_published'] ?? false) {
-            if ($status !== 'confirmed' || !$hasConfirmation) {
-                sendResponse(422, 'error', 'Publication requires authorized veterinary confirmation.');
-            }
+        if ($status === 'confirmed' && !$hasConfirmation) {
+            $pdo->rollBack(); sendResponse(422, 'error', 'Authorized veterinary confirmation is required before marking a report confirmed.');
+        }
+        $publish = !empty($data['is_published']);
+        if ($publish && ($status !== 'confirmed' || !$hasConfirmation)) {
+            $pdo->rollBack(); sendResponse(422, 'error', 'Publication requires authorized veterinary confirmation.');
         }
         $stmt = $pdo->prepare(
             "UPDATE disease_reports
              SET report_status = ?, admin_remarks = ?, reviewed_by = ?, reviewed_at = NOW(), is_published = ?
              WHERE report_id = ?"
         );
-        $stmt->execute([
-            $status, trim((string) ($data['admin_remarks'] ?? '')), (int) $user['user_id'],
-            (int) !empty($data['is_published']), $reportId
-        ]);
-        if (!$stmt->rowCount()) sendResponse(404, 'error', 'Report not found.');
+        $stmt->execute([$status, $remarks, (int) $user['user_id'], (int) $publish, $reportId]);
+        $pdo->commit();
         sendResponse(200, 'success', 'Report updated.');
     }
 

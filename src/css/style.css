@@ -2761,3 +2761,45 @@ html body :is(.dashboard-hero, .market-hero, .pens-heading) :is(.button, a):focu
   .user-summary { gap: 6px; }
   .user-copy { display: none; }
 }
+/* Admin report inspection: spacious, responsive and keyboard-accessible dialog */
+.admin-layout {grid-template-columns:minmax(0,1fr)}
+.report-inspect-dialog {width:min(760px,calc(100% - 28px));max-height:min(90dvh,900px);margin:auto;padding:0;border:1px solid #d8e2d3;border-radius:18px;background:#fffefa;color:var(--color-ink);box-shadow:0 28px 90px rgba(17,45,28,.25);overflow:auto}
+.report-inspect-dialog::backdrop {background:rgba(19,39,27,.58);backdrop-filter:blur(3px)}
+.report-inspect-dialog [hidden] {display:none!important}
+.inspect-header {display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding:24px 28px 18px;border-bottom:1px solid #dce5d8;background:#f4f8ee}
+.inspect-header h2 {margin:5px 0 10px;font-size:clamp(21px,3vw,27px);line-height:1.25;overflow-wrap:anywhere}
+.inspect-header .eyebrow {margin:0}
+.inspect-status {display:inline-block;border:1px solid #d9c8aa;border-radius:50px;padding:5px 12px;background:#fff6e6;font-size:12px;font-weight:700;color:#765220}
+.inspect-status[data-status="under_review"] {background:#eaf2ff;border-color:#c2d4ef;color:#254f89}
+.inspect-status[data-status="confirmed"] {background:#e6f4e8;border-color:#b7d9c0;color:#24663e}
+.inspect-status[data-status="rejected"] {background:#fff0ed;border-color:#ebc3be;color:#932c25}
+.inspect-close {border:1px solid #d1ddcd;border-radius:10px;background:white;color:#375640;min-width:40px;height:40px;cursor:pointer;font-size:26px;line-height:1}
+.inspect-close:hover,.inspect-close:focus-visible {background:#e9f1e4;outline:2px solid #8cae7d;outline-offset:2px}
+.inspect-body {display:grid;gap:16px;padding:22px 28px 24px}
+.inspect-section {padding:20px;border:1px solid #dce5d8;border-radius:12px;background:white;min-width:0}
+.inspect-section h3 {font-size:16px;margin:0 0 5px;color:#274b34}
+.inspect-hint {font-size:12px;line-height:1.6;color:#637363;margin:0 0 16px}
+.inspect-facts {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:0}
+.inspect-facts div {min-width:0}
+.inspect-facts dt {font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#647363;font-weight:750;margin-bottom:5px}
+.inspect-facts dd {font-size:14px;line-height:1.6;margin:0;overflow-wrap:anywhere}
+.inspect-wide {grid-column:1 / -1}
+.inspect-observation {padding:14px;background:#f5f8f1;border-radius:9px;white-space:pre-wrap;overflow-wrap:anywhere}
+.inspect-field {display:block;margin:0 0 9px;font-size:12px;font-weight:700}
+.report-inspect-dialog input,.report-inspect-dialog textarea {box-sizing:border-box;width:100%;max-width:100%;font:inherit;font-size:14px;border-radius:8px}
+.report-inspect-dialog textarea {resize:vertical;min-height:85px}
+.inspect-confirmation summary {cursor:pointer;font-size:15px;font-weight:750;color:#274b34}
+.inspect-confirmation summary span {display:block;font-size:11px;font-weight:400;color:#6d7b6c;margin:4px 0 0}
+.inspect-confirmation[open] summary {margin-bottom:16px}
+.inspect-field-grid {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.inspect-field-grid label {display:block;min-width:0;font-size:12px;font-weight:650}
+.inspect-field-grid input,.inspect-field-grid textarea {display:block;margin-top:7px}
+.inspect-footer {padding:16px 28px 22px;border-top:1px solid #dce5d8;background:#fbfcf8}
+.inspect-footer .form-message {font-size:12px;min-height:0;margin:0 0 10px;line-height:1.5}
+.inspect-footer .form-message:empty {display:none}
+.inspect-footer .admin-actions {display:flex;flex-wrap:wrap;gap:9px}
+.inspect-footer .admin-actions .button {width:auto;min-height:38px;font-size:12px;padding:9px 13px}
+.inspect-footer .admin-actions .button:disabled {opacity:.48;cursor:not-allowed}
+.data-table tr.is-selected td {background:#edf4e7}
+@media(max-width:600px) {.report-inspect-dialog {width:calc(100% - 16px);max-height:94dvh;border-radius:12px}.inspect-header {padding:18px}.inspect-body {padding:14px;gap:12px}.inspect-section {padding:15px}.inspect-facts,.inspect-field-grid {grid-template-columns:1fr}.inspect-footer {padding:14px}.inspect-footer .admin-actions {display:grid;grid-template-columns:1fr 1fr}.inspect-footer .admin-actions .button {width:100%;font-size:11px}}
+@media(max-width:390px) {.inspect-footer .admin-actions {grid-template-columns:1fr}}
