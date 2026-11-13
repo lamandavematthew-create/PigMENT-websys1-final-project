@@ -30,7 +30,7 @@
     .map((item) => Number(item.pig_id));
   const latestWeight = (pigId) => (state.weights.get(Number(pigId)) || [])[0];
 
-  const priceArtwork = "../../public/assets/registered-pigs-price";
+  const priceArtwork = "../public/assets/registered-pigs-price";
   const wholePeso = new Intl.NumberFormat("en-PH", {style:"currency", currency:"PHP", maximumFractionDigits:0});
   const decimalPeso = new Intl.NumberFormat("en-PH", {style:"currency", currency:"PHP"});
   const money = (amount) => (Number.isInteger(amount) ? wholePeso : decimalPeso).format(amount);
@@ -383,10 +383,10 @@
       toggle.className = "pen-card-toggle";
       toggle.setAttribute("aria-expanded", String(state.expandedPen === pen.pen_id));
       // Compact pen summary matches the approved PigMENT design; values are from the API.
-      toggle.innerHTML = `<span class="pen-card-image" aria-hidden="true"><img src="../../public/assets/my-pigs-redesign/illustrations/pig-pen-scene.png" alt=""></span>
+      toggle.innerHTML = `<span class="pen-card-image" aria-hidden="true"><img src="../public/assets/my-pigs-redesign/illustrations/pig-pen-scene.png" alt=""></span>
         <span class="pen-card-main"><span class="pen-card-title"><strong class="pen-card-name"></strong><span class="pen-card-status"></span></span>
-          <span class="pen-card-metrics"><span class="pen-card-pigs"><img src="../../public/assets/my-pigs-redesign/icons/svg/pig-outline.svg" alt="" aria-hidden="true"><span class="pen-card-pig-count"></span></span>
-          <span class="pen-card-weight"><img src="../../public/assets/my-pigs-redesign/icons/svg/weight.svg" alt="" aria-hidden="true"><span class="pen-card-weight-value"></span></span></span>
+          <span class="pen-card-metrics"><span class="pen-card-pigs"><img src="../public/assets/my-pigs-redesign/icons/svg/pig-outline.svg" alt="" aria-hidden="true"><span class="pen-card-pig-count"></span></span>
+          <span class="pen-card-weight"><img src="../public/assets/my-pigs-redesign/icons/svg/weight.svg" alt="" aria-hidden="true"><span class="pen-card-weight-value"></span></span></span>
         </span><span class="pen-card-chevron" aria-hidden="true">›</span>`;
       text(toggle.querySelector(".pen-card-name"), pen.pen_name);
       const status = toggle.querySelector(".pen-card-status");
@@ -492,6 +492,7 @@
     document.body.classList.remove("register-pig-modal-open");
     if (registrationPreviousFocus?.isConnected) registrationPreviousFocus.focus({ preventScroll: true });
     registrationPreviousFocus = null;
+    if (document.body.dataset.workspaceRoute === "my-pigs" && location.hash === "#register-pig") history.replaceState(null, "", "index.html#my-pigs");
   }
   function openRegistration() {
     registrationPreviousFocus = document.activeElement;
@@ -509,11 +510,6 @@
   $("#close-registration").addEventListener("click", () => closeRegistration());
   $("#cancel-registration").addEventListener("click", () => closeRegistration());
   registerBackdrop.addEventListener("click", () => closeRegistration());
-  // Home dashboard links point to my-pigs.html#register-pig.
-  if (window.location.hash === "#register-pig") openRegistration();
-  window.addEventListener("hashchange", () => {
-    if (window.location.hash === "#register-pig" && registerDialog.hidden) openRegistration();
-  });
   document.addEventListener("keydown", (event) => {
     if (registerDialog.hidden) return;
     if (event.key === "Escape") { event.preventDefault(); closeRegistration(); return; }
@@ -744,5 +740,22 @@
     } catch (error) { $("#litter-error").textContent = error.message; $("#litter-error").hidden = false; }
   });
 
-  load();
+  let started = false;
+  function syncMyPigs(target) {
+    if (document.body.dataset.workspaceRoute !== "my-pigs") {
+      if (!registerDialog.hidden) closeRegistration(true);
+      if (!$("#edit-pig-panel").hidden) closeEditPig(true);
+      if (!$("#pen-form").hidden) closePenForm();
+      return;
+    }
+    if (!started) {
+      started = true;
+      load();
+    }
+    if (target === "register-pig" && registerDialog.hidden) openRegistration();
+    else if (target !== "register-pig" && !registerDialog.hidden) closeRegistration();
+  }
+  document.addEventListener("pigment:workspace-route", (event) => syncMyPigs(event.detail.target));
+  syncMyPigs(location.hash.slice(1));
+
 })();

@@ -7,7 +7,7 @@
     const [pathname, query] = path.split("?");
     let url;
     if (isNestedPage) {
-      url = pathname === "index.html" ? "../index.html" : pathname.replace(/^pages\//, "");
+      url = /^index\.html(?:#|$)/.test(pathname) ? `../${pathname}` : pathname.replace(/^pages\//, "");
     } else {
       url = ["login.html", "register.html"].includes(pathname) ? `pages/${pathname}` : pathname;
     }
@@ -16,9 +16,9 @@
 
   function getSafeNext() {
     const next = new URLSearchParams(window.location.search).get("next");
-    if (!next || next.startsWith("http") || next.startsWith("//") || next.includes("..")) {
-      return "";
-    }
+    const legacy = { "my-pigs.html":"my-pigs", "marketplace.html":"marketplace", "reports.html":"summary", "profile.html":"profile" };
+    if (next && Object.hasOwn(legacy, next)) return "index.html#" + legacy[next];
+    if (!next || !/^index\.html(?:#[a-z-]+)?$/.test(next)) return "";
     return next;
   }
 

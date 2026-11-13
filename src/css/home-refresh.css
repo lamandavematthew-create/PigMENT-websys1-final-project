@@ -107,3 +107,26 @@ html body.home-refresh .page-footer {color:#536358;}
 }
 html body.home-refresh .hero-rays {right:22%;top:10%;height:42px;transform:rotate(2deg);}
 @media (max-width:760px) {html body.home-refresh .hero-rays {right:8%;top:39%;height:36px;}}
+
+/* Mobile drawer starts below the sticky header so its brand is never covered. */
+@media screen and (max-width: 800px) {
+  body.home-refresh { --mobile-header-height:72px; }
+  html body.home-refresh .topbar {
+    height:var(--mobile-header-height);
+    min-height:var(--mobile-header-height);
+  }
+  html body.home-refresh .sidebar {
+    inset-block-start:var(--mobile-header-height);
+    width:min(270px, 100%);
+    overflow-x:hidden;
+    overflow-y:auto;
+    overscroll-behavior:contain;
+  }
+  html body.home-refresh .sidebar > * { flex-shrink:0; }
+  html body.home-refresh .sidebar .brand { margin-bottom:48px; }
+}
+@media screen and (max-width: 360px) {
+  html body.home-refresh .topbar { padding-inline:12px; gap:8px; }
+  html body.home-refresh .topbar-actions, html body.home-refresh .topbar .user-summary { gap:6px; }
+  html body.home-refresh .topbar .auth-logout { padding-inline:9px; }
+}

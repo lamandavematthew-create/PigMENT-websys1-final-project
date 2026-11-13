@@ -2,7 +2,7 @@
   const grid = document.querySelector("#listing-grid");
   if (!grid) return;
 
-  const apiBase = "../../api/";
+  const apiBase = "../api/";
   const listView = document.querySelector("#list-view");
   const detailView = document.querySelector("#detail-view");
   const formView = document.querySelector("#form-view");
@@ -13,6 +13,11 @@
   const weightFilter = document.querySelector("#weight-filter");
   const locationFilter = document.querySelector("#location-filter");
   const filterPanel = document.querySelector(".market-filter-panel");
+  const filterToggle = document.querySelector("#market-filters-toggle");
+  const filterOptionsRow = document.querySelector("#market-filter-options");
+  const filterCount = document.querySelector("#market-filter-count");
+  const browseTab = document.querySelector("#browse-tab");
+  const myListingsTab = document.querySelector("#my-listings-tab");
   const resultsHeading = document.querySelector(".market-results-heading");
   const count = document.querySelector("#listing-count");
   const message = document.querySelector("#market-message");
@@ -78,7 +83,7 @@
   function imagePath(path) {
     if (!path || typeof path !== "string") return "";
     if (/^https?:\/\//i.test(path) || path.startsWith("/")) return path;
-    return `../../${path.replace(/^\.?\//, "")}`;
+    return `../${path.replace(/^\.?\//, "")}`;
   }
 
   function artwork() {
@@ -103,7 +108,7 @@
     image.src = path;
     image.alt = listing.listing_title || "Marketplace listing";
     image.loading = "lazy";
-    image.onerror = () => wrapper.replaceChildren(artwork());
+    image.onerror = () => image.replaceWith(artwork());
     wrapper.append(image);
     return wrapper;
   }
@@ -123,43 +128,60 @@
     return [listing.barangay, listing.municipality].filter(Boolean).join(", ");
   }
 
+  const metaIcons = {
+    breed: '<path d="m12 3 9 5-9 5-9-5 9-5Zm-9 9 9 5 9-5M3 16l9 5 9-5"/>',
+    weight: '<path d="M6 8h12l3 13H3L6 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
+    location: '<path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/>'
+  };
+
+  function cardMeta(kind, value) {
+    const item = document.createElement("li");
+    item.innerHTML = `<svg class="market-ui-icon" aria-hidden="true" viewBox="0 0 24 24">${metaIcons[kind]}</svg><span></span>`;
+    item.lastElementChild.textContent = value;
+    return item;
+  }
+
   function card(listing, owned = false) {
     const article = document.createElement("article");
     article.className = "listing-card";
-    article.append(listingImage(listing));
-    const content = document.createElement("div");
-    content.className = "listing-card-content";
-    const top = document.createElement("div");
-    top.className = "listing-card-topline";
+    const media = document.createElement("div");
+    media.className = "market-card-media";
     const type = document.createElement("span");
     type.className = "listing-type-label";
     type.textContent = listing.pig_type || "Pig";
+    media.append(listingImage(listing), type);
+    const content = document.createElement("div");
+    content.className = "listing-card-content";
+    const title = document.createElement("h3");
+    title.textContent = listing.listing_title;
     const price = document.createElement("strong");
     price.className = "listing-price";
     price.textContent = formatPrice(listing.asking_price);
-    top.append(type, price);
-    const title = document.createElement("h3");
-    title.textContent = listing.listing_title;
-    const breed = document.createElement("p");
-    breed.className = "listing-breed";
-    breed.textContent = listing.breed;
-    const facts = document.createElement("div");
-    facts.className = "listing-card-facts";
-    facts.append(fact("Age", formatAge(listing.age_months)), fact("Estimated weight", listing.estimated_weight ? `~${listing.estimated_weight} kg` : "Not provided"));
-    const location = document.createElement("p");
-    location.className = "listing-location";
-    location.textContent = locationText(listing) || "Location not provided";
-    const seller = document.createElement("p");
-    seller.className = "listing-seller";
-    seller.textContent = owned ? `Status: ${statusLabel(listing.listing_status)}` : `Listed by ${[listing.seller_first_name, listing.seller_last_name].filter(Boolean).join(" ") || "Farmer"}`;
+    const topline = document.createElement("div");
+    topline.className = "market-card-title";
+    topline.append(title, price);
+    const facts = document.createElement("ul");
+    facts.className = "market-card-meta";
+    facts.append(
+      cardMeta("breed", `Breed: ${listing.breed || "Not provided"}`),
+      cardMeta("weight", `Weight: ${listing.estimated_weight ? `~${listing.estimated_weight} kg` : "Not provided"}`),
+      cardMeta("location", locationText(listing) || "Location not provided")
+    );
+    content.append(topline, facts);
+    if (owned) {
+      const status = document.createElement("p");
+      status.className = "listing-seller";
+      status.textContent = `Status: ${statusLabel(listing.listing_status)}`;
+      content.append(status);
+    }
     const view = document.createElement("button");
     view.className = "button button-secondary listing-view-button";
     view.type = "button";
-    view.textContent = owned ? "View Details" : "View Listing";
+    view.textContent = "View Details";
     view.addEventListener("click", () => showDetails(listing, owned));
-    content.append(top, title, breed, facts, location, seller, view);
+    content.append(view);
     if (owned) content.append(managementActions(listing));
-    article.append(content);
+    article.append(media, content);
     return article;
   }
 
@@ -207,6 +229,9 @@
   }
 
   function renderBrowse() {
+    const selectedFilters = [typeFilter, breedFilter, weightFilter, locationFilter].filter((control) => control.value !== "all").length;
+    filterCount.textContent = selectedFilters ? `(${selectedFilters})` : "";
+    filterCount.hidden = selectedFilters === 0;
     const visible = filteredListings();
     grid.replaceChildren(...visible.map((listing) => card(listing)));
     count.textContent = `${visible.length} ${visible.length === 1 ? "listing" : "listings"}`;
@@ -394,7 +419,7 @@
 
   function beginEdit(listing) {
     fillForm(listing);
-    document.querySelector("#form-title").textContent = "Edit Post";
+    document.querySelector("#marketplace-form-title").textContent = "Edit Post";
     document.querySelector("#save-listing").textContent = "Save Changes";
   }
 
@@ -453,12 +478,28 @@
     uploadArea.classList.add("has-image");
   });
 
+  filterToggle.hidden = false;
+  filterToggle.addEventListener("click", () => {
+    const expanded = filterToggle.getAttribute("aria-expanded") === "true";
+    filterToggle.setAttribute("aria-expanded", String(!expanded));
+    filterOptionsRow.classList.toggle("is-expanded", !expanded);
+  });
+
+  function selectTab(tab) {
+    activeTab = tab;
+    const browsing = tab === "browse";
+    browseTab.classList.toggle("is-active", browsing);
+    myListingsTab.classList.toggle("is-active", !browsing);
+    browseTab.setAttribute("aria-pressed", String(browsing));
+    myListingsTab.setAttribute("aria-pressed", String(!browsing));
+  }
+
   [search, typeFilter, breedFilter, weightFilter, locationFilter].forEach((control) => control.addEventListener("input", renderBrowse));
   document.querySelector("#reset-filters").addEventListener("click", () => { search.value = ""; typeFilter.value = "all"; breedFilter.value = "all"; weightFilter.value = "all"; locationFilter.value = "all"; renderBrowse(); });
   document.querySelector("#empty-reset").addEventListener("click", () => document.querySelector("#reset-filters").click());
   document.querySelector("#post-listing").addEventListener("click", () => {
     if (!currentUser) {
-      window.location.assign("login.html?next=marketplace.html&message=Please sign in to post a listing.");
+      window.location.assign("pages/login.html?next=index.html%23marketplace&message=Please sign in to post a listing.");
       return;
     }
     fillForm();
@@ -471,20 +512,18 @@
   document.querySelector("#save-listing").addEventListener("click", publish);
   document.querySelector("#market-retry").addEventListener("click", loadAll);
   document.querySelector("#browse-tab").addEventListener("click", () => {
-    activeTab = "browse";
+    selectTab("browse");
     filterPanel.hidden = false;
     resultsHeading.hidden = false;
-    document.querySelector("#browse-tab").classList.add("is-active");
-    document.querySelector("#my-listings-tab").classList.remove("is-active");
+    showMessage("");
     renderBrowse();
   });
   document.querySelector("#my-listings-tab").addEventListener("click", () => {
-    activeTab = "mine";
+    selectTab("mine");
     filterPanel.hidden = true;
     resultsHeading.hidden = true;
     empty.hidden = true;
-    document.querySelector("#my-listings-tab").classList.add("is-active");
-    document.querySelector("#browse-tab").classList.remove("is-active");
+    showMessage("");
     if (!currentUser) {
       showMessage("Please sign in to manage your listings.", true);
       grid.replaceChildren();
@@ -494,5 +533,14 @@
   });
   form.addEventListener("submit", (event) => { event.preventDefault(); if (!form.reportValidity()) return; showPreview(); });
 
-  loadAll();
+  let started = false;
+  function enterMarketplace() {
+    if (!started && document.body.dataset.workspaceRoute === "marketplace") {
+      started = true;
+      loadAll();
+    }
+  }
+  document.addEventListener("pigment:workspace-route", enterMarketplace);
+  enterMarketplace();
+
 })();

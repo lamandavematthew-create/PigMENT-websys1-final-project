@@ -87,12 +87,58 @@ html body.my-pigs-refresh .pig-card .pig-profile {
   grid-area:details; background:#f7faf3; padding:14px;
   border:1px solid #e0e9db; border-radius:11px;
 }
-@container pig-records (max-width: 370px) {
-  html body.my-pigs-refresh .records-panel .records-heading-compact .search-field {
-    flex:1 1 100%; width:100%;
+/* The shared narrow-screen toolbar switches to flex-direction: column.
+   Do not carry its desktop flex-basis into the vertical axis. */
+@media (max-width: 650px) {
+  html body.my-pigs-refresh .records-panel .records-heading-compact {
+    display:grid;
+    grid-template-columns:minmax(0,1fr);
+    align-content:start;
+    gap:9px;
+    min-height:0;
+    padding:12px 14px 14px;
   }
-  html body.my-pigs-refresh .records-panel .records-heading-compact .filter-field {
-    flex:1 1 100%;
+  html body.my-pigs-refresh .records-panel .records-heading-compact .list-controls-inline {
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(110px, .58fr);
+    align-items:center;
+    justify-content:stretch;
+    width:100%;
+    min-width:0;
+    gap:7px 8px;
+  }
+  html body.my-pigs-refresh .records-panel .records-heading-compact .record-count {
+    grid-column:1 / -1;
+    margin:0;
+    line-height:1.35;
+  }
+  html body.my-pigs-refresh .records-panel .records-heading-compact :is(.search-field,.filter-field) {
+    display:block;
+    position:relative;
+    width:100%;
+    min-width:0;
+    margin:0;
+  }
+  html body.my-pigs-refresh .records-panel .records-heading-compact :is(#pig-search,#status-filter) {
+    display:block;
+    width:100%;
+    height:44px;
+    min-height:44px;
+    min-width:0;
+    font-size:16px;
+    line-height:normal;
+  }
+  html body.my-pigs-refresh .records-panel .records-heading-compact #pig-search { padding:7px 8px 7px 33px; }
+  html body.my-pigs-refresh .records-panel .records-heading-compact .registered-search-icon { left:10px; }
+  html body.my-pigs-refresh .records-panel .records-heading-compact::after {
+    left:auto;
+    right:7px;
+    opacity:.36;
+  }
+}
+@media (max-width: 410px) {
+  html body.my-pigs-refresh .records-panel .records-heading-compact .list-controls-inline {
+    grid-template-columns:minmax(0,1fr);
   }
 }
 

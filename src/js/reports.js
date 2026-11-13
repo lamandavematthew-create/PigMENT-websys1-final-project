@@ -52,6 +52,7 @@
     container.replaceChildren();
     const activePens = pens.filter((pen) => pen.pen_status === "active");
     setText("#active-pen-count", activePens.length);
+    setText("#active-pen-label", activePens.length === 1 ? "active pen" : "active pens");
     if (!activePens.length) {
       const empty = document.createElement("p");
       empty.className = "small-muted report-empty-copy";
@@ -62,24 +63,42 @@
     activePens.forEach((pen) => {
       const occupancy = current.filter((item) => Number(item.pen_id) === Number(pen.pen_id)).length;
       const card = document.createElement("article");
-      card.className = "report-stat-card";
+      card.className = "summary-pen-card";
+      const heading = document.createElement("div");
+      heading.className = "summary-pen-line";
       const name = document.createElement("span");
-      name.textContent = pen.pen_name;
+      const penName = String(pen.pen_name || "").trim();
+      name.textContent = penName ? (/^\d+$/.test(penName) ? `Pen ${penName}` : penName) : "Unnamed pen";
       const value = document.createElement("strong");
-      value.textContent = `${occupancy} / ${pen.capacity} pigs`;
-      const detail = document.createElement("small");
-      detail.textContent = `${occupancy} assigned · capacity ${pen.capacity}`;
-      card.append(name, value, detail);
+      const capacity = Number(pen.capacity);
+      const validCapacity = Number.isFinite(capacity) && capacity > 0;
+      value.textContent = validCapacity ? `${occupancy} / ${capacity} pigs` : `${occupancy} assigned · no capacity set`;
+      heading.append(name, value);
+      card.append(heading);
+      if (validCapacity) {
+        const percent = Math.round(occupancy / capacity * 100);
+        const line = document.createElement("div");
+        line.className = "summary-pen-meter";
+        const bar = document.createElement("progress");
+        bar.max = capacity;
+        bar.value = Math.min(occupancy, capacity);
+        bar.setAttribute("aria-label", `${name.textContent} occupancy`);
+        const label = document.createElement("span");
+        label.textContent = `${percent}%`;
+        line.append(bar, label);
+        card.append(line);
+      }
       container.append(card);
     });
   }
 
   function renderLitters(litters) {
     setText("#total-litters", litters.length);
+    setText("#total-litters-label", litters.length === 1 ? "recorded litter" : "recorded litters");
     const container = $("#litter-summary");
     container.replaceChildren();
     if (!litters.length) {
-      container.textContent = "No litter records have been recorded.";
+      container.textContent = "No litter records yet.";
       return;
     }
     litters.forEach((litter) => {
@@ -118,13 +137,21 @@
       renderListings(listingResponse.data || []);
     } catch (error) {
       if (error.status === 401) {
-        window.location.assign(`login.html?next=${encodeURIComponent("reports.html")}&message=Your session has ended. Please sign in again.`);
+        window.location.assign(`pages/login.html?next=${encodeURIComponent("index.html#summary")}&message=Your session has ended. Please sign in again.`);
         return;
       }
-      showMessage(error.message || "Reports could not be loaded. Please try again.", true);
+      showMessage(error.message || "The summary could not be loaded. Please try again.", true);
     }
   }
 
   $("#print-report").addEventListener("click", () => window.print());
-  auth.requireAuth().then((user) => { if (user) load(); });
+  let started = false;
+  function enterSection() {
+    if (!started && document.body.dataset.workspaceRoute === "summary") {
+      started = true;
+      load();
+    }
+  }
+  document.addEventListener("pigment:workspace-route", enterSection);
+  enterSection();
 })();

@@ -1,76 +1,11 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="View and update your PigMENT farmer profile.">
-  <title>My Profile | PigMENT</title>
-  <link rel="stylesheet" href="../css/style.css">
-  <script src="../js/script.js" defer></script>
-  <script src="../js/auth.js" defer></script>
-  <script src="../js/profile.js" defer></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PigMENT</title>
+  <link rel="canonical" href="../index.html#profile">
+  <script src="../js/workspace-redirect.js" defer></script>
 </head>
-<body data-requires-auth="true" data-auth-pending="true">
-  <div class="app-shell">
-    <aside class="sidebar" id="sidebar">
-      <a class="brand" href="../index.html" aria-label="PigMENT dashboard">
-        <img class="brand-logo" src="../../public/assets/pigment-logo.png" alt="">
-        <span>Pig<span class="brand-accent">MENT</span><small>Farm management</small></span>
-      </a>
-      <p class="nav-caption">MAIN MENU</p>
-      <nav class="side-nav" aria-label="Main navigation">
-        <a class="nav-link" href="../index.html"><svg aria-hidden="true" viewbox="0 0 24 24"><rect height="7" rx="1" width="7" x="3" y="3"></rect><rect height="7" rx="1" width="7" x="14" y="3"></rect><rect height="7" rx="1" width="7" x="3" y="14"></rect><rect height="7" rx="1" width="7" x="14" y="14"></rect></svg><span>Home</span></a>
-        <a class="nav-link" href="my-pigs.html"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M4 13v-2a2 2 0 0 1 2-2h1l2-3h6l2 3h1a2 2 0 0 1 2 2v2"></path><path d="M5 13h14l1 3a2 2 0 0 1-2 2h-1"></path><path d="M6 17H5a2 2 0 0 1-2-2l1-2"></path><circle cx="8" cy="15" r="1"></circle><circle cx="16" cy="15" r="1"></circle></svg><span>My Pigs</span></a>
-        <a class="nav-link" href="marketplace.html"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M3 9 12 4l9 5"></path><path d="M5 10v9M9 10v9M15 10v9M19 10v9M3 20h18M2 9h20"></path></svg><span>Marketplace</span></a>
-        <a class="nav-link" href="../index.html#disease-awareness"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M12 21s8-4 8-11V5l-8-3-8 3v5c0 7 8 11 8 11Z"></path><path d="M9 12h6M12 9v6"></path></svg><span>Pig Health</span></a>
-      </nav>
-      <div class="sidebar-bottom">
-        <p class="nav-caption">MORE</p>
-        <a class="nav-link" href="reports.html"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M4 19V5M4 19h17"></path><path d="m7 15 4-4 3 2 5-6"></path><path d="M16 7h3v3"></path></svg><span>Reports</span></a>
-        <a class="nav-link active" href="profile.html" aria-current="page"><svg aria-hidden="true" viewbox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg><span>Profile</span></a>
-        <div class="sidebar-note"><strong>Your farm workspace</strong><span>Update your account information securely.</span></div>
-      </div>
-    </aside>
-
-    <div class="page-area">
-      <header class="topbar">
-        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar"><span class="sr-only">Toggle navigation</span><span></span><span></span><span></span></button>
-        <div class="topbar-context"><span class="topbar-label">Farm workspace</span><span class="topbar-location">My Profile</span></div>
-        <div class="topbar-actions"><div class="user-summary"><span class="user-avatar" aria-hidden="true">F</span><span class="user-copy"><strong>Farm account</strong><small>Farmer account</small></span><button class="button button-secondary auth-logout" type="button">Log out</button></div></div>
-      </header>
-
-      <main class="main-content profile-page">
-        <div class="page-heading"><div><p class="eyebrow">Account settings</p><h1>My Profile</h1><p class="page-description">View and update the information connected to your farmer account.</p></div><button class="button button-primary" id="edit-profile" type="button">Edit Profile</button></div>
-        <p class="form-message" id="profile-message" role="status" hidden></p>
-        <section class="profile-card" aria-labelledby="profile-information-title">
-          <div class="profile-card-heading"><div><p class="eyebrow">Account information</p><h2 id="profile-information-title">My Information</h2></div><span class="status-label status-label-monitoring" id="profile-role">Farmer</span></div>
-          <dl class="profile-details">
-            <div><dt>Full Name</dt><dd id="profile-name">—</dd></div>
-            <div><dt>Email Address</dt><dd id="profile-email">—</dd></div>
-            <div><dt>Contact Number</dt><dd id="profile-phone">—</dd></div>
-            <div><dt>Municipality</dt><dd id="profile-municipality">—</dd></div>
-            <div><dt>Barangay</dt><dd id="profile-barangay">—</dd></div>
-            <div><dt>Address</dt><dd id="profile-address">—</dd></div>
-            <div><dt>Account Role</dt><dd id="profile-role-detail">—</dd></div>
-          </dl>
-        </section>
-
-        <section class="profile-card profile-edit-card" id="profile-form-panel" hidden aria-labelledby="edit-profile-title">
-          <div class="profile-card-heading"><div><p class="eyebrow">Editable details</p><h2 id="edit-profile-title">Edit Profile</h2></div></div>
-          <form id="profile-form" class="form-grid">
-            <label>First Name<input name="first_name" required maxlength="100"></label>
-            <label>Last Name<input name="last_name" required maxlength="100"></label>
-            <label>Phone Number<input name="phone_number" required maxlength="20"></label>
-            <label>Municipality<input name="municipality" required maxlength="100"></label>
-            <label>Barangay<input name="barangay" required maxlength="100"></label>
-            <label class="form-span-2">Address<textarea name="address" rows="3" maxlength="255"></textarea></label>
-            <div class="form-span-2 form-actions"><button class="button button-primary" type="submit">Save Changes</button><button class="button button-secondary" id="cancel-profile" type="button">Cancel</button></div>
-          </form>
-          <p class="small-muted">Email address and account role cannot be changed here.</p>
-        </section>
-        <footer class="page-footer"><span>PigMENT · My Profile</span><span>Your email and role are read-only.</span></footer>
-      </main>
-    </div>
-  </div>
-</body>
+<body><main><p>This section has moved to the PigMENT workspace.</p><a href="../index.html#profile">Open PigMENT</a></main></body>
 </html>
