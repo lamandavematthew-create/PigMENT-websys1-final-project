@@ -1,0 +1,20 @@
+html body #litter-dialog:not([open]) { display: none; }
+html body #litter-dialog {
+  position: fixed; inset: 0; box-sizing: border-box; width: min(680px, calc(100% - 24px));
+  max-width: none; max-height: min(90vh, calc(100% - 24px)); max-height: min(90dvh, calc(100% - 24px));
+  margin: auto; overflow: auto; overscroll-behavior: contain;
+  padding: clamp(15px, 3vw, 25px); border: 1px solid #d1e2d5; border-radius: 16px;
+  background: #fffefa; color: #15382c; box-shadow: 0 24px 80px #092c2355;
+}
+#litter-dialog::backdrop { background: #102d2496; backdrop-filter: blur(2px); }
+body:has(#litter-dialog[open]) { overflow: hidden; }
+#litter-dialog .form-heading { align-items: flex-start; }
+html body #litter-dialog-title { font-size: clamp(20px, 4vw, 24px); margin-bottom: 0; }
+#litter-dialog .litter-form-grid { gap: 12px; }
+#litter-dialog .litter-form-grid > label { display: block; min-width: 0; }
+#litter-dialog .litter-form-grid :is(select, input, textarea) { display: block; box-sizing: border-box; width: 100%; margin-top: 5px; }
+#litter-dialog .form-actions { margin-top: 16px; }
+#litter-dialog .form-error { margin-top: 10px; }
+@media (max-width: 560px) {
+  #litter-dialog .litter-form-grid { grid-template-columns: minmax(0, 1fr); }
+}

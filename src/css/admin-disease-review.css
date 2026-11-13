@@ -1,0 +1,136 @@
+html body.admin-workspace .disease-review-page .admin-hero { min-height: 176px; }
+.disease-review-page :is(#reports, #zones, .review-table-wrap, #review-retry, #zone-retry)[hidden] { display: none; }
+.review-queue-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px 22px; flex-wrap: wrap; }
+.review-queue-heading .muted { margin-bottom: 0; }
+.review-controls { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px 18px; margin: 22px 0 16px; }
+.review-filters { display: flex; flex-wrap: wrap; gap: 7px; }
+.review-filters button {
+  min-height: 42px; display: inline-flex; align-items: center; gap: 7px;
+  padding: 6px 10px; border-radius: 9px; border: 1px solid #c7d5cc;
+  background: #fff; color: #274136; font: inherit; font-size: 13px; cursor: pointer;
+}
+.review-filters button:hover, .review-filters button[aria-pressed="true"] {
+  background: #e7f2dc; border-color: #4f8758; color: #164630;
+}
+.review-filters button[aria-pressed="true"] { font-weight: 750; box-shadow: inset 0 0 0 1px #4f8758; }
+.review-filters button span { background: #eaf0eb; border-radius: 20px; padding: 1px 7px; font-weight: 700; }
+.review-filters button[aria-pressed="true"] span { background: #cce5b9; }
+.review-search { position: relative; width: min(100%, 286px); }
+.review-search svg, .review-safeguard svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.8; flex-shrink: 0; }
+.review-search svg { position: absolute; top: 12px; left: 12px; color: #396050; pointer-events: none; }
+.review-search input[type="search"] { width: 100%; min-height: 42px; margin: 0; padding-left: 37px; }
+.disease-review-page .review-table-wrap { border: 1px solid #dbe4dc; border-radius: 10px; overflow-x: auto; }
+.disease-review-page .review-table { min-width: 0; }
+.review-table strong, .review-table small { display: block; }
+.review-table small { color: #486057; }
+.review-status { display: inline-flex; align-items: center; gap: 6px; padding: 4px 9px; border-radius: 20px; background: #eaf0eb; color: #244536; font-size: 12px; font-weight: 700; width: fit-content; }
+.review-status::before { content: ""; width: 7px; height: 7px; flex: none; border-radius: 50%; background: currentColor; }
+.review-status[data-status="pending"] { background: #ffedc0; color: #714600; }
+.review-status[data-status="under_review"] { background: #e1effa; color: #255471; }
+.review-status[data-status="confirmed"] { background: #dff1de; color: #1b572f; }
+.review-status[data-status="rejected"] { background: #f9e6e6; color: #853337; }
+html body.admin-workspace .review-open { background: #07543b; border-color: #07543b; color: #fff; font-weight: 750; min-height: 42px; }
+html body.admin-workspace .review-open:hover { background: #033e2c; border-color: #033e2c; }
+.review-message:empty, .review-results-count:empty { display: none; }
+.review-message { margin: 12px 0; color: #475951; }
+.review-safeguard { display: flex; align-items: flex-start; gap: 9px; color: #2c493b; background: #edf3e5; padding: 12px; border-radius: 8px; margin: 16px 0 0; }
+.review-results-count { color: #475951; margin: 12px 0 0; }
+.disease-review-page .admin-zone-layout:has(.zone-form[hidden]) { grid-template-columns: minmax(0, 1fr); }
+.disease-review-page #zone-message:not(:empty) { margin-bottom: 10px; }
+.disease-review-page #zones .table-wrap { overflow-x: auto; }
+@media (max-width: 650px) {
+  html body.admin-workspace .disease-review-page .admin-hero { min-height: 205px; }
+  .disease-review-page .review-table tbody { padding: 8px; }
+  .review-table .review-open { width: 100%; }
+  .review-controls { margin-top: 16px; }
+  .review-search { width: 100%; }
+}
+.disease-review-page .zone-form[hidden] { display: none; }
+@media (max-width: 600px) {
+  html body.admin-workspace .disease-review-page .admin-hero { min-height: 240px; }
+  html body.admin-workspace .disease-review-page .admin-hero .hero-art { top: 48%; }
+}
+
+/* Zone management shares the report queue's spacing and green palette. */
+.disease-review-page .zone-management { margin-top: 0; }
+.zone-card-heading { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 10px 20px; margin-bottom: 14px; }
+.zone-card-heading .muted, .zone-card-heading h2 { margin-bottom: 0; }
+.zone-map-actions, .zone-row-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.zone-farmer-link { color: #07543b; text-decoration: underline; text-underline-offset: 3px; padding: 6px; font-weight: 700; }
+html body.admin-workspace .zone-draw { color: #123522; background: #ffcd57; border-color: #e7ad31; font-weight: 750; }
+html body.admin-workspace .zone-draw:not(:disabled):hover { background: #ffda83; }
+.disease-review-page .zone-map-panel .admin-zone-map { margin-top: 0; height: clamp(280px, 43vh, 460px); min-height: 280px; border: 1px solid #dbe4dc; border-radius: 12px; isolation: isolate; }
+.zone-map-panel .admin-zone-layout:has(.zone-form:not([hidden])) .admin-zone-map { min-height: 330px; }
+.disease-review-page .zone-table-wrap { overflow-x: auto; border: 1px solid #dbe4dc; border-radius: 10px; }
+.disease-review-page #zone-results[hidden], .disease-review-page #zone-count[hidden] { display: none; }
+.zone-feedback:empty { display: none; }
+.zone-feedback { margin: 0 0 12px; color: #385348; }
+.zone-pill { display: inline-block; vertical-align: middle; color: #365347; background: #e9f0eb; padding: 4px 8px; border-radius: 18px; font-size: 12px; font-weight: 750; }
+.zone-pill[data-state="published"] { color: #1a5639; background: #dcefe1; }
+.zone-row-actions .button { min-height: 38px; }
+.zone-row-actions small { flex-basis: 100%; color: #4c6056; }
+.zone-table-wrap .data-table { min-width: 0; }
+@media (max-width: 650px) {
+  .zone-card-heading { display: grid; }
+  .zone-table-wrap .data-table tbody { padding: 8px; }
+  .zone-map-actions .button, .zone-row-actions .button { min-height: 44px; }
+}
+.zone-map-actions .button svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.zone-map-actions .zone-draw svg circle { fill: #ffcd57; }
+.zone-pill[data-state="low"] { color: #315232; background: #e1edda; }
+.zone-pill[data-state="moderate"] { color: #704900; background: #ffedc0; }
+.zone-pill[data-state="high"] { color: #853337; background: #f9e6e6; }
+html body.admin-workspace .zone-row-actions .zone-publish:not(:disabled) { color: #123522; background: #ffcd57; border-color: #e7ad31; }
+
+/* Keep the map and editor usable independently. */
+.disease-review-page .zone-map-panel .admin-zone-layout {
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: 16px;
+}
+.zone-map-frame { min-width: 0; }
+.zone-map-hint { margin: 9px 2px 0; color: #475951; font-size: .875rem; }
+.disease-review-page .zone-form {
+  min-width: 0;
+  padding: clamp(14px, 2vw, 20px);
+  background: #f7faf6;
+  border: 1px solid #d5e2d8;
+  border-radius: 12px;
+}
+.zone-editor-heading { margin-bottom: 14px; }
+html body .zone-editor-heading h3 { color: #173e2e; font-size: 1.1rem; margin: 0 0 4px; }
+.zone-editor-heading p { margin: 0; color: #475951; font-size: .875rem; }
+.zone-editor-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px 12px; }
+.zone-editor-fields label { display: grid; grid-template-rows: 1fr auto; gap: 5px; min-width: 0; color: #273e33; font-size: .875rem; font-weight: 650; }
+.zone-field-wide { grid-column: 1 / -1; }
+.disease-review-page .zone-editor-fields :is(input, select, textarea) {
+  box-sizing: border-box; width: 100%; min-width: 0; max-width: none; margin: 0;
+  min-height: 42px; border: 1px solid #b1c0b7; border-radius: 8px;
+  padding: 8px 10px; background: #fff; color: #253e33; font: inherit; font-weight: 400;
+}
+.zone-editor-fields textarea { resize: vertical; }
+.zone-publication {
+  display: flex; align-items: flex-start; gap: 10px; margin-top: 14px;
+  padding: 11px; border: 1px solid #d6e4d7; border-radius: 8px; background: #edf4eb;
+  color: #234335; cursor: pointer;
+}
+.disease-review-page .zone-publication input[type="checkbox"] {
+  appearance: auto; flex: none; width: 18px; height: 18px; min-height: 0;
+  margin: 3px 0 0; padding: 0; accent-color: #07543b;
+}
+.zone-publication small { display: block; margin-top: 3px; color: #475951; }
+.zone-editor-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.zone-editor-actions .button { min-height: 44px; }
+html body.admin-workspace .zone-editor-save { background: #07543b; border-color: #07543b; color: #fff; font-weight: 750; }
+html body.admin-workspace .zone-editor-save:not(:disabled):hover { background: #033c2a; }
+@media (min-width: 1120px) {
+  .disease-review-page .zone-map-panel .admin-zone-layout:has(.zone-form:not([hidden])) {
+    grid-template-columns: minmax(0, 1fr) minmax(390px, 43%);
+  }
+  .zone-map-panel .admin-zone-layout:has(.zone-form:not([hidden])) .zone-map-frame { position: sticky; top: 86px; }
+  .disease-review-page .zone-map-panel .admin-zone-layout:has(.zone-form:not([hidden])) .admin-zone-map { height: clamp(345px, 56vh, 550px); }
+}
+@media (max-width: 480px) {
+  .zone-editor-fields { grid-template-columns: minmax(0, 1fr); }
+  .disease-review-page .zone-map-panel .admin-zone-layout:has(.zone-form:not([hidden])) .admin-zone-map { min-height: 290px; }
+}

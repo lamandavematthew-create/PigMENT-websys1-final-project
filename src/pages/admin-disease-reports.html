@@ -1,66 +1,14 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="PigMENT admin dashboard for disease reports.">
-  <title>Admin Disease Reports | PigMENT</title>
-  <link rel="stylesheet" href="../css/style.css">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <link rel="stylesheet" href="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.18.0/dist/leaflet-geoman.css">
-  <script src="../js/script.js" defer></script>
-  <script src="../js/auth.js" defer></script>
-  <script src="../js/disease-data.js?v=2" defer></script>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
-  <script src="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.18.0/dist/leaflet-geoman.min.js" defer></script>
-  <script src="../js/admin-disease-reports.js?v=3" defer></script>
+  <title>PigMENT | Admin Dashboard</title>
+  <script src="../js/admin-legacy-redirect.js"></script>
 </head>
-<body data-requires-auth="true" data-admin-only="true" data-auth-pending="true">
-  <div class="app-shell"><aside class="sidebar" id="sidebar"><a class="brand" href="admin-dashboard.html"><img class="brand-logo" src="../../public/assets/pigment-logo.png" alt=""><span>Pig<span class="brand-accent">MENT</span><small>Administrator workspace</small></span></a><p class="nav-caption">ADMIN MENU</p><nav class="side-nav" aria-label="Admin navigation"><a class="nav-link" href="admin-dashboard.html#overview"><span>Overview</span></a><a class="nav-link active" href="#reports"><span>Disease Reports</span></a><a class="nav-link" href="#zones"><span>Disease Zones</span></a><a class="nav-link" href="admin-dashboard.html#marketplace"><span>Marketplace</span></a><a class="nav-link" href="admin-dashboard.html#users"><span>User Accounts</span></a></nav><div class="sidebar-bottom"><button class="button button-secondary auth-logout" type="button">Log out</button></div></aside><div class="page-area"><header class="topbar"><button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar"><span class="sr-only">Toggle navigation</span><span></span><span></span><span></span></button><div class="topbar-context"><span class="topbar-label">Admin workspace</span><span class="topbar-location">Disease reports &amp; zones</span></div><div class="user-summary"><span class="user-avatar">A</span><span class="user-copy"><strong>Administrator</strong><small>Admin account</small></span></div></header><main class="main-content disease-page"><div class="page-heading"><div><p class="eyebrow">Admin interface</p><h1>Disease report dashboard</h1><p class="page-description">Review farmer submissions before anything appears on the public awareness map.</p></div><a class="button button-secondary" href="../index.html#disease-awareness">View farmer map</a></div><div class="prototype-note"><span class="note-icon" aria-hidden="true">i</span><p><strong>Moderation safeguard:</strong> An incident can be published only when its status is officially confirmed and authorized confirmation details are present.</p></div><section class="admin-layout" id="reports"><div class="records-panel"><div class="records-heading"><div><p class="eyebrow">Review queue</p><h2>Submitted reports</h2><p class="record-count" id="admin-count"></p></div></div><div class="table-wrap"><table class="data-table"><thead><tr><th>Report</th><th>Location</th><th>Incident date</th><th>Status</th><th>Action</th></tr></thead><tbody id="report-list"></tbody></table></div></div><dialog class="report-inspect-dialog" id="report-detail" aria-labelledby="detail-title">
-  <div class="inspect-header">
-    <div><p class="eyebrow">Disease report · Administrator review</p><h2 id="detail-title">Report details</h2><span class="inspect-status" id="detail-status">Pending review</span></div>
-    <button class="inspect-close" id="close-report-detail" type="button" aria-label="Close report details">×</button>
-  </div>
-  <p class="small-muted" id="detail-empty">Choose a report to see its details.</p>
-  <div id="detail-content" hidden>
-    <div class="inspect-body">
-      <section class="inspect-section" aria-labelledby="incident-info-title">
-        <h3 id="incident-info-title">Incident information</h3><p class="inspect-hint">Details supplied by the farmer. These are not verified medical findings.</p>
-        <dl class="inspect-facts">
-          <div><dt>Location</dt><dd id="detail-location"></dd></div>
-          <div><dt>Incident date</dt><dd id="detail-date"></dd></div>
-          <div><dt>Submitted by</dt><dd id="detail-reporter"></dd></div>
-          <div class="inspect-wide"><dt>Farmer's observation</dt><dd class="inspect-observation" id="detail-description"></dd></div>
-        </dl>
-      </section>
-      <section class="inspect-section" aria-labelledby="review-title">
-        <h3 id="review-title">Review decision</h3><p class="inspect-hint">Accept a report for investigation, or provide a reason when rejecting it.</p>
-        <label class="inspect-field" for="detail-admin-remarks">Admin remarks / rejection reason</label>
-        <textarea id="detail-admin-remarks" rows="3" maxlength="1000" placeholder="Enter a clear explanation for your decision..."></textarea>
-      </section>
-      <details class="inspect-section inspect-confirmation" id="confirmation-section">
-        <summary>Authorized veterinary confirmation <span>Expand only when evidence is available</span></summary>
-        <p class="inspect-hint">Recording a confirmation requires a verifiable authorized source. Accepting a report for review does not confirm the disease.</p>
-        <div class="inspect-field-grid">
-          <label>Confirmed by<input id="confirmed-by" maxlength="100" autocomplete="off"></label>
-          <label>Designation<input id="confirmation-designation" maxlength="100" autocomplete="off"></label>
-          <label>Organization<input id="confirmation-organization" maxlength="100" autocomplete="off"></label>
-          <label>Confirmation date<input type="date" id="confirmation-date"></label>
-          <label class="inspect-wide">Reference number<input id="confirmation-reference" maxlength="100" autocomplete="off"></label>
-          <label class="inspect-wide">Confirmation notes<textarea id="detail-confirmation-details" rows="3" maxlength="1000"></textarea></label>
-        </div>
-      </details>
-    </div>
-    <footer class="inspect-footer">
-      <p class="form-message" id="admin-message" role="status" aria-live="polite"></p>
-      <div class="admin-actions">
-        <button class="button button-secondary" type="button" data-action="under_review">Accept for review</button>
-        <button class="button button-danger" type="button" data-action="rejected">Reject report</button>
-        <button class="button button-primary" type="button" data-action="confirmed">Record confirmation</button>
-        <button class="button button-primary" type="button" data-action="publish">Publish confirmed incident</button>
-      </div>
-    </footer>
-  </div>
-</dialog></section><section id="zones" class="zone-management panel" aria-labelledby="zone-management-title"><div class="panel-heading"><div><p class="eyebrow">Geographic controls</p><h2 id="zone-management-title">Manage infected zones</h2></div><span class="status-label status-label-warning">Database-backed disease data</span></div><p class="small-muted">Draw explicit boundaries on the map. A report never automatically creates a zone.</p><div class="admin-zone-layout"><div><div id="admin-zone-map" class="disease-map admin-zone-map" aria-label="Admin infected zone drawing map"></div><p class="small-muted">Use the polygon tool to draw a boundary. Select a saved zone to edit or delete it.</p></div><form id="zone-form" class="form-grid zone-form" hidden><input type="hidden" name="zoneId"><input type="hidden" name="geometry"><label>Zone name<input name="name" required maxlength="80"></label><label>Municipality<input name="municipality" required maxlength="60"></label><label>Barangay or affected location<input name="barangay" required maxlength="100"></label><label>Disease type<select name="diseaseType" required><option>African Swine Fever (ASF)</option><option>Suspected ASF</option><option>Other swine illness</option></select></label><label>Severity<select name="severity" required><option value="low">Low</option><option value="moderate" selected>Moderate</option><option value="high">High</option></select></label><label>Zone status<select name="status" required><option value="monitoring">Under monitoring</option><option value="confirmed">Confirmed infected</option><option value="resolved">Resolved</option></select></label><label class="form-span-2">Description<textarea name="description" rows="3" required></textarea></label><label>Associated incident report<select name="incidentReportId"><option value="">None</option></select></label><label class="form-span-2"><input type="checkbox" name="isPublished" value="1"> Publish verified zone</label><div class="form-span-2 form-actions"><button class="button button-primary" type="submit">Save zone</button><button class="button button-secondary" id="cancel-zone" type="button">Cancel</button><span class="form-message" id="zone-message" role="status"></span></div></form></div><div class="table-wrap zone-table-wrap"><table class="data-table"><thead><tr><th>Zone</th><th>Location</th><th>Disease</th><th>Severity</th><th>Publication</th><th>Actions</th></tr></thead><tbody id="zone-list"></tbody></table></div></section><footer class="page-footer"><span>PigMENT · Admin disease reports</span><span>Records are stored in the disease database.</span></footer></main></div></div>
+<body>
+  <p>This section moved to the admin dashboard.</p>
+  <a href="admin-dashboard.html#reports">Review disease reports</a>
+  <a href="admin-dashboard.html#zones">Infected zones</a>
 </body>
 </html>

@@ -3,32 +3,56 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Create a farmer account on PigMENT.">
+  <meta name="description" content="Create your PigMENT farmer account and manage your swine farm in Marinduque.">
   <title>Create Account | PigMENT</title>
   <link rel="stylesheet" href="../css/style.css">
-  <script src="../js/auth.js" defer></script>
+  <link rel="stylesheet" href="../css/login-sunrise.css">
+  <link rel="stylesheet" href="../css/register-sunrise.css">
+  <link rel="stylesheet" href="../css/message-modal.css?v=1">
+  <script src="../js/message-modal.js?v=1" defer></script>
+  <script src="../js/auth.js?v=message-modal-1" defer></script>
 </head>
-<body class="auth-page">
-  <main class="auth-layout">
-    <section class="auth-card auth-card-wide" aria-labelledby="register-title">
-      <a class="brand auth-brand" href="../index.html" aria-label="PigMENT home"><img class="brand-logo" src="../../public/assets/pigment-logo.png" alt=""><span class="brand-accent">PigMENT<small>Farm management</small></span></a>
-      <p class="eyebrow">Get started</p>
-      <h1 id="register-title">Create your farmer account</h1>
-      <p class="page-description">Set up your workspace to manage pigs and connect with local farmers.</p>
-      <p id="auth-page-message" class="form-message auth-message" role="status" hidden></p>
-      <form id="register-form" class="auth-form auth-form-grid">
-        <label>First name<input name="first_name" autocomplete="given-name" maxlength="100" required></label>
-        <label>Last name<input name="last_name" autocomplete="family-name" maxlength="100" required></label>
-        <label>Email address<input name="email" type="email" autocomplete="email" maxlength="150" required></label>
-        <label>Phone number<input name="phone_number" type="tel" autocomplete="tel" maxlength="20" required></label>
-        <label>Municipality<input name="municipality" maxlength="100" required></label>
-        <label>Barangay<input name="barangay" maxlength="100" required></label>
-        <label>Password<div class="password-field"><input id="register-password" name="password" type="password" autocomplete="new-password" required><button type="button" class="password-toggle" data-password-toggle="register-password">Show</button></div></label>
-        <label>Confirm password<div class="password-field"><input id="confirm-password" name="confirm_password" type="password" autocomplete="new-password" required><button type="button" class="password-toggle" data-password-toggle="confirm-password">Show</button></div></label>
-        <label class="form-span-2">Address <span class="optional">(optional)</span><textarea name="address" rows="2" autocomplete="street-address"></textarea></label>
-        <div class="form-span-2"><button class="button button-primary auth-submit" type="submit">Create account</button></div>
-      </form>
-      <p class="auth-switch">Already have an account? <a href="login.html">Sign in</a></p>
+<body class="auth-page sunrise-page sunrise-register-page">
+  <main class="sunrise-shell">
+    <section class="sunrise-story" aria-label="Discover PigMENT">
+      <div class="sunrise-story-inner">
+        <p class="sunrise-eyebrow">Farm management for Marinduque</p>
+        <h1>Smarter swine farming<br>in <span>Marinduque.</span></h1>
+        <p class="sunrise-intro">Manage your pigs, find better market opportunities, and stay ahead of diseases — all in one place.</p>
+        <div class="sunrise-feature-composition">
+          <img class="sunrise-mascot" src="../../public/assets/pigment-superpig.png" width="1126" height="1397" alt="" decoding="async">
+          <div class="sunrise-features" aria-label="What you can do with PigMENT">
+            <div class="sunrise-feature"><span class="sunrise-feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18M5 17v3M10 13v7M15 9v11M20 4v16M4 12l6-5 4 2 6-6"/></svg></span><span><strong>Track Growth</strong><small>Monitor weight, progress, and farm performance.</small></span></div>
+            <div class="sunrise-feature"><span class="sunrise-feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 2-5h14l2 5v2a3 3 0 0 1-4.5 2.6 3 3 0 0 1-4.5 0 3 3 0 0 1-4.5 0A3 3 0 0 1 3 11V9ZM5 14v6h14v-6M9 20v-5h6v5"/></svg></span><span><strong>Marketplace</strong><small>Connect with buyers and grow your income.</small></span></div>
+            <div class="sunrise-feature health-feature"><span class="sunrise-feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/><path d="M12 7v8M8 11h8"/></svg></span><span><strong>Pig Health</strong><small>Get timely disease alerts and practical care tips.</small></span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="sunrise-auth" aria-labelledby="register-title">
+      <div class="sunrise-auth-card sunrise-register-card">
+        <a class="sunrise-brand" href="../index.html" aria-label="PigMENT home"><img src="../../public/assets/pigment-logo.png" width="74" height="74" alt=""><span>Pig<span class="sunrise-brand-accent">MENT</span></span></a>
+        <div class="sunrise-auth-heading sunrise-register-heading">
+          <span class="sunrise-spark" aria-hidden="true">✦</span>
+          <h2 id="register-title">Create your account</h2>
+          <p>Join PigMENT and manage your swine farm with confidence.</p>
+        </div>
+        <p id="auth-page-message" class="form-message auth-message sunrise-message" role="status" aria-live="polite" hidden></p>
+        <form id="register-form" class="auth-form auth-form-grid sunrise-form sunrise-register-form">
+          <label for="register-first-name"><span class="sunrise-field-label">First name</span><input id="register-first-name" name="first_name" autocomplete="given-name" maxlength="100" placeholder="First name" required></label>
+          <label for="register-last-name"><span class="sunrise-field-label">Last name</span><input id="register-last-name" name="last_name" autocomplete="family-name" maxlength="100" placeholder="Last name" required></label>
+          <label for="register-email"><span class="sunrise-field-label">Email address</span><input id="register-email" name="email" type="email" autocomplete="email" maxlength="150" placeholder="you@example.com" required></label>
+          <label for="register-phone"><span class="sunrise-field-label">Phone number</span><input id="register-phone" name="phone_number" type="tel" autocomplete="tel" maxlength="20" placeholder="09XX XXX XXXX" required></label>
+          <label for="register-municipality"><span class="sunrise-field-label">Municipality</span><input id="register-municipality" name="municipality" maxlength="100" placeholder="e.g. Boac" required></label>
+          <label for="register-barangay"><span class="sunrise-field-label">Barangay</span><input id="register-barangay" name="barangay" maxlength="100" placeholder="Your barangay" required></label>
+          <label for="register-password"><span class="sunrise-field-label">Password</span><span class="password-field sunrise-password"><input id="register-password" name="password" type="password" autocomplete="new-password" placeholder="Create a password" required><button type="button" class="password-toggle sunrise-visibility" data-password-toggle="register-password" aria-label="Show password">Show</button></span></label>
+          <label for="confirm-password"><span class="sunrise-field-label">Confirm password</span><span class="password-field sunrise-password"><input id="confirm-password" name="confirm_password" type="password" autocomplete="new-password" placeholder="Confirm password" required><button type="button" class="password-toggle sunrise-visibility" data-password-toggle="confirm-password" aria-label="Show password">Show</button></span></label>
+          <label class="form-span-2" for="register-address"><span class="sunrise-field-label">Address <span class="optional">(optional)</span></span><textarea id="register-address" name="address" rows="2" autocomplete="street-address" placeholder="Street or additional address details"></textarea></label>
+          <div class="form-span-2 sunrise-register-actions"><button class="button button-primary auth-submit sunrise-submit" type="submit">Create account <span aria-hidden="true">→</span></button></div>
+        </form>
+        <div class="sunrise-divider" aria-hidden="true"></div>
+        <p class="auth-switch sunrise-switch">Already have an account? <a href="login.html">Sign in</a></p>
+      </div>
     </section>
   </main>
 </body>

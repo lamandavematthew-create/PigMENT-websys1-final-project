@@ -1,0 +1,20 @@
+html body .pigment-message-modal {
+  position: fixed; inset: 0; width: min(465px, calc(100% - 28px));
+  max-height: calc(100% - 28px); box-sizing: border-box; margin: auto; padding: clamp(18px,4vw,26px);
+  border: 1px solid #d6e3da; border-radius: 18px; background: #fffdfa; color: #233d32;
+  box-shadow: 0 24px 76px #0b2d2460; overflow-y: auto;
+}
+.pigment-message-modal:not([open]), .pigment-message-modal [hidden] { display: none !important; }
+.pigment-message-modal::backdrop { background: #102d2496; }
+.pigment-message-kicker { color: #49685a; text-transform: uppercase; font-size: 12px; font-weight: 800; letter-spacing: .09em; margin: 0 0 4px; }
+html body .pigment-message-modal h2 { color: #173e2e; font-size: clamp(20px,4vw,24px); margin: 0 0 10px; }
+#pigment-message-body { color: #455a50; margin: 0 0 18px; white-space: pre-line; overflow-wrap: anywhere; }
+.pigment-message-input label { display: block; margin-bottom: 5px; font-weight: 700; }
+.pigment-message-input textarea { display: block; width: 100%; box-sizing: border-box; padding: 9px; border: 1px solid #9aac9f; border-radius: 8px; font: inherit; color: inherit; background: #fff; resize: vertical; }
+.pigment-message-error { color: #8a2c40; margin: 5px 0 10px; }
+.pigment-message-error:empty { display: none; }
+.pigment-message-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 9px; margin-top: 17px; }
+.pigment-message-actions button { min-height: 44px; padding: 8px 14px; border: 1px solid #799184; border-radius: 8px; font: inherit; font-weight: 750; cursor: pointer; color: #173e2e; background: #fff; }
+.pigment-message-actions button:focus-visible, .pigment-message-input textarea:focus-visible { outline: 2px solid #2d7755; outline-offset: 2px; }
+.pigment-message-actions .pigment-message-submit { background: #07543b; color: #fff; border-color: #07543b; }
+.pigment-message-modal[data-tone="danger"] .pigment-message-submit { background: #963d50; border-color: #963d50; }

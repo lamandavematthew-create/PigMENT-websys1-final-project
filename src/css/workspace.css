@@ -1,0 +1,4 @@
+/* Section routing shares a single page shell. Hidden views must not take space. */
+.farmer-workspace #dashboard [hidden] { display:none !important; }
+.farmer-workspace #pig-pens { scroll-margin-top:86px; }
+.farmer-workspace #dashboard:focus { outline:none; }

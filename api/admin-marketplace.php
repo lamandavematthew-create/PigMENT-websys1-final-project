@@ -6,14 +6,22 @@ try {
     $exists=$pdo->query("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=DATABASE() AND table_name='listing_moderation'")->fetchColumn();
     $method=$_SERVER['REQUEST_METHOD'];
     if ($method==='GET') {
-        $search=trim((string)($_GET['search']??''));
-        if (strlen($search)>100) sendResponse(422,'error','Search term too long.');
-        $sql="SELECT m.listing_id,m.listing_title,m.pig_type,m.asking_price,m.municipality,m.listing_status,m.created_at,u.first_name,u.last_name,u.email";
+        $search=$_GET['search']??'';
+        $listingStatus=$_GET['status']??'';
+        if (!is_string($search) || strlen(trim($search))>100) sendResponse(422,'error','Invalid search term.');
+        if (!in_array($listingStatus,['','active','sold','inactive'],true)) sendResponse(422,'error','Invalid listing status.');
+        $search=trim($search);
+        $sql="SELECT m.listing_id,m.listing_title,m.pig_type,m.asking_price,m.municipality,m.listing_status,m.created_at,u.first_name,u.last_name,u.email,u.account_status AS seller_account_status";
         $sql.=$exists?",COALESCE(lm.is_hidden,0) AS is_hidden,lm.reason AS moderation_reason":" ,0 AS is_hidden,NULL AS moderation_reason";
         $sql.=" FROM marketplace_listings m INNER JOIN users u ON u.user_id=m.seller_id";
         if ($exists) $sql.=" LEFT JOIN listing_moderation lm ON lm.listing_id=m.listing_id";
-        $sql.=" WHERE (m.listing_title LIKE ? OR u.first_name LIKE ? OR u.last_name LIKE ? OR u.email LIKE ?) ORDER BY m.created_at DESC LIMIT 200";
-        $term='%'.$search.'%';$stmt=$pdo->prepare($sql);$stmt->execute([$term,$term,$term,$term]);
+        $sql.=" WHERE (m.listing_title LIKE ? OR u.first_name LIKE ? OR u.last_name LIKE ? OR CONCAT_WS(' ',u.first_name,u.last_name) LIKE ? OR u.email LIKE ?)";
+        $term='%'.$search.'%';
+        $params=[$term,$term,$term,$term,$term];
+        if ($listingStatus!=='') { $sql.=" AND m.listing_status = ?"; $params[]=$listingStatus; }
+        $sql.=" ORDER BY m.created_at DESC, m.listing_id DESC LIMIT 200";
+        $stmt=$pdo->prepare($sql);
+        $stmt->execute($params);
         sendResponse(200,'success','Marketplace listings retrieved.',['listings'=>$stmt->fetchAll(PDO::FETCH_ASSOC),'moderation_ready'=>(bool)$exists]);
     }
     if ($method!=='PATCH') {header('Allow: GET, PATCH');sendResponse(405,'error','Method not allowed.');}

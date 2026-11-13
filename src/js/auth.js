@@ -7,7 +7,7 @@
     const [pathname, query] = path.split("?");
     let url;
     if (isNestedPage) {
-      url = pathname === "index.html" ? "../index.html" : pathname.replace(/^pages\//, "");
+      url = /^index\.html(?:#|$)/.test(pathname) ? `../${pathname}` : pathname.replace(/^pages\//, "");
     } else {
       url = ["login.html", "register.html"].includes(pathname) ? `pages/${pathname}` : pathname;
     }
@@ -16,9 +16,9 @@
 
   function getSafeNext() {
     const next = new URLSearchParams(window.location.search).get("next");
-    if (!next || next.startsWith("http") || next.startsWith("//") || next.includes("..")) {
-      return "";
-    }
+    const legacy = { "my-pigs.html":"my-pigs", "marketplace.html":"marketplace", "reports.html":"summary", "profile.html":"profile" };
+    if (next && Object.hasOwn(legacy, next)) return "index.html#" + legacy[next];
+    if (!next || !/^index\.html(?:#[a-z-]+)?$/.test(next)) return "";
     return next;
   }
 
@@ -116,7 +116,7 @@
           }
           button.disabled = false;
           button.textContent = "Log out";
-          window.alert(error.message);
+          await window.PigmentModal.notify({title: "Could not log out", message: error.message || "Please try again."});
         }
 
       });
@@ -139,7 +139,9 @@
     try {
       const user = await getSession();
       if (!user) {
-        const next = `${window.location.pathname.split("/").pop()}${window.location.hash}`;
+        const file = window.location.pathname.split("/").pop();
+        const query = file === "admin-dashboard.html" ? window.location.search : "";
+        const next = `${file}${query}${window.location.hash}`;
         window.location.assign(pageUrl(`login.html?next=${encodeURIComponent(next)}&message=Please log in to continue.`));
         return null;
       }
@@ -160,7 +162,13 @@
   }
 
   function getAuthenticatedDestination(user) {
-    if (user.role === "admin") return "pages/admin-dashboard.html";
+    if (user.role === "admin") {
+      const next = new URLSearchParams(window.location.search).get("next") || "";
+      if (/^admin-dashboard\.html(?:\?report=[1-9]\d*#reports|#(?:overview|reports|zones|marketplace|users))$/.test(next)) {
+        return "pages/" + next;
+      }
+      return "pages/admin-dashboard.html#overview";
+    }
     const next = getSafeNext();
     return next && !next.includes("admin-") ? next : "index.html";
   }

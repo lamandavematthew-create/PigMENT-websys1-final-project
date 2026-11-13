@@ -3,19 +3,9 @@
 
   const mapElement = document.querySelector("#disease-map");
   if (!mapElement || !window.PigmentDiseaseStore) return;
-  if (!window.L) {
-    const message = document.querySelector("#report-form-message");
-    const submit = document.querySelector('#disease-report-form button[type="submit"]');
-    if (message) message.textContent = "The location map could not load. Check your internet connection and reload the page to report an illness.";
-    if (submit) submit.disabled = true;
-    return;
-  }
+  const L = window.L;
 
-  const dashboardView = document.querySelector("#dashboard-view");
   const diseaseView = document.querySelector("#disease-awareness");
-  const healthNavLink = document.querySelector("#pig-health-nav-link");
-  const homeNavLink = document.querySelector("#home-nav-link");
-  const workspaceLabel = document.querySelector("#workspace-label");
   const municipalityFilter = document.querySelector("#municipality-filter");
   const diseaseFilter = document.querySelector("#disease-filter");
   const zoneStatusFilter = document.querySelector("#zone-status-filter");
@@ -26,16 +16,22 @@
   const reportLocation = document.querySelector("#selected-report-location");
   const reportLatitude = reportForm?.elements.namedItem("latitude");
   const reportLongitude = reportForm?.elements.namedItem("longitude");
-  const map = L.map(mapElement).setView([13.43, 121.96], 10);
+  const map = L ? L.map(mapElement).setView([13.43, 121.96], 10) : null;
+  const dialog = document.querySelector("#submit-report");
+  const reportOpen = document.querySelector("#health-report-open");
+  const success = document.querySelector("#health-report-success");
+  const tabs = [...diseaseView.querySelectorAll(".health-tabs a")];
+  const sections = tabs.map((tab) => document.querySelector(tab.hash));
+  const submitButton = reportForm.querySelector("button[type=submit]");
+  let returnFocus = null;
   const pickerElement = document.querySelector("#report-location-map");
-  const pickerMap = pickerElement ? L.map(pickerElement).setView([13.43, 121.96], 10) : null;
+  const pickerMap = L && pickerElement ? L.map(pickerElement).setView([13.43, 121.96], 10) : null;
   if (pickerMap) L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18, attribution: "&copy; OpenStreetMap contributors" }).addTo(pickerMap);
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18, attribution: "&copy; OpenStreetMap contributors" }).addTo(map);
-  const markerLayer = L.layerGroup().addTo(map);
-  const zoneLayer = L.layerGroup().addTo(map);
+  if (map) L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18, attribution: "&copy; OpenStreetMap contributors" }).addTo(map);
+  const markerLayer = map ? L.layerGroup().addTo(map) : null;
+  const zoneLayer = map ? L.layerGroup().addTo(map) : null;
   let reports = [];
   let zones = [];
-  let selectedLocationMarker = null;
   let pickerLocationMarker = null;
 
   const zoneStyles = {
@@ -56,40 +52,68 @@
     return { pending: "Pending Review", under_review: "Under Review", confirmed: "Confirmed", rejected: "Rejected" }[status] || status;
   }
 
-  function showView(view) {
-    const showDisease = view === "disease";
-    if (dashboardView) dashboardView.hidden = showDisease;
-    if (diseaseView) diseaseView.hidden = !showDisease;
-    healthNavLink?.classList.toggle("active", showDisease);
-    homeNavLink?.classList.toggle("active", !showDisease);
-    if (workspaceLabel) workspaceLabel.textContent = showDisease ? "Pig Health" : "Farm workspace";
-    if (showDisease) window.setTimeout(() => {
-      map.invalidateSize();
-      pickerMap?.invalidateSize();
-    }, 0);
+  function openReport() {
+    if (dialog.open) return;
+    returnFocus = document.activeElement === document.body ? reportOpen : document.activeElement;
+    dialog.showModal();
+    document.body.classList.add("health-report-open");
+    window.requestAnimationFrame(() => pickerMap?.invalidateSize());
   }
 
-  function shouldShowDiseaseView(hash) {
-    const target = (hash || window.location.hash || "").replace(/^#/, "");
-    return ["disease-awareness", "health-guide", "disease-map-section", "submit-report", "my-reports"].includes(target);
+  function showView(target) {
+    const showDisease = document.body.dataset.workspaceRoute === "disease-awareness";
+    if (!showDisease) {
+      if (dialog.open) dialog.close();
+      return;
+    }
+    const activeId = target === "health-guide" || target === "my-reports" ? target : "disease-map-section";
+    sections.forEach((section, index) => {
+      section.hidden = section.id !== activeId;
+      if (!section.hidden) tabs[index].setAttribute("aria-current", "location");
+      else tabs[index].removeAttribute("aria-current");
+    });
+    if (activeId === "disease-map-section") window.requestAnimationFrame(() => map?.invalidateSize());
+    if (target === "submit-report") openReport();
+  }
+
+  function navigate(target, replace = false) {
+    window.PigmentWorkspace.navigate(target, replace);
   }
 
   function syncDiseaseViewFromHash() {
-    showView(shouldShowDiseaseView(window.location.hash) ? "disease" : "dashboard");
+    const target = window.location.hash.slice(1);
+    if (dialog.open && target !== "submit-report") dialog.close();
+    showView(target);
+    if (!healthLoaded && document.body.dataset.workspaceRoute === "disease-awareness") {
+      healthLoaded = true;
+      refresh();
+      loadMyReports();
+    }
   }
-
-  healthNavLink?.addEventListener("click", (event) => {
+  let healthLoaded = false;
+  reportOpen.addEventListener("click", (event) => {
     event.preventDefault();
-    window.history.replaceState(null, "", "#disease-awareness");
-    showView("disease");
+    openReport();
   });
-  homeNavLink?.addEventListener("click", (event) => {
-    event.preventDefault();
-    window.history.replaceState(null, "", "#dashboard");
-    showView("dashboard");
+  dialog.querySelectorAll("[data-close-health-report]").forEach((button) => {
+    button.addEventListener("click", () => { if (!submitting) dialog.close(); });
   });
-  window.addEventListener("hashchange", syncDiseaseViewFromHash);
+  let submitting = false;
+  dialog.addEventListener("cancel", (event) => { if (submitting) event.preventDefault(); });
+  dialog.addEventListener("close", () => {
+    document.body.classList.remove("health-report-open");
+    if (window.location.hash === "#submit-report") navigate("disease-map-section", true);
+    if (returnFocus?.isConnected) returnFocus.focus({ preventScroll: true });
+    returnFocus = null;
+  });
+  document.addEventListener("pigment:workspace-route", syncDiseaseViewFromHash);
   syncDiseaseViewFromHash();
+  if (!map) {
+    mapElement.textContent = "The map could not load. Check your connection and reload the page.";
+    pickerElement.textContent = "The location map could not load.";
+    reportMessage.textContent = "Reload the page to load the map before submitting.";
+    submitButton.disabled = true;
+  }
 
   function matchesFilters(item, isZone) {
     return (!municipalityFilter.value || item.municipality === municipalityFilter.value) &&
@@ -98,19 +122,24 @@
   }
 
   function populateFilters() {
+    const selectedMunicipality = municipalityFilter.value;
+    const selectedDisease = diseaseFilter.value;
     const municipalities = [...new Set(reports.concat(zones).map((item) => item.municipality).filter(Boolean))].sort();
     const diseases = [...new Set(reports.concat(zones).map((item) => item.disease_type).filter(Boolean))].sort();
     municipalityFilter.innerHTML = '<option value="">All municipalities</option>' + municipalities.map((item) => `<option value="${escapeHtml(item)}">${escapeHtml(item)}</option>`).join("");
     diseaseFilter.innerHTML = '<option value="">All disease types</option>' + diseases.map((item) => `<option value="${escapeHtml(item)}">${escapeHtml(item)}</option>`).join("");
+    if (municipalities.includes(selectedMunicipality)) municipalityFilter.value = selectedMunicipality;
+    if (diseases.includes(selectedDisease)) diseaseFilter.value = selectedDisease;
   }
 
   function renderMap() {
-    markerLayer.clearLayers();
-    zoneLayer.clearLayers();
+    markerLayer?.clearLayers();
+    zoneLayer?.clearLayers();
     const visibleZones = zones.filter(window.PigmentDiseaseStore.isZoneVisible).filter((item) => matchesFilters(item, true));
     const visibleReports = reports.filter(window.PigmentDiseaseStore.isPublished).filter((item) => matchesFilters(item, false));
-    visibleZones.forEach((zone) => L.geoJSON({ type: "Feature", properties: zone, geometry: zone.geometry }, { style: zoneStyles[zone.zone_status] || zoneStyles.monitoring, onEachFeature: (feature, layer) => layer.bindPopup(`<strong>${escapeHtml(zone.zone_name)}</strong><br>Municipality: ${escapeHtml(zone.municipality)}<br>Disease: ${escapeHtml(zone.disease_type)}<br>Status: ${escapeHtml(zone.zone_status)}`) }).addTo(zoneLayer));
-    visibleReports.forEach((report) => L.circleMarker([report.latitude, report.longitude], { radius: 8, color: "#b42318", fillColor: "#dc2626", fillOpacity: 0.95, weight: 2 }).bindPopup(`<strong>${escapeHtml(report.disease_type)}</strong><br>Location: ${escapeHtml(report.municipality)}, ${escapeHtml(report.barangay)}<br>Incident date: ${escapeHtml(dateLabel(report.incident_date))}<br>Status: Confirmed`).addTo(markerLayer));
+    if (map) visibleZones.forEach((zone) => L.geoJSON({ type: "Feature", properties: zone, geometry: zone.geometry }, { style: zoneStyles[zone.zone_status] || zoneStyles.monitoring, onEachFeature: (feature, layer) => layer.bindPopup(`<strong>${escapeHtml(zone.zone_name)}</strong><br>Municipality: ${escapeHtml(zone.municipality)}<br>Disease: ${escapeHtml(zone.disease_type)}<br>Status: ${escapeHtml(zone.zone_status)}`) }).addTo(zoneLayer));
+    if (map) visibleReports.forEach((report) => L.circleMarker([report.latitude, report.longitude], { radius: 8, color: "#a16207", fillColor: "#facc15", fillOpacity: 0.95, weight: 2 }).bindPopup(`<strong>${escapeHtml(report.disease_type)}</strong><br>Location: ${escapeHtml(report.municipality)}, ${escapeHtml(report.barangay)}<br>Incident date: ${escapeHtml(dateLabel(report.incident_date))}<br>Status: Confirmed`).addTo(markerLayer));
+    if (!map) return;
     const total = visibleZones.length + visibleReports.length;
     mapCount.textContent = `${visibleZones.length} zone${visibleZones.length === 1 ? "" : "s"} and ${visibleReports.length} incident marker${visibleReports.length === 1 ? "" : "s"} shown`;
     emptyMessage.hidden = total !== 0;
@@ -123,7 +152,7 @@
       renderMap();
     } catch (error) {
       mapCount.textContent = error.message;
-      emptyMessage.hidden = false;
+      emptyMessage.hidden = true;
     }
 
   }
@@ -138,7 +167,7 @@
       list.replaceChildren(...(ownReports.length ? ownReports.map((report) => {
         const item = document.createElement("article");
         item.className = "report-summary-card";
-        item.innerHTML = `<strong>Report #${report.report_id}</strong><span>${escapeHtml(report.disease_type)} · ${escapeHtml(report.municipality)}, ${escapeHtml(report.barangay)}</span><span>${escapeHtml(statusLabel(report.report_status))} · ${escapeHtml(dateLabel(report.incident_date))}</span>`;
+        item.innerHTML = `<div><strong>Report #${escapeHtml(report.report_id)}</strong><span>${escapeHtml(report.disease_type)}</span></div><div><strong>${escapeHtml(report.municipality)}, ${escapeHtml(report.barangay)}</strong><span>${escapeHtml(dateLabel(report.incident_date))}</span></div><span class="health-report-status" data-status="${escapeHtml(report.report_status)}">${escapeHtml(statusLabel(report.report_status))}</span>`;
         return item;
       }) : [Object.assign(document.createElement("p"), { className: "small-muted", textContent: "You have not submitted any reports." })]));
     } catch (error) {
@@ -157,8 +186,6 @@
     reportLongitude.value = longitude.toFixed(7);
     reportLocation.textContent = `Selected general location: ${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
     reportMessage.textContent = "";
-    if (selectedLocationMarker) map.removeLayer(selectedLocationMarker);
-    selectedLocationMarker = L.marker([latitude, longitude], { title: "Selected report location" }).addTo(map);
     if (pickerMap) {
       if (pickerLocationMarker) pickerMap.removeLayer(pickerLocationMarker);
       pickerLocationMarker = L.marker([latitude, longitude], { title: "Selected incident location" }).addTo(pickerMap);
@@ -168,10 +195,11 @@
   municipalityFilter.addEventListener("change", renderMap);
   diseaseFilter.addEventListener("change", renderMap);
   zoneStatusFilter.addEventListener("change", renderMap);
-  map.on("click", setSelectedLocation);
+  document.querySelector("#health-reset-filters").addEventListener("click", () => {
+    [municipalityFilter, diseaseFilter, zoneStatusFilter].forEach((filter) => { filter.value = ""; });
+    renderMap();
+  });
   pickerMap?.on("click", setSelectedLocation);
-  refresh();
-  loadMyReports();
   const incidentDateInput = reportForm?.elements.namedItem("incidentDate");
   if (incidentDateInput) {
     const now = new Date();
@@ -182,7 +210,7 @@
   if (reportForm) {
     reportForm.addEventListener("submit", async (event) => {
       event.preventDefault();
-      if (!reportForm.reportValidity()) return;
+      if (!pickerMap || submitting || !reportForm.reportValidity()) return;
       if (!reportLatitude?.value || !reportLongitude?.value) {
         reportMessage.textContent = "Please select the incident location using the map in this form.";
         pickerElement?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -193,8 +221,8 @@
         reportMessage.textContent = "The incident date cannot be in the future.";
         return;
       }
-      const submit = reportForm.querySelector("button[type=submit]");
-      submit.disabled = true;
+      submitting = true;
+      submitButton.disabled = true;
       reportMessage.textContent = "Submitting report...";
       try {
         const values = Object.fromEntries(new FormData(reportForm).entries());
@@ -209,13 +237,13 @@
         });
         reportForm.reset();
         reportLocation.textContent = "No location selected. A map point is required.";
-        reportMessage.textContent = "Report sent successfully. It is now pending administrator review and will appear in My Reports.";
-        await loadMyReports().catch(() => {});
+        reportMessage.textContent = "";
+        success.textContent = "Report sent for review. You can track its status here.";
+        success.hidden = false;
+        dialog.close();
+        navigate("my-reports", window.location.hash === "#submit-report");
+        await loadMyReports();
         document.dispatchEvent(new Event("pigment:farm-activity-updated"));
-        if (selectedLocationMarker) {
-          map.removeLayer(selectedLocationMarker);
-          selectedLocationMarker = null;
-        }
         if (pickerLocationMarker && pickerMap) {
           pickerMap.removeLayer(pickerLocationMarker);
           pickerLocationMarker = null;
@@ -223,7 +251,8 @@
       } catch (error) {
         reportMessage.textContent = error.message;
       } finally {
-        submit.disabled = false;
+        submitting = false;
+        submitButton.disabled = false;
       }
     });
   }

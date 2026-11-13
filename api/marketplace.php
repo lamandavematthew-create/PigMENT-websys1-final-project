@@ -20,6 +20,14 @@ try {
     if ($method === 'GET') {
 
         $myListings = ($_GET['mine'] ?? '') === '1';
+        $includeContact = ($_GET['contact'] ?? '') === '1';
+        if ($includeContact && !isset($_GET['id'])) {
+            sendResponse(422, 'error', 'A listing ID is required to view seller contact details.');
+        }
+        if ($includeContact && !$myListings) {
+            requireLogin($pdo);
+            header('Cache-Control: private, no-store');
+        }
 
         // Private listing management
         if ($myListings) {
@@ -30,6 +38,26 @@ try {
             }
 
             $ownerId = (int) $user['user_id'];
+            if ($includeContact) {
+                header('Cache-Control: private, no-store');
+                $listingId = filter_var($_GET['id'], FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+                if (!$listingId) {
+                    sendResponse(422, 'error', 'Invalid listing ID.');
+                }
+                $stmt = $pdo->prepare(
+                    "SELECT u.first_name AS seller_first_name, u.last_name AS seller_last_name,
+                            u.phone_number AS seller_phone
+                     FROM marketplace_listings m
+                     INNER JOIN users u ON u.user_id = m.seller_id
+                     WHERE m.listing_id = ? AND m.seller_id = ?"
+                );
+                $stmt->execute([$listingId, $ownerId]);
+                $seller = $stmt->fetch();
+                if (!$seller) {
+                    sendResponse(404, 'error', 'Listing not found.');
+                }
+                sendResponse(200, 'success', 'Seller contact retrieved.', $seller);
+            }
 
             $stmt = $pdo->prepare(
                 "SELECT m.*,
@@ -66,6 +94,7 @@ try {
                 m.age_months,
                 m.estimated_weight,
                 m.asking_price,
+                m.asking_price_per_kg,
                 m.description,
                 m.municipality,
                 m.barangay,
@@ -73,6 +102,7 @@ try {
                 m.created_at,
                 u.first_name AS seller_first_name,
                 u.last_name AS seller_last_name,
+                " . ($includeContact ? "u.phone_number AS seller_phone," : "") . "
                 (
                     SELECT li.image_path
                     FROM listing_images li
@@ -277,7 +307,7 @@ try {
     $sex = $data['sex'] ?? '';
     $age = $data['age_months'] ?? null;
     $weight = $data['estimated_weight'] ?? null;
-    $price = $data['asking_price'] ?? null;
+    $rate = $data['asking_price_per_kg'] ?? null;
     $description = $data['description'] ?? '';
     $municipality = $data['municipality'] ?? '';
     $barangay = $data['barangay'] ?? '';
@@ -325,16 +355,6 @@ try {
         sendResponse(422, 'error', 'A field is too long.');
     }
 
-    // Validate asking price
-    if (
-        !is_numeric($price) ||
-        !is_finite((float) $price) ||
-        $price <= 0 ||
-        $price > 9999999999.99
-    ) {
-        sendResponse(422, 'error', 'Invalid asking price.');
-    }
-
     // Validate optional age
     if ($age === '') {
         $age = null;
@@ -367,6 +387,54 @@ try {
         )
     ) {
         sendResponse(422, 'error', 'Invalid weight estimate.');
+    }
+
+    $listingId = null;
+    $current = null;
+    if ($method === 'PUT') {
+        $listingId = filter_var(
+            $_GET['id'] ?? null,
+            FILTER_VALIDATE_INT,
+            ['options' => ['min_range' => 1]]
+        );
+        if (!$listingId) {
+            sendResponse(422, 'error', 'Valid listing ID required.');
+        }
+
+        $stmt = $pdo->prepare(
+            "SELECT asking_price, asking_price_per_kg, estimated_weight
+             FROM marketplace_listings
+             WHERE listing_id = ? AND seller_id = ?"
+        );
+        $stmt->execute([$listingId, $sellerId]);
+        $current = $stmt->fetch();
+        if (!$current) {
+            sendResponse(404, 'error', 'Listing not found.');
+        }
+    }
+
+    // Existing flat-price listings keep their original total unless a rate is entered.
+    if ($rate === null && $current && $current['asking_price_per_kg'] === null
+        && (float) $weight === (float) $current['estimated_weight']) {
+        $price = $current['asking_price'];
+    } else {
+        if ($rate === null && $current) {
+            $rate = $current['asking_price_per_kg'];
+        }
+        if ($weight === null || !is_numeric($rate) || !is_finite((float) $rate)
+            || (float) $rate < 0.01 || (float) $rate > 999999.99) {
+            sendResponse(422, 'error', 'Enter a valid estimated weight and asking price per kg.');
+        }
+
+        // Normalize to the stored precision before multiplying, then round to centavos.
+        $rate = round((float) $rate, 2);
+        $weight = round((float) $weight, 2);
+        $price = round($rate * $weight, 2);
+    }
+
+    if (!is_numeric($price) || !is_finite((float) $price)
+        || (float) $price < 0.01 || (float) $price > 9999999999.99) {
+        sendResponse(422, 'error', 'The estimated total is outside the supported price range.');
     }
 
     // Verify ownership of an optional linked pig
@@ -433,12 +501,13 @@ try {
                 age_months,
                 estimated_weight,
                 asking_price,
+                asking_price_per_kg,
                 description,
                 municipality,
                 barangay,
                 listing_status
             ) VALUES (
-                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active'
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active'
             )"
         );
 
@@ -452,6 +521,7 @@ try {
             $age,
             $weight,
             $price,
+            $rate,
             $description ?: null,
             $municipality,
             $barangay ?: null
@@ -470,28 +540,6 @@ try {
     // =====================================
 
     if ($method === 'PUT') {
-
-        $listingId = filter_var(
-            $_GET['id'] ?? null,
-            FILTER_VALIDATE_INT,
-            ['options' => ['min_range' => 1]]
-        );
-
-        if (!$listingId) {
-            sendResponse(422, 'error', 'Valid listing ID required.');
-        }
-
-        $stmt = $pdo->prepare(
-            "SELECT listing_id
-             FROM marketplace_listings
-             WHERE listing_id = ? AND seller_id = ?"
-        );
-
-        $stmt->execute([$listingId, $sellerId]);
-
-        if (!$stmt->fetch()) {
-            sendResponse(404, 'error', 'Listing not found.');
-        }
 
         $status = $data['listing_status'] ?? 'active';
 
@@ -515,6 +563,7 @@ try {
                  age_months = ?,
                  estimated_weight = ?,
                  asking_price = ?,
+                 asking_price_per_kg = ?,
                  description = ?,
                  municipality = ?,
                  barangay = ?,
@@ -531,6 +580,7 @@ try {
             $age,
             $weight,
             $price,
+            $rate,
             $description ?: null,
             $municipality,
             $barangay ?: null,
