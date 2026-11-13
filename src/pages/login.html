@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Sign in to PigMENT, a farm management platform for swine farmers in Marinduque.">
+  <title>Sign In | PigMENT</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/login-sunrise.css">
+  <link rel="stylesheet" href="../css/message-modal.css?v=1">
+  <script src="../js/message-modal.js?v=1" defer></script>
+  <script src="../js/auth.js?v=unified-admin-1" defer></script>
+</head>
+<body class="auth-page sunrise-page">
+  <main class="sunrise-shell">
+    <section class="sunrise-story" aria-label="Discover PigMENT">
+      <div class="sunrise-story-inner">
+        <p class="sunrise-eyebrow">Farm management for Marinduque</p>
+        <h1>Smarter swine farming<br>in <span>Marinduque.</span></h1>
+        <p class="sunrise-intro">Manage your pigs, find better market opportunities, and stay ahead of diseases — all in one place.</p>
+        <div class="sunrise-feature-composition">
+          <img class="sunrise-mascot" src="../../public/assets/pigment-superpig.png" width="1126" height="1397" alt="" decoding="async">
+          <div class="sunrise-features" aria-label="What you can do with PigMENT">
+            <div class="sunrise-feature"><span class="sunrise-feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18M5 17v3M10 13v7M15 9v11M20 4v16M4 12l6-5 4 2 6-6"/></svg></span><span><strong>Track Growth</strong><small>Monitor weight, progress, and farm performance.</small></span></div>
+            <div class="sunrise-feature"><span class="sunrise-feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 2-5h14l2 5v2a3 3 0 0 1-4.5 2.6 3 3 0 0 1-4.5 0 3 3 0 0 1-4.5 0A3 3 0 0 1 3 11V9ZM5 14v6h14v-6M9 20v-5h6v5"/></svg></span><span><strong>Marketplace</strong><small>Connect with buyers and grow your income.</small></span></div>
+            <div class="sunrise-feature health-feature"><span class="sunrise-feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/><path d="M12 7v8M8 11h8"/></svg></span><span><strong>Pig Health</strong><small>Get timely disease alerts and practical care tips.</small></span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="sunrise-auth" aria-labelledby="login-title">
+      <div class="sunrise-auth-card">
+        <a class="sunrise-brand" href="../index.html" aria-label="PigMENT home"><img src="../../public/assets/pigment-logo.png" width="58" height="58" alt=""><span>Pig<span class="sunrise-brand-accent">MENT</span></span></a>
+        <div class="sunrise-auth-heading"><span class="sunrise-spark" aria-hidden="true">✦</span><h2 id="login-title">Welcome back,</h2><p>Sign in to manage your farm, pigs, and more.</p></div>
+        <p id="auth-page-message" class="form-message auth-message sunrise-message" role="status" aria-live="polite" hidden></p>
+        <form id="login-form" class="auth-form sunrise-form">
+          <label for="sunrise-email"><span class="sunrise-field-label"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>Email address</span><input id="sunrise-email" name="email" type="email" placeholder="Enter your email" autocomplete="email" required></label>
+          <label for="login-password"><span class="sunrise-field-label"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Password</span><span class="password-field sunrise-password"><input id="login-password" name="password" type="password" placeholder="Enter your password" autocomplete="current-password" required><button type="button" class="password-toggle sunrise-visibility" data-password-toggle="login-password" aria-label="Show password">Show</button></span></label>
+          <button class="button button-primary auth-submit sunrise-submit" type="submit">Sign in <span aria-hidden="true">→</span></button>
+        </form>
+        <div class="sunrise-divider" aria-hidden="true"></div>
+        <p class="auth-switch sunrise-switch">New to PigMENT? <a href="register.html">Create an account</a></p>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

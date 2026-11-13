@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="PigMENT farm management dashboard for pig farmers in Marinduque.">
+  <title>Home | PigMENT</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/home-refresh.css?v=3">
+  <link rel="stylesheet" href="css/pig-health-refresh.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+  <script src="js/script.js" defer></script>
+  <link rel="stylesheet" href="css/message-modal.css?v=1">
+  <script src="js/message-modal.js?v=1" defer></script>
+  <script src="js/auth.js?v=message-modal-1" defer></script>
+  <script src="js/farm-snapshot.js?v=2" defer></script>
+  <script src="js/farm-log.js" defer></script>
+  <script src="js/weight-estimator.js" defer></script>
+  <script src="js/disease-data.js?v=3" defer></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
+  <script src="js/workspace.js" defer></script>
+  <script src="js/disease-map.js?v=6" defer></script>
+  <script src="js/my-pigs.js?v=price-line-1" defer></script>
+  <script src="js/marketplace.js?v=preview-photo-1" defer></script>
+  <script src="js/reports.js?v=workspace" defer></script>
+  <script src="js/profile.js?v=workspace" defer></script>
+  <link rel="stylesheet" href="css/weight-calculator-dialog.css">
+  <script src="js/weight-calculator.js?v=2" defer></script>
+  <link rel="stylesheet" href="css/my-pigs-refresh.css">
+  <link rel="stylesheet" href="css/my-pigs-pens-match.css">
+  <link rel="stylesheet" href="css/edit-pig-modal.css">
+  <link rel="stylesheet" href="css/my-pigs-record-compact.css">
+  <link rel="stylesheet" href="css/registered-pigs-icons-match.css">
+  <link rel="stylesheet" href="css/my-pigs-expanded-pen-fix.css">
+  <link rel="stylesheet" href="css/edit-pen-modal.css">
+  <link rel="stylesheet" href="css/register-pig-modal.css">
+  <link rel="stylesheet" href="css/litter-dialog.css?v=1">
+  <link rel="stylesheet" href="css/registered-pigs-price.css?v=4">
+  <link rel="stylesheet" href="css/marketplace-refresh.css?v=preview-photo-1">
+  <link rel="stylesheet" href="css/farm-summary.css">
+  <link rel="stylesheet" href="css/profile-refresh.css">
+  <link rel="stylesheet" href="css/workspace.css">
+</head>
+<body class="home-refresh farmer-workspace" data-api-farm-page="true" data-api-marketplace-page="true" data-requires-auth="true" data-auth-pending="true">
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="index.html" aria-label="PigMENT dashboard">
+        <img class="brand-logo" src="../public/assets/pigment-logo.png" alt="">
+        <span>Pig<span class="brand-accent">MENT</span><small>Farm management</small></span>
+      </a>
+      <p class="nav-caption">MAIN MENU</p>
+      <nav class="side-nav" aria-label="Main navigation">
+        <a class="nav-link active" id="home-nav-link" href="index.html" aria-current="page">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          <span>Home</span>
+        </a>
+        <a class="nav-link" href="index.html#my-pigs">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 13v-2a2 2 0 0 1 2-2h1l2-3h6l2 3h1a2 2 0 0 1 2 2v2"/><path d="M5 13h14l1 3a2 2 0 0 1-2 2h-1"/><path d="M6 17H5a2 2 0 0 1-2-2l1-2"/><circle cx="8" cy="15" r="1"/><circle cx="16" cy="15" r="1"/></svg>
+          <span>My Pigs</span>
+        </a>
+        <a class="nav-link" href="index.html#marketplace">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 9 12 4l9 5"/><path d="M5 10v9M9 10v9M15 10v9M19 10v9M3 20h18M2 9h20"/></svg>
+          <span>Marketplace</span>
+        </a>
+        <a class="nav-link" id="pig-health-nav-link" href="index.html#disease-awareness">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 21s8-4 8-11V5l-8-3-8 3v5c0 7 8 11 8 11Z"/><path d="M9 12h6M12 9v6"/></svg>
+          <span>Pig Health</span>
+        </a>
+      </nav>
+      <div class="sidebar-bottom">
+        <p class="nav-caption">MORE</p>
+        <a class="nav-link" href="index.html#summary">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 19V5M4 19h17"/><path d="m7 15 4-4 3 2 5-6"/><path d="M16 7h3v3"/></svg>
+          <span>Summary</span>
+        </a>
+        <a class="nav-link" href="index.html#profile">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+          <span>Profile</span>
+        </a>
+        <div class="sidebar-note"><strong>Your farm workspace</strong><span>Manage pig records, pens, and local listings in one place.</span></div>
+      </div>
+    </aside>
+
+    <div class="page-area">
+      <header class="topbar">
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">
+          <span class="sr-only">Toggle navigation</span><span></span><span></span><span></span>
+        </button>
+        <div class="topbar-context"><span class="topbar-label" id="workspace-label">Farm workspace</span><span class="topbar-location">Marinduque, Philippines</span></div>
+        <div class="topbar-actions">
+          <button class="notification-button" type="button" aria-label="Notifications (visual placeholder)" disabled>
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>
+            <span class="notification-dot" aria-hidden="true"></span>
+          </button>
+          <span class="topbar-divider" aria-hidden="true"></span>
+          <div class="user-summary"><span class="user-avatar" aria-hidden="true">F</span><span class="user-copy"><strong>Farm account</strong><small>Marinduque</small></span><button class="button button-secondary auth-logout" type="button">Log out</button></div>
+        </div>
+      </header>
+
+      <main class="main-content dashboard-main" id="dashboard" tabindex="-1">
+        <div id="dashboard-view">
+        <div class="page-heading dashboard-hero">
+          <div class="dashboard-hero-copy"><p class="eyebrow">Farm overview</p><h1>Welcome to your farm</h1><p class="page-description">Your farm at a glance. Choose what you would like to do.</p></div>
+          <div class="hero-art" aria-hidden="true">
+            <img class="hero-farm" src="../public/assets/home-redesign/pig_farm_scene.png" alt="">
+            <img class="hero-mascot" src="../public/assets/home-redesign/superhero_pig.png" alt="">
+            <img class="hero-rays" src="../public/assets/home-redesign/gold_accent_rays.png" alt="">
+          </div>
+          <div class="dashboard-hero-actions">
+            <a class="button button-primary hero-register-button" href="index.html#register-pig">Register a Pig <span aria-hidden="true">→</span></a>
+          </div>
+        </div>
+        <aside class="panel quick-actions-panel" aria-labelledby="quick-actions-title">
+          <div class="panel-heading"><div><p class="eyebrow"><img class="heading-small-icon" src="../public/assets/home-redesign/quick_actions_bolt.png" alt="">Quick actions</p><h2 id="quick-actions-title">What would you like to do?</h2></div></div>
+          <p class="quick-actions-intro">Start with a common farm task.</p>
+          <div class="quick-actions">
+            <a class="action-button" href="index.html#register-pig"><span class="action-icon" aria-hidden="true"><img src="../public/assets/home-redesign/quick_register_pig_plus.png" alt=""></span><span><strong>Register a Pig</strong><small>Add a pig to your records</small></span><span class="action-arrow" aria-hidden="true">→</span></a>
+            <a class="action-button" href="index.html#pig-pens"><span class="action-icon" aria-hidden="true"><img src="../public/assets/home-redesign/quick_manage_pens.png" alt=""></span><span><strong>Manage Pig Pens</strong><small>See your pens and pigs</small></span><span class="action-arrow" aria-hidden="true">→</span></a>
+            <a class="action-button" href="pages/weight-calculator.html" data-open-calculator aria-haspopup="dialog" aria-controls="weight-calculator-dialog"><span class="action-icon" aria-hidden="true"><img src="../public/assets/home-redesign/quick_weight_calculator.png" alt=""></span><span><strong>Try Weight Calculator</strong><small>Estimate weight and selling value</small></span><span class="action-arrow" aria-hidden="true">→</span></a>
+            <a class="action-button" href="index.html#marketplace"><span class="action-icon" aria-hidden="true"><img src="../public/assets/home-redesign/quick_browse_marketplace.png" alt=""></span><span><strong>Browse Marketplace</strong><small>See pigs for sale or post a listing</small></span><span class="action-arrow" aria-hidden="true">→</span></a>
+          </div>
+        </aside>
+        <section aria-labelledby="farm-snapshot-title">
+          <div class="summary-heading">
+            <div><h2 id="farm-snapshot-title"><img class="heading-chart-icon" src="../public/assets/home-redesign/farm_snapshot_chart.png" alt="">Farm snapshot</h2></div>
+          </div>
+          <div class="summary-grid" aria-label="Farm summary">
+          <article class="summary-card">
+            <div class="summary-card-heading"><span>Total pigs</span><span class="summary-icon" aria-hidden="true"><img src="../public/assets/home-redesign/snapshot_total_pigs.png" alt=""></span></div>
+            <p class="summary-value" id="snapshot-total-pigs">—</p><p class="summary-footnote"><span class="status-dot status-dot-green"></span> All registered pig records</p>
+          </article>
+          <article class="summary-card">
+            <div class="summary-card-heading"><span>Active pigs</span><span class="summary-icon" aria-hidden="true"><img src="../public/assets/home-redesign/snapshot_active_pigs_eye.png" alt=""></span></div>
+            <p class="summary-value" id="snapshot-active-pigs">—</p><p class="summary-footnote"><span class="status-dot status-dot-green"></span> Currently on your farm</p>
+          </article>
+          <article class="summary-card">
+            <div class="summary-card-heading"><span>Active marketplace listings</span><span class="summary-icon" aria-hidden="true"><img src="../public/assets/home-redesign/snapshot_marketplace.png" alt=""></span></div>
+            <p class="summary-value" id="snapshot-active-listings">—</p><p class="summary-footnote"><span class="status-dot status-dot-gray"></span> Available listings</p>
+          </article>
+          <article class="summary-card">
+            <div class="summary-card-heading"><span>Health reports (30 days)</span><span class="summary-icon" aria-hidden="true"><img src="../public/assets/home-redesign/snapshot_health_reports.png" alt=""></span></div>
+            <p class="summary-value" id="snapshot-recent-reports">—</p><p class="summary-footnote"><span class="status-dot status-dot-amber"></span> Submitted in the last 30 days</p>
+          </article>
+          </div>
+          <p id="farm-snapshot-message" class="small-muted" role="status" aria-live="polite">Loading your farm information...</p>
+        </section>
+        <aside class="farm-reminder" id="farm-reminder" aria-labelledby="farm-reminder-title" hidden>
+          <span class="reminder-icon" aria-hidden="true"><img src="../public/assets/home-redesign/reminder_exclamation.png" alt=""></span>
+          <div class="reminder-copy">
+            <p class="eyebrow">Farm reminder</p>
+            <h2 id="farm-reminder-title">Health report follow-up</h2>
+            <p id="farm-reminder-text"></p>
+          </div>
+          <a class="button button-secondary" href="index.html#my-reports">View My Reports</a>
+        </aside>
+
+          <section class="panel activity-panel" aria-labelledby="activity-title">
+            <div class="panel-heading"><div><p class="eyebrow">Farm log</p><h2 id="activity-title">Recent activity</h2></div></div>
+            <div class="activity-list" id="farm-log-list" aria-live="polite" aria-busy="true">
+              <p class="small-muted">Loading your recent farm activity...</p>
+            </div>
+          </section>
+        <footer class="page-footer"><span>PigMENT · Farm management</span><span>Marinduque, Philippines</span></footer>
+        </div>
+        <section id="disease-awareness" class="disease-view health-refresh" hidden aria-labelledby="pig-health-title">
+          <header class="page-heading dashboard-hero health-hero">
+            <div class="dashboard-hero-copy">
+              <p class="eyebrow">Disease awareness</p>
+              <h1 id="pig-health-title">Pig Health</h1>
+              <p class="page-description">View published disease records and report unusual signs.</p>
+            </div>
+            <div class="hero-art" aria-hidden="true">
+              <img class="hero-farm" src="../public/assets/home-redesign/pig_farm_scene.png" alt="">
+              <img class="hero-mascot" src="../public/assets/home-redesign/superhero_pig.png" alt="">
+              <img class="hero-rays" src="../public/assets/home-redesign/gold_accent_rays.png" alt="">
+            </div>
+            <div class="dashboard-hero-actions">
+              <a class="button button-primary hero-register-button" id="health-report-open" href="#submit-report" aria-haspopup="dialog" aria-controls="submit-report">Report an Illness <span aria-hidden="true">→</span></a>
+            </div>
+          </header>
+          <nav class="health-tabs" aria-label="Pig Health sections">
+            <a href="#disease-map-section" aria-current="location">Disease Awareness Map</a>
+            <a href="#health-guide">Health Guide</a>
+            <a href="#my-reports">My Reports</a>
+          </nav>
+          <section id="disease-map-section" aria-labelledby="map-title">
+            <h2 id="map-title">Marinduque Disease Awareness Map</h2>
+            <div class="health-public-note"><span class="note-icon" aria-hidden="true">i</span><p><strong>Published records only.</strong> PigMENT does not automatically detect or diagnose disease. Contact your municipal or provincial veterinary office for official assessment.</p></div>
+            <div class="map-layout"><div class="map-panel"><div id="disease-map" class="disease-map" aria-label="Interactive disease awareness map"></div><div class="map-legend" aria-label="Map legend"><strong>Map legend</strong><span><i class="legend-swatch legend-confirmed"></i>Confirmed infected zone</span><span><i class="legend-swatch legend-monitoring"></i>Area under monitoring</span><span><i class="legend-swatch legend-resolved"></i>Resolved zone</span><span><i class="legend-swatch legend-suspected"></i>Confirmed incident</span></div><p class="map-attribution">Map data © OpenStreetMap contributors. Published records only; locations are shown at public precision.</p></div><aside class="map-controls panel" aria-label="Map filters"><h3>Filter records</h3><label class="filter-field" for="municipality-filter">Municipality<select id="municipality-filter"><option value="">All municipalities</option></select></label><label class="filter-field" for="disease-filter">Disease type<select id="disease-filter"><option value="">All disease types</option></select></label><label class="filter-field" for="zone-status-filter">Zone status<select id="zone-status-filter"><option value="">All zone statuses</option><option value="confirmed">Confirmed infected</option><option value="monitoring">Under monitoring</option><option value="resolved">Resolved</option></select></label><button class="button button-secondary" id="health-reset-filters" type="button">Reset filters</button><p class="record-count" id="map-count" role="status"></p><p class="empty-map-message" id="map-empty" hidden>No published records match these filters.</p><p class="small-muted">A suspected report never automatically becomes an infected zone.</p></aside>
+          </section>
+          <section class="health-guide panel" id="health-guide" hidden aria-labelledby="health-guide-title"><div class="panel-heading"><div><p class="eyebrow">Practical guidance</p><h2 id="health-guide-title">Health Guide</h2></div></div><details><summary>African Swine Fever</summary><p>ASF is a serious viral disease of pigs. Fever, weakness, loss of appetite, vomiting, diarrhea, skin discoloration, or sudden deaths can be warning signs, but they do not confirm ASF. Contact a veterinary authority for assessment.</p></details><details><summary>General pig health</summary><p>Monitor behavior, appetite, breathing, movement, and body condition. Seek veterinary guidance when changes persist, several pigs become ill, or deaths occur.</p></details><details><summary>Biosecurity basics</summary><p>Clean and disinfect equipment, limit visitors, isolate new or sick pigs, avoid sharing tools between pens, and keep records of pig movement.</p></details><p class="small-muted">Educational guidance only. Sources: FAO, WOAH, and Philippine veterinary authorities. Review with a local veterinary professional.</p><section class="awareness-grid" aria-labelledby="awareness-title"><div class="panel"><div class="panel-heading"><div><p class="eyebrow">Know the signs</p><h2 id="awareness-title">ASF awareness essentials</h2></div></div><div class="awareness-columns"><div><h3>Possible symptoms</h3><ul><li>High fever, weakness, or loss of appetite</li><li>Red or bluish skin, especially on ears or legs</li><li>Vomiting, diarrhea, coughing, or sudden death</li></ul></div><div><h3>Prevention</h3><ul><li>Limit visitors and avoid bringing pork products into the farm</li><li>Do not move pigs without following local veterinary guidance</li><li>Report unusual illness promptly to authorities</li></ul></div><div><h3>Biosecurity habits</h3><ul><li>Use dedicated footwear, clothing, and clean tools</li><li>Clean and disinfect pens, vehicles, and equipment</li><li>Keep new or returning pigs separated and monitored</li></ul></div></div></div></section></section>
+          <section class="panel" id="my-reports" hidden aria-labelledby="my-reports-title"><div class="panel-heading"><div><p class="eyebrow">Your submissions</p><h2 id="my-reports-title">My Reports</h2></div></div><p id="health-report-success" class="health-public-note" role="status" hidden></p><div id="my-reports-list" aria-live="polite"><p class="small-muted">Sign in to view your submitted reports.</p></div></section>
+          <footer class="page-footer"><span>PigMENT · Disease awareness</span><span>Educational information only</span></footer>
+        </section>
+        <section id="my-pigs" data-workspace-view="my-pigs" class="" hidden>
+        <!-- Identical banner markup and image assets as the Home page; only the copy differs. -->
+        <div class="page-heading dashboard-hero">
+          <div class="dashboard-hero-copy">
+            <p class="eyebrow">Growth monitoring</p>
+            <h1>My Pigs</h1>
+            <p class="page-description">View your pig records, keep track of growth, and update your farm list.</p>
+          </div>
+          <div class="hero-art" aria-hidden="true">
+            <img class="hero-farm" src="../public/assets/home-redesign/pig_farm_scene.png" alt="">
+            <img class="hero-mascot" src="../public/assets/home-redesign/superhero_pig.png" alt="">
+            <img class="hero-rays" src="../public/assets/home-redesign/gold_accent_rays.png" alt="">
+          </div>
+        </div>
+        <div class="heading-actions my-pigs-quick-actions" aria-label="Pig management shortcuts">
+          <a class="button button-secondary" href="pages/weight-calculator.html" data-open-calculator aria-haspopup="dialog" aria-controls="weight-calculator-dialog"><img src="../public/assets/my-pigs-redesign/icons/svg/calculator.svg" alt="">Quick Weight Calculator <span aria-hidden="true">→</span></a>
+          <a class="button button-secondary" href="#pig-pens"><img src="../public/assets/my-pigs-redesign/icons/svg/pen.svg" alt="">Manage Pig Pens <span aria-hidden="true">→</span></a>
+          <button class="button button-primary" id="open-registration" type="button"><img src="../public/assets/my-pigs-redesign/icons/svg/plus.svg" alt="">Register a Pig <span aria-hidden="true">→</span></button>
+        </div>
+
+        <section class="records-panel" aria-labelledby="records-title">
+          <p class="storage-warning" id="storage-warning" role="status" hidden>Browser session storage is unavailable. Changes will be lost when you leave this page.</p>
+          <div class="records-heading records-heading-compact">
+            <div class="records-heading-title">
+              <img src="../public/assets/registered-pigs-icons/PigMENT_Registered_Pigs_Icons/svg/pig-outline.svg" alt="" aria-hidden="true" class="records-pig-icon">
+              <div>
+                <h2 id="records-title">Registered Pigs</h2>
+                <p class="record-intro sr-only">Each card is one pig saved to your farm account.</p>
+              </div>
+            </div>
+            <div class="list-controls list-controls-inline">
+              <p id="record-count" class="record-count" aria-live="polite">Pig records</p>
+              <label class="search-field">
+                <span class="search-icon registered-search-icon" aria-hidden="true"></span>
+                <span class="sr-only">Search pigs by ID, name, or breed</span>
+                <input id="pig-search" type="search" placeholder="Search name or ID">
+              </label>
+              <label class="filter-field">
+                <span class="sr-only">Filter by monitoring status</span>
+                <select id="status-filter" aria-label="Filter by monitoring status">
+                  <option value="all">All Statuses</option>
+                  <option value="active">Active</option>
+                  <option value="sold">Sold</option>
+                  <option value="deceased">Deceased</option>
+                </select>
+              </label>
+            </div>
+          </div>
+          <p class="interaction-message" id="interaction-message" role="status" hidden></p>
+          <div class="pig-card-list" id="pig-list" aria-live="polite"></div>
+
+          <div class="empty-state" id="empty-state" hidden>
+            <span class="empty-icon ui-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="5.5"/><path d="m15 15 5 5"/></svg></span>
+            <h3 id="empty-title">No pigs found</h3>
+            <p id="empty-description">Try a different search or status filter.</p>
+            <button class="button button-secondary" id="empty-register" type="button" hidden>Register your first pig</button>
+          </div>
+        </section>
+
+        <section class="pens-panel" id="pig-pens" aria-labelledby="pens-title">
+          <div class="pens-heading">
+            <div class="pens-heading-intro"><img class="pens-heading-icon" src="../public/assets/my-pigs-redesign/icons/svg/pen.svg" alt="" aria-hidden="true"><div><p class="pens-kicker">GROUPS & CAPACITY</p><h2 id="pens-title">Manage Pig Pens</h2><p>Each pen groups pigs together. See its capacity and estimated value at a glance.</p></div></div>
+            <div class="pen-header-actions">
+              <button class="button button-secondary" id="open-litter-form" type="button" aria-haspopup="dialog" aria-controls="litter-dialog"><span class="litter-icon" aria-hidden="true">♧</span> Record a Litter</button>
+              <button class="button button-primary" id="open-pen-form" type="button"><span class="pen-add-icon" aria-hidden="true">⊕</span> Create Pig Pen</button>
+            </div>
+          </div>
+          <p class="interaction-message" id="pen-message" role="status" hidden></p>
+          <p class="pen-data-note"><strong>About estimates:</strong> Estimated sale value adds the sale prices entered for individual pigs in that pen. It is gross revenue, not profit; feed and other costs are not included. Piglets in litter groups are not included.</p>
+          <div class="pens-empty" id="pens-empty">
+            <span class="empty-icon ui-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 20V8l8-5 8 5v12M8 20v-6h8v6M3 20h18"/></svg></span>
+            <div><h3>No pig pens added yet</h3><p>Create a pen to group pigs, or record a litter and choose its pen.</p></div>
+            <button class="button button-primary" id="empty-create-pen" type="button"><span aria-hidden="true">＋</span> Create your first pen</button>
+          </div>
+          <div class="pen-list" id="pen-list" hidden></div>
+          <div class="pen-modal-backdrop" id="pen-modal-backdrop" hidden aria-hidden="true"></div>
+          <form class="form-panel pen-form" id="pen-form" role="dialog" aria-modal="true" aria-labelledby="pen-form-title" aria-describedby="pen-form-description" tabindex="-1" hidden>
+            <div class="form-heading">
+              <div><p class="eyebrow">Farm record</p><h2 id="pen-form-title">Create a Pig Pen</h2></div>
+              <button class="close-form" id="close-pen-form" type="button" aria-label="Close pig pen form">×</button>
+            </div>
+            <p class="form-intro" id="pen-form-description">Give the pen a name and set its maximum number of registered pigs.</p>
+            <div class="form-grid pen-form-grid">
+              <label>Pen name or number <span class="required-mark" aria-hidden="true">*</span><input name="penName" type="text" maxlength="40" placeholder="e.g. Pen 04" required></label>
+              <label>Pen type <span class="required-mark" aria-hidden="true">*</span>
+                <select name="penType" required>
+                  <option value="Sow and Litter">Sow and Litter</option>
+                  <option value="Piglets">Piglets</option>
+                  <option value="Growing Pigs">Growing Pigs</option>
+                  <option value="Fattening Pigs">Fattening Pigs</option>
+                  <option value="General">General</option>
+                </select>
+              </label>
+              <label>Current status <span class="required-mark" aria-hidden="true">*</span>
+                <select name="penStatus" required><option value="active">Active</option><option value="inactive">Inactive</option></select>
+              </label>
+              <label>Capacity <span class="field-unit">(animals, optional)</span><input name="capacity" type="number" min="1" step="1" placeholder="e.g. 10"></label>
+              <label class="notes-field">Description <span class="field-unit">(optional)</span><textarea name="description" rows="2" maxlength="160" placeholder="What is this pen used for?"></textarea></label>
+            </div>
+            <p class="pen-modal-error" id="pen-modal-error" role="alert" hidden></p>
+            <div class="form-actions"><button class="button button-primary" id="pen-form-submit" type="submit">Create Pig Pen</button><button class="button button-secondary" id="cancel-pen-form" type="button">Cancel</button></div>
+          </form>
+
+          <dialog id="litter-dialog" class="litter-dialog" aria-labelledby="litter-dialog-title" aria-describedby="litter-dialog-description">
+            <form class="litter-form" id="litter-form">
+              <div class="form-heading">
+                <div><p class="eyebrow">Litter record</p><h2 id="litter-dialog-title">Record a Litter</h2></div>
+                <button class="close-form" id="close-litter-form" type="button" aria-label="Close litter form">×</button>
+              </div>
+              <p class="form-intro" id="litter-dialog-description">Record the sow's farrowing details. Litter records are linked to the mother, not to a pen.</p>
+              <div class="form-grid litter-form-grid">
+                <label>Mother sow <span class="required-mark" aria-hidden="true">*</span><select name="motherPigId" id="litter-mother" required autofocus></select></label>
+                <label>Birth date <span class="required-mark" aria-hidden="true">*</span><input name="birthDate" type="date" required></label>
+                <label>Total born <span class="required-mark" aria-hidden="true">*</span><input name="totalBorn" type="number" min="0" step="1" required></label>
+                <label>Born alive <span class="required-mark" aria-hidden="true">*</span><input name="bornAlive" type="number" min="0" step="1" required></label>
+                <label>Stillborn <span class="required-mark" aria-hidden="true">*</span><input name="stillborn" type="number" min="0" step="1" required></label>
+                <label class="notes-field">Notes <span class="field-unit">(optional)</span><textarea name="notes" rows="2" maxlength="200" placeholder="Optional notes about this litter"></textarea></label>
+              </div>
+              <p class="form-error" id="litter-error" role="alert" hidden></p>
+              <div class="form-actions"><button class="button button-primary" type="submit">Save Litter</button><button class="button button-secondary" id="cancel-litter-form" type="button">Cancel</button></div>
+            </form>
+          </dialog>
+        </section>
+
+        <div class="edit-pig-backdrop" id="edit-pig-backdrop" hidden aria-hidden="true"></div>
+        <section class="form-panel edit-pig-panel" id="edit-pig-panel" role="dialog" aria-modal="true" aria-labelledby="edit-pig-title" aria-describedby="edit-pig-description" tabindex="-1" hidden>
+          <div class="form-heading"><div><p class="eyebrow">Farm record</p><h2 id="edit-pig-title">Edit Pig</h2></div><button class="close-form" id="close-edit-pig" type="button" aria-label="Close edit form">×</button></div>
+          <p class="form-intro" id="edit-pig-description">Update this pig's registered information. Changes will be saved to your farm account.</p>
+          <form id="edit-pig-form">
+            <div class="form-grid">
+              <label>Pig ID / code <span class="required-mark">*</span><input name="pigCode" type="text" maxlength="50" required></label>
+              <label>Pig name <span class="required-mark">*</span><input name="pigName" type="text" maxlength="100" required></label>
+              <label>Breed <span class="required-mark">*</span>
+                <select name="breed" required>
+                      <option value="">Select breed</option>
+                      <option value="Native">Native (Philippine native pig)</option>
+                      <option value="Native cross">Native cross</option>
+                      <option value="Crossbred">Crossbred (other mix)</option>
+                      <option value="Large White">Large White (Yorkshire)</option>
+                      <option value="Landrace">Landrace</option>
+                      <option value="Duroc">Duroc</option>
+                      <option value="Hampshire">Hampshire</option>
+                      <option value="Pietrain">Pietrain</option>
+                      <option value="Berkshire">Berkshire</option>
+                      <option value="N/A">N/A — Unknown breed</option>
+                    </select>
+              </label>
+              <label>Sex <span class="required-mark">*</span><select name="sex" required><option value="male">Male</option><option value="female">Female</option></select></label>
+              <label>Birth date <input name="birthDate" type="date"></label>
+              <label>Estimated age (months) <input name="ageMonths" type="number" min="0" max="999.99" step="0.01"></label>
+              <label>Status <select name="pigStatus"><option value="active">Active</option><option value="sold">Sold</option><option value="deceased">Deceased</option></select></label>
+              <label class="notes-field">Notes <textarea name="notes" rows="3" maxlength="240"></textarea></label>
+            </div>
+            <p class="edit-pig-error" id="edit-pig-error" role="alert" hidden></p>
+            <div class="form-actions"><button class="button button-primary" type="submit">Save Pig Changes</button><button class="button button-secondary" id="cancel-edit-pig" type="button">Cancel</button></div>
+          </form>
+        </section>
+
+        <!-- The registration dialog is mounted under <body> by my-pigs.js. -->
+        <div class="register-pig-backdrop" id="register-pig-backdrop" hidden aria-hidden="true"></div>
+        <section class="form-panel register-pig-dialog" id="registration-panel" role="dialog" aria-modal="true" aria-labelledby="form-title" aria-describedby="registration-intro" tabindex="-1" hidden>
+          <div class="form-heading register-dialog-header">
+            <div class="register-dialog-title">
+              <p class="eyebrow">FARM RECORD</p>
+              <h2 id="form-title">Register a Pig</h2>
+              <p class="form-intro" id="registration-intro">Add a new pig to your farm records.</p>
+            </div>
+            <button class="close-form" id="close-registration" type="button" aria-label="Close registration form">×</button>
+          </div>
+          <form id="pig-form">
+            <div class="register-dialog-body">
+              <section class="register-form-section" aria-labelledby="reg-info-title">
+                <h3 id="reg-info-title"><span class="reg-section-icon" aria-hidden="true">▦</span> Pig Information</h3>
+                <p class="reg-section-caption">Fields marked * are required.</p>
+                <div class="form-grid register-info-grid">
+                  <label><span class="register-label-text">Pig ID / code <span class="required-mark" aria-hidden="true">*</span></span>
+                    <input name="pigCode" type="text" maxlength="50" placeholder="e.g. PG-025" required autocomplete="off">
+                  </label>
+                  <label><span class="register-label-text">Pig name <span class="required-mark" aria-hidden="true">*</span></span>
+                    <input name="pigName" type="text" maxlength="100" placeholder="e.g. Rosie" required>
+                  </label>
+                  <label><span class="register-label-text">Breed <span class="required-mark" aria-hidden="true">*</span></span>
+                    <select name="breed" required>
+                      <option value="">Select breed</option>
+                      <option value="Native">Native (Philippine native pig)</option>
+                      <option value="Native cross">Native cross</option>
+                      <option value="Crossbred">Crossbred (other mix)</option>
+                      <option value="Large White">Large White (Yorkshire)</option>
+                      <option value="Landrace">Landrace</option>
+                      <option value="Duroc">Duroc</option>
+                      <option value="Hampshire">Hampshire</option>
+                      <option value="Pietrain">Pietrain</option>
+                      <option value="Berkshire">Berkshire</option>
+                      <option value="N/A">N/A — Unknown breed</option>
+                    </select>
+                  </label>
+                  <label><span class="register-label-text">Sex <span class="required-mark" aria-hidden="true">*</span></span>
+                    <select name="sex" required>
+                      <option value="">Select sex</option>
+                      <option value="female">Female</option>
+                      <option value="male">Male</option>
+                    </select>
+                  </label>
+                  <label><span class="register-label-text">Date of birth <span class="field-unit">(optional)</span></span>
+                    <input name="birthDate" type="date">
+                  </label>
+                  <label><span class="register-label-text">Estimated age <span class="field-unit">(months, optional)</span></span>
+                    <input name="ageMonths" type="number" min="0" max="999.99" step="0.01" placeholder="e.g. 8">
+                  </label>
+                </div>
+                <p class="reg-field-guidance">You may enter the birth date or estimated age based on your farm records.</p>
+              </section>
+              <section class="register-form-section register-measure-section" aria-labelledby="reg-measure-title">
+                <h3 id="reg-measure-title"><span class="reg-section-icon" aria-hidden="true">↔</span> Weight &amp; Measurements <span class="field-unit">(optional)</span></h3>
+                <p class="reg-section-caption">Heart girth is measured around the chest behind the front legs; body length runs from the shoulder to the base of the tail.</p>
+                <div class="weight-entry-grid">
+                  <label>Heart girth (cm)<input name="girth" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="Enter measurement"></label>
+                  <label>Body length (cm)<input name="length" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="Enter measurement"></label>
+                  <label>Price per kilogram (PHP/kg, optional)<input name="pricePerKg" type="number" min="0.01" max="99999999.99" step="0.01" inputmode="decimal" placeholder="e.g. 180"></label>
+                  <div class="register-weight-preview" aria-live="polite">
+                    <label for="register-estimated-weight">Estimated weight (kg)</label>
+                    <div class="register-weight-display"><strong id="registration-weight-display">— kg</strong><span>Calculated estimate</span></div>
+                    <input id="register-estimated-weight" name="estimatedWeight" type="number" min="0.01" step="0.01" readonly tabindex="-1" aria-label="Calculated estimated weight in kilograms">
+                  </div>
+                </div>
+                <p class="weight-entry-message" id="weight-entry-message">Enter heart girth and body length to calculate an estimate.</p>
+                <p class="weight-entry-value" id="weight-entry-value" hidden></p>
+              </section>
+              <section class="register-form-section register-notes-section" aria-labelledby="reg-notes-title">
+                <h3 id="reg-notes-title"><span class="reg-section-icon" aria-hidden="true">✎</span> Additional Notes <span class="field-unit">(optional)</span></h3>
+                <label class="notes-field"><span class="sr-only">Notes</span>
+                  <textarea name="notes" rows="2" maxlength="240" placeholder="Observations or care notes about this pig"></textarea>
+                </label>
+              </section>
+              <p class="measurement-note">Records are saved to your authenticated farm account.</p>
+              <p class="register-form-error" id="register-form-error" role="alert" hidden></p>
+            </div>
+            <div class="form-actions register-dialog-footer">
+              <button class="button button-secondary" id="cancel-registration" type="button">Cancel</button>
+              <button class="button button-primary" type="submit">Register a Pig</button>
+            </div>
+          </form>
+        </section>
+
+        <footer class="page-footer"><span>PigMENT · Farm management</span><span>Marinduque, Philippines</span></footer>
+              </section>
+        <section id="marketplace" data-workspace-view="marketplace" class="marketplace-main" hidden>
+        <section class="market-view" id="list-view" aria-labelledby="market-title">
+          <header class="page-heading dashboard-hero marketplace-hero">
+            <div class="dashboard-hero-copy">
+              <p class="eyebrow">The local farmers’ exchange</p>
+              <h1 id="market-title">Pig Marketplace</h1>
+              <p class="page-description">Browse pigs for sale from local farmers.</p>
+            </div>
+            <div class="hero-art" aria-hidden="true">
+              <img class="hero-farm" src="../public/assets/home-redesign/pig_farm_scene.png" alt="">
+              <img class="hero-mascot" src="../public/assets/home-redesign/superhero_pig.png" alt="">
+              <img class="hero-rays" src="../public/assets/home-redesign/gold_accent_rays.png" alt="">
+            </div>
+            <div class="dashboard-hero-actions">
+              <button class="button button-primary hero-register-button market-post-button" id="post-listing" type="button"><span aria-hidden="true">+</span> Post a Listing</button>
+            </div>
+          </header>
+
+          <nav class="market-tabs" aria-label="Marketplace sections">
+            <button class="market-tab is-active" id="browse-tab" type="button" aria-pressed="true">Browse Listings</button>
+            <button class="market-tab" id="my-listings-tab" type="button" aria-pressed="false">My Listings</button>
+          </nav>
+
+          <section class="market-filter-panel" aria-label="Search and filter pig listings">
+            <label class="market-search-field">
+              <svg class="market-search-mark market-ui-icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg>
+              <span class="sr-only">Search by pig type, breed, or location</span>
+              <input id="market-search" type="search" placeholder="Search by pig type, breed, or location">
+            </label>
+            <button class="button button-secondary market-filters-toggle" id="market-filters-toggle" type="button" aria-expanded="false" aria-controls="market-filter-options" hidden>
+              <svg class="market-ui-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M3 6h7m4 0h7M3 12h12m4 0h2M3 18h3m4 0h11"/><circle cx="12" cy="6" r="2"/><circle cx="17" cy="12" r="2"/><circle cx="8" cy="18" r="2"/></svg>
+              Filters <span id="market-filter-count" hidden></span>
+            </button>
+            <div class="market-filter-row" id="market-filter-options">
+              <label class="market-filter-field">Pig type
+                <select id="type-filter">
+                  <option value="all">All pig types</option>
+                  <option value="piglet">Piglet</option>
+                  <option value="grower">Grower</option>
+                  <option value="gilt">Gilt</option>
+                  <option value="sow">Sow</option>
+                  <option value="boar">Boar</option>
+                </select>
+              </label>
+              <label class="market-filter-field">Breed
+                <select id="breed-filter"><option value="all">All breeds</option></select>
+              </label>
+              <label class="market-filter-field">Estimated weight
+                <select id="weight-filter">
+                  <option value="all">Any weight</option>
+                  <option value="under-40">Under 40 kg</option>
+                  <option value="40-80">40–80 kg</option>
+                  <option value="80-120">80–120 kg</option>
+                  <option value="over-120">Over 120 kg</option>
+                </select>
+              </label>
+              <label class="market-filter-field">Location
+                <select id="location-filter"><option value="all">All locations</option></select>
+              </label>
+              <button class="market-reset-button" id="reset-filters" type="button">Reset filters</button>
+            </div>
+          </section>
+
+
+          <div class="market-results-heading">
+            <h2>Listings from around Marinduque</h2>
+            <p class="market-result-count" id="listing-count" aria-live="polite"></p>
+          </div>
+          <p class="market-message" id="market-message" role="status" hidden></p>
+          <button class="button button-secondary market-retry" id="market-retry" type="button" hidden>Retry</button>
+          <div class="market-listing-grid" id="listing-grid" aria-live="polite"></div>
+          <div class="market-empty-state" id="market-empty" hidden>
+            <span class="market-empty-mark" aria-hidden="true">⌕</span>
+            <h2>No listings match those filters</h2>
+            <p>Try a different search or reset your filters to see all pigs for sale.</p>
+            <button class="button button-secondary" id="empty-reset" type="button">Show all listings</button>
+          </div>
+          <footer class="page-footer"><span>PigMENT · Farm management</span><span>Marinduque, Philippines</span></footer>
+        </section>
+
+        <section class="market-view market-detail-view" id="detail-view" aria-labelledby="detail-title" hidden>
+          <button class="market-back-button" id="detail-back" type="button"><span aria-hidden="true">←</span> <span class="market-detail-back-label">Back to Listings</span></button>
+          <div class="market-detail-layout" id="detail-content"></div>
+        </section>
+
+        <section class="market-view market-form-view" id="form-view" aria-labelledby="marketplace-form-title" hidden>
+          <button class="market-back-button" id="form-back" type="button"><span aria-hidden="true">←</span> Back to Listings</button>
+          <header class="market-form-heading">
+            <p class="market-section-kicker">Share your farm's next sale</p>
+            <h1 id="marketplace-form-title">Post a Listing</h1>
+            <p>Add a few details to help nearby farmers find the right pig.</p>
+          </header>
+          <p class="market-form-message" id="form-message" role="alert" hidden></p>
+          <form id="listing-form" novalidate>
+            <section class="market-form-section" aria-labelledby="pig-info-title">
+              <div class="market-form-section-heading"><span class="market-step-number">1</span><div><h2 id="pig-info-title">About the pig</h2><p>Start with the details buyers look for first.</p></div></div>
+              <div class="market-form-grid">
+                <label class="market-field market-field-wide">Listing title <span class="required-mark" aria-hidden="true">*</span>
+                  <input name="title" type="text" maxlength="60" placeholder="e.g. Healthy young native pig" required>
+                </label>
+                <label class="market-field">Pig type <span class="required-mark" aria-hidden="true">*</span>
+                  <select name="type" required><option value="">Choose a pig type</option><option value="piglet">Piglet</option><option value="grower">Grower</option><option value="gilt">Gilt</option><option value="sow">Sow</option><option value="boar">Boar</option></select>
+                </label>
+                <label class="market-field">Breed <span class="required-mark" aria-hidden="true">*</span>
+                  <select name="breed" required>
+                    <option value="">Select breed</option>
+                    <option value="Native">Native (Philippine native pig)</option>
+                    <option value="Native cross">Native cross</option>
+                    <option value="Crossbred">Crossbred (other mix)</option>
+                    <option value="Large White">Large White (Yorkshire)</option>
+                    <option value="Landrace">Landrace</option>
+                    <option value="Duroc">Duroc</option>
+                    <option value="Hampshire">Hampshire</option>
+                    <option value="Pietrain">Pietrain</option>
+                    <option value="Berkshire">Berkshire</option>
+                    <option value="N/A">N/A — Unknown breed</option>
+                  </select>
+                </label>
+                <label class="market-field">Sex <span class="required-mark" aria-hidden="true">*</span>
+                  <select name="sex" required><option value="">Choose sex</option><option value="female">Female</option><option value="male">Male</option></select>
+                </label>
+                <label class="market-field">Age <span class="required-mark" aria-hidden="true">*</span>
+                  <input name="age" type="number" min="0" max="999.99" step="0.01" placeholder="e.g. 5" required>
+                </label>
+                <label class="market-field">Estimated weight (kg) <span class="required-mark" aria-hidden="true">*</span>
+                  <input id="listing-estimated-weight" name="weight" type="number" min="0.01" max="1000" step="0.01" placeholder="e.g. 40" required>
+                  <small>An estimate is fine. Please label it as an estimate.</small>
+                </label>
+                <label class="market-field">Asking price per kg (PHP)
+                  <input id="listing-price-per-kg" name="price" type="number" min="0.01" max="999999.99" step="0.01" placeholder="e.g. 250" required aria-describedby="listing-price-hint">
+                  <small id="listing-price-hint">The listing shows this rate multiplied by the estimated weight.</small>
+                </label>
+                <p class="market-field-wide"><strong>Estimated total</strong> <output id="listing-price-total" for="listing-price-per-kg listing-estimated-weight" aria-live="polite">—</output></p>
+              </div>
+            </section>
+            <section class="market-form-section" aria-labelledby="seller-info-title">
+              <div class="market-form-section-heading"><span class="market-step-number">2</span><div><h2 id="seller-info-title">Where and a little more</h2><p>Share a general location and what makes this pig a good fit. Your profile name and phone number appear in listing details for signed-in users.</p></div></div>
+              <div class="market-form-grid">
+                <label class="market-field">Municipality <span class="required-mark" aria-hidden="true">*</span>
+                  <input name="municipality" type="text" maxlength="100" placeholder="e.g. Boac" required>
+                  <small>A general location is enough. Do not include your home address.</small>
+                </label>
+                <label class="market-field">Barangay <span class="market-optional-label">Optional</span>
+                  <input name="barangay" type="text" maxlength="100" placeholder="e.g. Laylay">
+                </label>
+                <label class="market-field market-field-wide">Description <span class="required-mark" aria-hidden="true">*</span>
+                  <textarea name="description" rows="4" maxlength="500" placeholder="Tell buyers about the pig's health, temperament, or care." required></textarea>
+                </label>
+              </div>
+            </section>
+            <section class="market-form-section market-image-section" aria-labelledby="image-title">
+              <div class="market-form-section-heading"><span class="market-step-number">3</span><div><h2 id="image-title">Add a photo <span class="market-optional-label">Optional</span></h2><p>A clear photo helps buyers see what you are offering.</p></div></div>
+              <label class="market-upload-area" id="upload-area">
+                <input id="listing-image" name="image" type="file" accept="image/*">
+                <span class="market-upload-icon" aria-hidden="true">↑</span>
+                <span class="market-upload-copy"><strong>Choose a photo</strong><span>Image files only · up to 5 MB</span></span>
+                <span class="market-upload-preview" id="upload-preview" hidden></span>
+              </label>
+            </section>
+            <div class="market-form-actions">
+              <button class="button button-secondary" id="cancel-listing" type="button">Cancel</button>
+              <button class="button button-primary" type="submit">Preview Listing <span aria-hidden="true">→</span></button>
+            </div>
+          </form>
+        </section>
+
+        <section class="market-view market-preview-view" id="preview-view" aria-labelledby="preview-title" hidden>
+          <button class="market-back-button" id="preview-back" type="button"><span aria-hidden="true">←</span> Back to editing</button>
+          <header class="market-form-heading"><p class="market-section-kicker">One last look</p><h1 id="preview-title">Preview your listing</h1><p>Check your details before adding this listing to the page.</p></header>
+          <div class="market-prototype-note"><strong>Review before publishing.</strong> The listing will be saved to your account after confirmation.</div>
+          <p class="market-form-message" id="preview-message" role="alert" hidden></p>
+          <div id="listing-preview"></div>
+          <div class="market-form-actions">
+            <button class="button button-secondary" id="edit-listing" type="button">Edit details</button>
+            <button class="button button-primary" id="save-listing" type="button">Publish Listing</button>
+          </div>
+        </section>
+              </section>
+        <section id="summary" data-workspace-view="summary" class="reports-page" hidden>
+        <header class="page-heading dashboard-hero summary-hero">
+          <div class="dashboard-hero-copy">
+            <p class="eyebrow">Farm overview</p><h1>Farm Summary</h1>
+            <p class="page-description">A snapshot of your livestock, pens, and marketplace activity.</p>
+            <button class="button button-primary hero-register-button" id="print-report" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true" class="summary-print-icon"><path d="M6 8V3h12v5M6 17H3V8h18v9h-3M6 14h12v7H6zM17 11h1"/></svg>
+              Print Summary
+            </button>
+          </div>
+          <div class="hero-art" aria-hidden="true">
+            <img class="hero-farm" src="../public/assets/home-redesign/pig_farm_scene.png" alt="">
+            <img class="hero-mascot" src="../public/assets/home-redesign/superhero_pig.png" alt="">
+            <img class="hero-rays" src="../public/assets/home-redesign/gold_accent_rays.png" alt="">
+          </div>
+        </header>
+        <p class="form-message" id="reports-message" role="status" hidden></p>
+        <section class="summary-kpis" aria-labelledby="farm-summary-title">
+          <h2 class="sr-only" id="farm-summary-title">Livestock Summary</h2>
+          <div class="report-card-grid">
+            <article class="report-stat-card"><span class="summary-stat-icon"><img src="../public/assets/home-redesign/snapshot_total_pigs.png" alt="" width="32" height="32"></span><div><span>Registered pigs</span><strong id="total-pigs">—</strong></div></article>
+            <article class="report-stat-card"><span class="summary-stat-icon"><img src="../public/assets/home-redesign/snapshot_active_pigs_eye.png" alt="" width="32" height="32"></span><div><span>Active pigs</span><strong id="active-pigs">—</strong></div></article>
+            <article class="report-stat-card"><span class="summary-stat-icon"><img src="../public/assets/home-redesign/snapshot_marketplace.png" alt="" width="32" height="32"></span><div><span>Sold pigs</span><strong id="sold-pigs">—</strong></div></article>
+            <article class="report-stat-card"><span class="summary-stat-icon"><img src="../public/assets/home-redesign/snapshot_health_reports.png" alt="" width="32" height="32"></span><div><span>Deceased pigs</span><strong id="deceased-pigs">—</strong></div></article>
+          </div>
+        </section>
+        <div class="summary-row summary-row-main">
+          <section class="report-section summary-panel" aria-labelledby="pens-summary-title">
+            <div class="summary-panel-heading"><img src="../public/assets/registered-pigs-icons/PigMENT_Registered_Pigs_Icons/svg/pen-house.svg" alt="" width="32" height="32"><h2 id="pens-summary-title">Pig Pen Summary</h2><span class="summary-count"><strong id="active-pen-count">—</strong> <span id="active-pen-label">active pens</span></span></div>
+            <p class="small-muted" id="pen-summary-note">Occupancy counts current active pig assignments only.</p>
+            <div id="pen-summary"></div>
+          </section>
+          <section class="report-section summary-panel" aria-labelledby="growth-summary-title">
+            <div class="summary-panel-heading"><img src="../public/assets/registered-pigs-icons/PigMENT_Registered_Pigs_Icons/svg/weight-scale.svg" alt="" width="32" height="32"><h2 id="growth-summary-title">Growth Summary</h2></div>
+            <p class="small-muted" id="summary-growth-note">Latest recorded weight estimates.</p>
+            <div class="report-table-wrap"><table class="data-table report-table" aria-describedby="summary-growth-note"><thead><tr><th scope="col">Pig</th><th scope="col">Estimated weight</th><th scope="col">Measured on</th></tr></thead><tbody id="growth-summary"></tbody></table></div>
+          </section>
+        </div>
+        <div class="summary-row summary-row-extra">
+          <section class="report-section summary-panel" aria-labelledby="litter-summary-title">
+            <div class="summary-panel-heading"><img src="../public/assets/my-pigs-redesign/icons/svg/litter.svg" alt="" width="32" height="32"><h2 id="litter-summary-title">Litter Summary</h2><span class="summary-count"><strong id="total-litters">—</strong> <span id="total-litters-label">recorded litters</span></span></div>
+            <div id="litter-summary" class="litter-summary"></div>
+          </section>
+          <section class="report-section summary-panel" aria-labelledby="marketplace-summary-title">
+            <div class="summary-panel-heading"><img src="../public/assets/home-redesign/snapshot_marketplace.png" alt="" width="32" height="32"><h2 id="marketplace-summary-title">Marketplace Summary</h2></div>
+            <div class="summary-market-body">
+              <div class="summary-market-counts">
+                <div><strong id="active-listings">—</strong><span>Active</span></div>
+                <div><strong id="sold-listings">—</strong><span>Sold</span></div>
+                <div><strong id="inactive-listings">—</strong><span>Inactive</span></div>
+              </div>
+              <a class="summary-market-link" href="index.html#marketplace">Open Marketplace <span aria-hidden="true">→</span></a>
+            </div>
+          </section>
+        </div>
+
+        <p class="report-health-link">Looking for submitted disease reports? Open <a href="index.html#my-reports">Pig Health → My Reports</a>.</p>
+        <footer class="page-footer"><span>PigMENT · Farm Summary</span><span>Summary generated from your current records.</span></footer>
+              </section>
+        <section id="profile" data-workspace-view="profile" class="profile-page" hidden>
+        <header class="page-heading dashboard-hero profile-hero">
+          <div class="dashboard-hero-copy">
+            <p class="eyebrow">Account settings</p><h1>My Profile</h1>
+            <p class="page-description">Manage your contact and farm location details.</p>
+          </div>
+          <div class="hero-art" aria-hidden="true">
+            <img class="hero-farm" src="../public/assets/home-redesign/pig_farm_scene.png" alt="">
+            <img class="hero-mascot" src="../public/assets/home-redesign/superhero_pig.png" alt="">
+            <img class="hero-rays" src="../public/assets/home-redesign/gold_accent_rays.png" alt="">
+          </div>
+        </header>
+        <p class="form-message" id="profile-message" role="status" hidden></p>
+        <section class="profile-card profile-record" aria-labelledby="profile-name">
+          <header class="profile-identity">
+            <span class="profile-initials" id="profile-initials" aria-hidden="true">—</span>
+            <div class="profile-identity-copy"><h2 id="profile-name">Your profile</h2><p id="profile-role">—</p></div>
+            <button class="button button-primary hero-register-button profile-edit-action" id="edit-profile" type="button" aria-controls="profile-form-panel" aria-expanded="false" disabled><svg class="profile-line-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="m4 16-1 5 5-1L21 7l-4-4zM14 6l4 4"/></svg> Edit Profile</button>
+          </header>
+          <div class="profile-record-section">
+            <h3>Contact information</h3>
+            <dl class="profile-record-rows"><div><dt><svg class="profile-line-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2A18 18 0 0 1 3 5.2 2 2 0 0 1 5 3h3l2 5-2 2a13 13 0 0 0 6 6l2-2 6 2.9z"/></svg><span>Contact number</span></dt><dd id="profile-phone">—</dd></div></dl>
+          </div>
+          <div class="profile-record-section">
+            <h3>Farm location</h3>
+            <dl class="profile-record-rows">
+              <div><dt><svg class="profile-line-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M20 10c0 6-8 11-8 11s-8-5-8-11a8 8 0 1 1 16 0z"/><circle cx="12" cy="10" r="2.5"/></svg><span>Municipality</span></dt><dd id="profile-municipality">—</dd></div>
+              <div><dt><svg class="profile-line-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5zM3 12l9 5 9-5M3 16l9 5 9-5"/></svg><span>Barangay</span></dt><dd id="profile-barangay">—</dd></div>
+              <div><dt><svg class="profile-line-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7M5 9v12h14V9M10 21v-6h4v6"/></svg><span>Address</span></dt><dd id="profile-address">—</dd></div>
+            </dl>
+          </div>
+          <div class="profile-account-access">
+            <h3><svg class="profile-line-icon" aria-hidden="true" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 5v2"/></svg> Account access</h3>
+            <div><dl><div><dt>Email address</dt><dd id="profile-email">—</dd></div></dl>
+            <p>Email and account role cannot be edited here.</p></div>
+            <span class="profile-readonly">Read-only</span>
+          </div>
+        </section>
+
+        <section class="profile-card profile-edit-card" id="profile-form-panel" hidden aria-labelledby="edit-profile-title">
+          <div class="profile-card-heading"><div><p class="eyebrow">Editable details</p><h2 id="edit-profile-title">Edit Profile</h2></div></div>
+          <form id="profile-form" class="form-grid">
+            <label>First Name<input name="first_name" required maxlength="100"></label>
+            <label>Last Name<input name="last_name" required maxlength="100"></label>
+            <label>Phone Number<input type="tel" autocomplete="tel" name="phone_number" required maxlength="20"></label>
+            <label>Municipality<input name="municipality" required maxlength="100"></label>
+            <label>Barangay<input name="barangay" required maxlength="100"></label>
+            <label class="form-span-2">Address<textarea name="address" rows="3" maxlength="255"></textarea></label>
+            <div class="form-span-2 form-actions"><button class="button button-primary" type="submit">Save Changes</button><button class="button button-secondary" id="cancel-profile" type="button">Cancel</button></div>
+          </form>
+          <p class="form-message" id="profile-form-message" role="status" hidden></p>
+          <p class="small-muted">Email address and account role cannot be changed here.</p>
+        </section>
+        <footer class="page-footer"><span>PigMENT · My Profile</span></footer>
+              </section>
+      </main>
+    </div>
+  </div>
+  <dialog id="submit-report" class="health-report-dialog" aria-labelledby="submit-report-title" aria-describedby="health-report-intro">
+    <header class="health-report-header">
+      <div><p class="eyebrow">Farmer action</p><h2 id="submit-report-title">Report an Illness</h2>
+      <p id="health-report-intro">Share what you observed for administrative review. This is not a diagnosis or emergency reporting channel.</p></div>
+      <button class="health-close" type="button" data-close-health-report aria-label="Close illness report">×</button>
+    </header>
+    <form id="disease-report-form">
+      <div class="health-report-body">
+        <section aria-labelledby="health-details-title">
+          <h3 id="health-details-title">Incident details</h3>
+          <div class="form-grid health-report-fields"><label>Suspected disease<select name="diseaseType" required><option value="">Choose suspected disease</option><option value="Suspected ASF">Suspected ASF</option><option value="Other swine illness">Other swine illness</option></select></label><label>Municipality<select name="municipality" required><option value="">Choose municipality</option><option>Boac</option><option>Mogpog</option><option>Gasan</option><option>Buenavista</option><option>Santa Cruz</option><option>Torrijos</option></select></label><label>Barangay<input name="barangay" required placeholder="e.g., Isok I"></label><label>Incident date<input name="incidentDate" type="date" required></label><label class="form-span-2">What did you observe?<textarea name="description" rows="3" required placeholder="Describe signs observed without attempting to diagnose."></textarea></label></div>
+        </section>
+        <section class="health-report-location" aria-labelledby="health-location-title">
+          <h3 id="health-location-title">Incident location</h3>
+          <p>Tap the map to mark the general location. Tap again to move the pin.</p>
+          <div id="report-location-map" class="disease-map" role="group" aria-label="Select general incident location on the map"></div>
+          <input type="hidden" name="latitude"><input type="hidden" name="longitude">
+          <p id="selected-report-location" role="status">No location selected. A map point is required.</p>
+        </section>
+      </div>
+      <footer class="health-report-footer">
+        <p id="report-form-message" role="status" aria-live="polite"></p>
+        <p>Your report is not public while it is under review.</p>
+        <div class="form-actions"><button class="button button-secondary" type="button" data-close-health-report>Cancel</button><button class="button button-primary" type="submit">Send report for review</button></div>
+      </footer>
+    </form>
+  </dialog>
+  <dialog id="weight-calculator-dialog" class="calculator-panel" aria-labelledby="calculator-title" aria-describedby="calculator-description">
+    <button class="calculator-close" type="button" data-close-calculator aria-label="Close calculator">×</button>
+    <p class="eyebrow">Farmer tool</p>
+    <h1 id="calculator-title">Pig Weight &amp; Price Calculator</h1>
+    <p id="calculator-description" class="page-description">Estimate your pig's weight and possible selling value without registering a pig.</p>
+    <form id="weight-calculator" class="calculator-form">
+      <div class="calculator-fields">
+        <label>Heart girth
+          <input name="girth" type="number" autofocus min="0.01" step="0.01" required>
+        </label>
+        <label>Body length
+          <input name="length" type="number" min="0.01" step="0.01" required>
+        </label>
+        <label>Measurement unit
+          <select name="unit"><option value="cm">Centimeters (cm)</option><option value="in">Inches (in)</option></select>
+        </label>
+        <label>Price per kilogram <span class="field-unit">(PHP/kg, optional)</span>
+          <input name="price" type="number" min="0.01" step="0.01" inputmode="decimal">
+        </label>
+      </div>
+      <p class="calculator-message form-error" role="alert" hidden></p>
+      <section class="calculator-result" aria-live="polite" hidden>
+        <div><span>Estimated weight</span><strong data-result="kg"></strong></div>
+        <div><span>Estimated weight (secondary)</span><strong data-result="lb"></strong></div>
+        <div><span>Price per kilogram</span><strong data-result="price"></strong></div>
+        <div><span>Potential gross selling value</span><strong data-result="value"></strong></div>
+        <small>Estimate only, not profit. The formula is not independently validated for every Philippine native pig breed.</small>
+      </section>
+      <div class="form-actions">
+        <button class="button button-primary" type="submit" hidden>Calculate</button>
+        <button class="button button-secondary" type="button" data-reset-calculator>Reset</button>
+        <button class="button button-primary" type="button" data-close-calculator>Done</button>
+      </div>
+      <details class="measurement-guide">
+        <summary>How to measure</summary>
+        <p><strong>Heart girth:</strong> Measure around the pig's chest immediately behind its front legs.</p>
+        <p><strong>Body length:</strong> Measure along the back from the midpoint between the ears to the base of the tail.</p>
+      </details>
+    </form>
+  </dialog>
+</body>
+</html>

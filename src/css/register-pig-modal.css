@@ -1,0 +1,154 @@
+/* PigMENT: responsive, page-level Register a Pig dialog. No API or data styles changed. */
+html body.my-pigs-refresh.register-pig-modal-open {overflow: hidden;}
+html body.my-pigs-refresh #registration-panel[hidden],
+html body.my-pigs-refresh #register-pig-backdrop[hidden],
+html body.my-pigs-refresh #register-form-error[hidden] {display:none !important;}
+html body.my-pigs-refresh #register-pig-backdrop:not([hidden]) {
+  position:fixed;inset:0;z-index:5200;
+  background:rgba(6,33,23,.72);
+  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+}
+html body.my-pigs-refresh #registration-panel:not([hidden]) {
+  box-sizing:border-box;position:fixed;z-index:5201;
+  top:50%;left:50%;transform:translate(-50%,-50%);
+  width:min(860px,calc(100vw - 30px));max-width:860px;
+  max-height:min(91dvh,900px);overflow-y:auto;overscroll-behavior:contain;
+  margin:0;padding:0;background:#fffdfa;
+  border:1px solid #cddfcb;border-top:5px solid #086248;
+  border-radius:20px;box-shadow:0 30px 95px rgba(4,32,22,.35);
+  scrollbar-width:thin;scrollbar-color:#a2bba7 transparent;
+}
+html body.my-pigs-refresh #registration-panel .register-dialog-header {
+  position:sticky;top:0;z-index:3;
+  display:flex;justify-content:space-between;align-items:flex-start;gap:18px;
+  padding:19px 27px 17px;margin:0;background:#fffdfa;
+  border-bottom:1px solid #e7e9de;
+}
+html body.my-pigs-refresh #registration-panel .register-dialog-title {min-width:0;}
+html body.my-pigs-refresh #registration-panel .eyebrow {
+  margin:0 0 4px;color:#56816c;letter-spacing:.13em;font-size:11px;font-weight:850;
+}
+html body.my-pigs-refresh #registration-panel .register-dialog-header h2 {
+  margin:0;color:#123b2c;font-size:clamp(22px,2.4vw,28px);letter-spacing:-.025em;line-height:1.2;
+}
+html body.my-pigs-refresh #registration-panel .register-dialog-header .form-intro {
+  color:#617267;font-size:13px;font-weight:450;margin:6px 0 0;line-height:1.45;
+}
+html body.my-pigs-refresh #registration-panel .close-form {
+  flex:0 0 40px;width:40px;height:40px;display:grid;place-items:center;
+  border:1px solid #d5e2d3;border-radius:10px;background:#f7faf5;
+  font-size:26px;line-height:1;color:#285440;cursor:pointer;
+}
+html body.my-pigs-refresh #registration-panel .close-form:hover {background:#edf5eb;}
+html body.my-pigs-refresh #registration-panel .register-dialog-body {padding:19px 27px 16px;}
+html body.my-pigs-refresh #registration-panel .register-form-section {margin:0 0 20px;}
+html body.my-pigs-refresh #registration-panel .register-form-section h3 {
+  display:flex;gap:9px;align-items:center;flex-wrap:wrap;
+  font-size:16px;letter-spacing:-.015em;line-height:1.3;color:#133f2e;
+  font-weight:850;margin:0 0 7px;
+}
+html body.my-pigs-refresh #registration-panel .reg-section-icon {
+  display:inline-grid;place-items:center;flex:0 0 30px;width:30px;height:30px;
+  background:#e7f3e4;color:#086147;font-size:19px;font-weight:750;border-radius:9px;
+}
+html body.my-pigs-refresh #registration-panel .reg-section-caption,
+html body.my-pigs-refresh #registration-panel .reg-field-guidance {
+  color:#65776a;font-size:12px;line-height:1.5;margin:0 0 13px;
+}
+html body.my-pigs-refresh #registration-panel .reg-field-guidance {margin:9px 0 0;}
+html body.my-pigs-refresh #registration-panel .register-info-grid {
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px 18px;
+}
+html body.my-pigs-refresh #registration-panel .register-info-grid label,
+html body.my-pigs-refresh #registration-panel .weight-entry-grid label {
+  min-width:0;display:flex;flex-direction:column;align-items:stretch;gap:6px;
+  font-size:12px;font-weight:750;line-height:1.4;color:#254a37;
+}
+html body.my-pigs-refresh #registration-panel .field-unit {font-size:11px;font-weight:500;color:#63746b;}
+html body.my-pigs-refresh #registration-panel .required-mark {color:#a64d38;}
+html body.my-pigs-refresh #registration-panel :is(input:not([type="hidden"]),select,textarea) {
+  box-sizing:border-box;min-width:0;width:100%;min-height:44px;
+  border:1px solid #cbd8c8;border-radius:9px;background:white;
+  padding:10px 12px;font-size:14px;font-weight:500;color:#1d3627;
+  line-height:1.4;box-shadow:none;
+}
+html body.my-pigs-refresh #registration-panel :is(input,textarea)::placeholder {color:#849287;opacity:1;}
+html body.my-pigs-refresh #registration-panel :is(input,select,textarea):focus-visible,
+html body.my-pigs-refresh #registration-panel button:focus-visible {
+  outline:3px solid #e9bd52;outline-offset:2px;
+}
+html body.my-pigs-refresh #registration-panel .register-measure-section {
+  padding:16px 18px;border:1px solid #d7e4cf;
+  border-radius:13px;background:#f7f9f2;
+}
+html body.my-pigs-refresh #registration-panel .register-measure-section h3 {margin-bottom:7px;}
+html body.my-pigs-refresh #registration-panel .weight-entry-grid {
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px 16px;
+}
+html body.my-pigs-refresh #registration-panel .register-weight-preview {
+  display:flex;flex-direction:column;justify-content:center;gap:5px;
+  border:1px solid #cfe5ce;border-radius:10px;
+  background:#e8f3e6;padding:9px 14px;
+}
+html body.my-pigs-refresh #registration-panel .register-weight-preview label {color:#426b50;font-size:11px;font-weight:700;}
+html body.my-pigs-refresh #registration-panel .register-weight-display {
+  display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;
+}
+html body.my-pigs-refresh #registration-panel .register-weight-display strong {
+  font-size:23px;letter-spacing:-.02em;color:#07593f;line-height:1.2;
+}
+html body.my-pigs-refresh #registration-panel .register-weight-display span {color:#5a7962;font-size:10px;}
+/* Preserve the original estimatedWeight input for the JS/calculator contract, but make the result the visible control. */
+html body.my-pigs-refresh #registration-panel #register-estimated-weight {
+  position:absolute !important;width:1px !important;height:1px !important;min-height:0 !important;
+  padding:0 !important;border:0 !important;opacity:0;pointer-events:none;
+}
+html body.my-pigs-refresh #registration-panel .weight-entry-message,
+html body.my-pigs-refresh #registration-panel .weight-entry-value {
+  margin:9px 0 0;font-size:12px;line-height:1.45;color:#476c50;
+}
+html body.my-pigs-refresh #registration-panel .weight-entry-value {font-weight:800;color:#176045;}
+html body.my-pigs-refresh #registration-panel .register-notes-section {margin-bottom:11px;}
+html body.my-pigs-refresh #registration-panel .register-notes-section textarea {
+  min-height:73px;resize:vertical;max-height:170px;
+}
+html body.my-pigs-refresh #registration-panel .measurement-note {font-size:11px;color:#677b6b;margin:0;}
+html body.my-pigs-refresh #registration-panel #register-form-error:not([hidden]) {
+  margin:14px 0 0;padding:12px;border:1px solid #e4aaaa;
+  border-radius:9px;background:#fff0f0;color:#912c2b;font-size:13px;
+}
+html body.my-pigs-refresh #registration-panel .register-dialog-footer {
+  position:sticky;bottom:0;z-index:3;display:flex;justify-content:flex-end;gap:11px;
+  margin:0;padding:14px 27px;background:#fffdfa;border-top:1px solid #e7e9de;
+  box-shadow:0 -6px 20px rgba(19,52,32,.035);
+}
+html body.my-pigs-refresh #registration-panel .register-dialog-footer .button {
+  min-height:43px;padding:10px 19px;border-radius:10px;font-size:13px;font-weight:800;
+}
+html body.my-pigs-refresh #registration-panel .register-dialog-footer .button-primary {
+  background:#075c42;color:#fff;border:1px solid #075c42;
+}
+html body.my-pigs-refresh #registration-panel .register-dialog-footer .button-primary:hover {background:#064732;}
+html body.my-pigs-refresh #registration-panel .register-dialog-footer .button-secondary {
+  background:#fff;color:#29543c;border:1px solid #b4c9b6;
+}
+@media(max-width:650px) {
+  html body.my-pigs-refresh #registration-panel:not([hidden]) {
+    width:calc(100vw - 16px);max-height:calc(100dvh - 16px);border-radius:15px;
+  }
+  html body.my-pigs-refresh #registration-panel .register-dialog-header {padding:16px 17px 13px;}
+  html body.my-pigs-refresh #registration-panel .register-dialog-body {padding:16px 17px 13px;}
+  html body.my-pigs-refresh #registration-panel .register-info-grid,
+  html body.my-pigs-refresh #registration-panel .weight-entry-grid {grid-template-columns:1fr;gap:12px;}
+  html body.my-pigs-refresh #registration-panel .register-measure-section {padding:13px;}
+  html body.my-pigs-refresh #registration-panel .register-dialog-footer {padding:12px 17px;}
+  html body.my-pigs-refresh #registration-panel .register-dialog-footer .button {flex:1;}
+}
+@media(prefers-reduced-motion:no-preference) {
+  html body.my-pigs-refresh #register-pig-backdrop:not([hidden]) {animation:register-pig-fade .15s ease-out;}
+  @keyframes register-pig-fade {from{opacity:0}to{opacity:1}}
+}
+
+html body.my-pigs-refresh #registration-panel .register-label-text {display:inline;line-height:1.45;}
+html body.my-pigs-refresh #registration-panel .register-label-text .required-mark {display:inline;margin-left:3px;}
+html body.my-pigs-refresh #registration-panel .register-label-text .field-unit {display:inline;margin-left:4px;}
