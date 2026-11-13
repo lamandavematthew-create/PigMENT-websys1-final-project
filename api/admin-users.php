@@ -5,10 +5,16 @@ try {
     $admin=requireAdmin($pdo);
     $method=$_SERVER['REQUEST_METHOD'];
     if ($method==='GET') {
-        $search=trim((string)($_GET['search']??''));
-        if (strlen($search)>100) sendResponse(422,'error','Search term too long.');
-        $stmt=$pdo->prepare("SELECT user_id,first_name,last_name,email,municipality,account_status FROM users WHERE role='farmer' AND (first_name LIKE ? OR last_name LIKE ? OR email LIKE ?) ORDER BY user_id DESC LIMIT 200");
-        $term='%'.$search.'%'; $stmt->execute([$term,$term,$term]);
+        $search=$_GET['search']??'';
+        $accountStatus=$_GET['status']??'';
+        if (!is_string($search) || strlen(trim($search))>100) sendResponse(422,'error','Invalid search term.');
+        if (!in_array($accountStatus,['','active','suspended'],true)) sendResponse(422,'error','Invalid account status.');
+        $sql="SELECT user_id,first_name,last_name,email,municipality,account_status FROM users WHERE role='farmer' AND (first_name LIKE ? OR last_name LIKE ? OR CONCAT_WS(' ',first_name,last_name) LIKE ? OR email LIKE ?)";
+        $term='%'.trim($search).'%';
+        $params=[$term,$term,$term,$term];
+        if ($accountStatus!=='') { $sql.=" AND account_status = ?"; $params[]=$accountStatus; }
+        $stmt=$pdo->prepare($sql." ORDER BY user_id DESC LIMIT 200");
+        $stmt->execute($params);
         sendResponse(200,'success','Farmer accounts retrieved.',$stmt->fetchAll(PDO::FETCH_ASSOC));
     }
     if ($method!=='PATCH') {header('Allow: GET, PATCH');sendResponse(405,'error','Method not allowed.');}

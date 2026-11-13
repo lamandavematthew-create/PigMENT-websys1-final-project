@@ -41,7 +41,7 @@
     panel.className = "pig-price";
     const rate = Number(pig.price_per_kg);
     const value = weightEstimator.calculateSellingValue(Number(latestWeight(pig.pig_id)?.estimated_weight), rate);
-    panel.innerHTML = `<div class="pig-price-rate"><img src="${priceArtwork}/price-tag-badge.svg" alt="" width="32" height="32"><div><span>Price per kg</span><strong></strong></div></div>
+    panel.innerHTML = `<div class="pig-price-rate"><img src="${priceArtwork}/price-tag-badge.svg" alt="" width="24" height="24"><span>Price per kg</span><strong></strong></div>
       <div class="pig-price-total"><span>Estimated value</span><strong></strong></div>`;
     panel.querySelector(".pig-price-rate strong").textContent = rate > 0 ? `${money(rate)}/kg` : "Not set";
     panel.querySelector(".pig-price-total strong").textContent = value !== null ? money(value) : "Unavailable";
@@ -92,6 +92,17 @@
     if (editPigPreviousFocus && editPigPreviousFocus.isConnected) editPigPreviousFocus.focus({preventScroll:true});
     editPigPreviousFocus = null;
   }
+  function selectSavedBreed(select, savedBreed) {
+    select.querySelector("option[data-saved-breed]")?.remove();
+    const breed = String(savedBreed ?? "").trim() || "N/A";
+    if (!Array.from(select.options).some(option => option.value === breed)) {
+      // Keep older free-text values selectable without adding them to other records.
+      const saved = new Option(breed + " (saved breed)", breed);
+      saved.dataset.savedBreed = "";
+      select.add(saved);
+    }
+    select.value = breed;
+  }
   function openEditPig(pig) {
     const panel = $("#edit-pig-panel");
     const form = $("#edit-pig-form");
@@ -99,7 +110,7 @@
     editingPigId = pig.pig_id;
     form.elements.pigCode.value = pig.pig_code || "";
     form.elements.pigName.value = pig.pig_name || "";
-    form.elements.breed.value = pig.breed || "";
+    selectSavedBreed(form.elements.breed, pig.breed);
     form.elements.sex.value = pig.sex || "male";
     form.elements.birthDate.value = pig.birth_date || "";
     form.elements.ageMonths.value = pig.estimated_age_months || "";
@@ -201,7 +212,7 @@
     remove.className = "button pig-delete-action";
     remove.textContent = "Delete";
     remove.addEventListener("click", async () => {
-      if (!window.confirm(`Delete ${pigName(pig)} (${pig.pig_code}) permanently? This cannot be undone.`)) return;
+      if (!await window.PigmentModal.ask({title: "Delete pig record?", message: `Delete ${pigName(pig)} (${pig.pig_code}) permanently? This cannot be undone.`, accept: "Delete pig", tone: "danger"})) return;
       remove.disabled = true;
       try {
         await api(`pigs.php?id=${encodeURIComponent(pig.pig_id)}`, {method:"DELETE"});
@@ -443,7 +454,7 @@
         remove.type = "button";
         remove.textContent = "Delete Pen";
         remove.addEventListener("click", async () => {
-          if (!window.confirm(`Delete ${pen.pen_name}? This cannot be undone.`)) return;
+          if (!await window.PigmentModal.ask({title: "Delete pen?", message: `Delete ${pen.pen_name}? This cannot be undone.`, accept: "Delete pen", tone: "danger"})) return;
           try {
             await api(`pens.php?id=${encodeURIComponent(pen.pen_id)}`, { method: "DELETE" });
             state.expandedPen = null;
@@ -465,9 +476,12 @@
 
   function updateLitterOptions() {
     const select = $("#litter-mother");
+    const previous = select.value;
+    const eligible = state.pigs.filter((pig) => pig.sex === "female" && pig.pig_status === "active");
     select.replaceChildren();
-    option(select, "", state.pigs.some((pig) => pig.sex === "female") ? "Choose a mother sow" : "Register a female pig first");
-    state.pigs.filter((pig) => pig.sex === "female" && pig.pig_status === "active").forEach((pig) => option(select, pig.pig_id, `${pigName(pig)} · ${pig.pig_code}`));
+    option(select, "", eligible.length ? "Choose a mother sow" : "Register an active female pig first");
+    eligible.forEach((pig) => option(select, pig.pig_id, `${pigName(pig)} · ${pig.pig_code}`));
+    if (eligible.some((pig) => String(pig.pig_id) === previous)) select.value = previous;
   }
 
   $("#pig-search").addEventListener("input", renderPigs);
@@ -594,9 +608,24 @@
   $("#empty-create-pen").addEventListener("click", () => openPenForm());
   $("#close-pen-form").addEventListener("click", closePenForm);
   $("#cancel-pen-form").addEventListener("click", closePenForm);
-  $("#open-litter-form").addEventListener("click", () => { updateLitterOptions(); $("#litter-form").hidden = false; });
-  $("#close-litter-form").addEventListener("click", () => { $("#litter-form").hidden = true; });
-  $("#cancel-litter-form").addEventListener("click", () => { $("#litter-form").hidden = true; });
+  const litterDialog = $("#litter-dialog");
+  const litterError = $("#litter-error");
+  let litterSaving = false;
+  function closeLitter() {
+    if (litterDialog.open && !litterSaving) litterDialog.close();
+  }
+  $("#open-litter-form").addEventListener("click", () => {
+    if (litterDialog.open || litterSaving) return;
+    updateLitterOptions();
+    litterError.hidden = true;
+    litterDialog.showModal();
+  });
+  $("#close-litter-form").addEventListener("click", closeLitter);
+  $("#cancel-litter-form").addEventListener("click", closeLitter);
+  litterDialog.addEventListener("cancel", (event) => {
+    event.preventDefault();
+    closeLitter();
+  });
 
   $("#close-edit-pig").addEventListener("click", closeEditPig);
   $("#cancel-edit-pig").addEventListener("click", closeEditPig);
@@ -726,23 +755,39 @@
   $("#litter-form").addEventListener("submit", async (event) => {
     event.preventDefault();
     const formElement = event.currentTarget;
+    if (!litterDialog.open || litterSaving || !formElement.reportValidity()) return;
     const form = new FormData(formElement);
     const total = Number(form.get("totalBorn"));
     const alive = Number(form.get("bornAlive"));
     const stillborn = Number(form.get("stillborn"));
-    if (total !== alive + stillborn) { $("#litter-error").textContent = "Total born must equal born alive plus stillborn."; $("#litter-error").hidden = false; return; }
+    if (total !== alive + stillborn) {
+      litterError.textContent = "Total born must equal born alive plus stillborn.";
+      litterError.hidden = false;
+      return;
+    }
+    const buttons = [...formElement.querySelectorAll("button")];
+    litterSaving = true;
+    litterError.hidden = true;
+    buttons.forEach(button => { button.disabled = true; });
     try {
       await api("litters.php", { method: "POST", body: json({ mother_pig_id: form.get("motherPigId"), birth_date: form.get("birthDate"), total_born: total, born_alive: alive, stillborn, notes: form.get("notes").trim() }) });
       formElement.reset();
-      $("#litter-form").hidden = true;
+      if (litterDialog.open) litterDialog.close();
       penMessage("Litter record saved.");
       await load();
-    } catch (error) { $("#litter-error").textContent = error.message; $("#litter-error").hidden = false; }
+    } catch (error) {
+      litterError.textContent = error.message || "The litter could not be saved.";
+      litterError.hidden = false;
+    } finally {
+      litterSaving = false;
+      buttons.forEach(button => { button.disabled = false; });
+    }
   });
 
   let started = false;
   function syncMyPigs(target) {
     if (document.body.dataset.workspaceRoute !== "my-pigs") {
+      if (litterDialog.open) litterDialog.close();
       if (!registerDialog.hidden) closeRegistration(true);
       if (!$("#edit-pig-panel").hidden) closeEditPig(true);
       if (!$("#pen-form").hidden) closePenForm();

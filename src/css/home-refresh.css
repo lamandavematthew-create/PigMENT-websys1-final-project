@@ -31,7 +31,6 @@ html body.home-refresh .notification-button svg {stroke:#075439;}
 html body.home-refresh .main-content {background:transparent;}
 html body.home-refresh .dashboard-main {max-width:1480px;width:100%;padding:19px clamp(16px,2.9vw,40px) 28px;}
 html body.home-refresh #dashboard-view {position:relative;isolation:isolate;padding-bottom:12px;}
-html body.home-refresh #dashboard-view::after {content:"";position:absolute;z-index:-1;bottom:0;left:-2.8%;right:-2.8%;height:164px;background:url('../../public/assets/home-redesign/decorative_green_waves.png') center bottom/100% 100% no-repeat;opacity:.96;pointer-events:none;}
 /* Hero: real heading/link, independent illustration layers. */
 html body.home-refresh .dashboard-main .dashboard-hero {position:relative;isolation:isolate;display:flex;align-items:center;min-height:192px;overflow:hidden;padding:29px 32px;margin:0 0 15px;border:0;border-radius:20px;background:linear-gradient(110deg,#00513a 0%,#087351 56%,#0a6749 100%);box-shadow:0 9px 28px rgba(12,70,43,.15);}
 html body.home-refresh .dashboard-hero::before {content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(ellipse at 87% 30%,rgba(146,230,168,.55),transparent 42%),linear-gradient(12deg,transparent 20%,rgba(29,138,97,.35) 70%);}
@@ -130,3 +129,5 @@ html body.home-refresh .hero-rays {right:22%;top:10%;height:42px;transform:rotat
   html body.home-refresh .topbar-actions, html body.home-refresh .topbar .user-summary { gap:6px; }
   html body.home-refresh .topbar .auth-logout { padding-inline:9px; }
 }
+
+html body.home-refresh .farm-reminder[hidden] {display:none;}

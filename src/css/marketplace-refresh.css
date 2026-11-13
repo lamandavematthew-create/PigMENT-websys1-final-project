@@ -108,3 +108,64 @@ html body.marketplace-refresh .marketplace-main :is(button,input,select):focus-v
 }
 
 .marketplace-refresh #listing-preview .market-card-media { max-height:230px; }
+#listing-preview .listing-photo { background: #ecf3ec; }
+#listing-preview .listing-photo img { object-fit: contain; }
+#detail-back .market-detail-back-label { font-size: inherit; }
+
+/* Marketplace details keep the entire photo and put price and seller first. */
+#detail-view { container: market-details / inline-size; }
+#detail-view .market-detail-layout {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-areas: "heading heading" "image copy";
+  gap: 18px clamp(18px, 2.6vw, 34px);
+  padding: clamp(14px, 2vw, 28px);
+}
+#detail-view .market-detail-header {
+  grid-area: heading; display: flex; flex-wrap: wrap; align-items: center;
+  justify-content: space-between; gap: 10px 20px; padding-bottom: 14px;
+  border-bottom: 1px solid #dce8dc;
+}
+#detail-view .market-detail-header h1 {
+  min-width: 0; margin: 0; color: #104337; font-size: clamp(24px, 3vw, 36px);
+  line-height: 1.16; overflow-wrap: anywhere;
+}
+#detail-view .market-detail-status {
+  padding: 5px 11px; border-radius: 999px; background: #eeece5;
+  color: #514b41; font-size: .82rem; font-weight: 700;
+}
+#detail-view .market-detail-status[data-status="active"] { background: #def1de; color: #145534; }
+#detail-view .market-detail-image { grid-area: image; min-width: 0; }
+#detail-view .market-detail-image > :is(.listing-art, .listing-photo) {
+  height: auto; aspect-ratio: 4 / 3; background-color: #ecf3ec;
+}
+#detail-view .listing-photo > img { object-fit: contain; }
+#detail-view .market-detail-copy { grid-area: copy; display: grid; gap: 14px; min-width: 0; padding: 0; }
+#detail-view .market-detail-pricing {
+  display: grid; justify-items: start; gap: 4px; padding: 12px 16px;
+  border: 1px solid #cfe4d1; border-radius: 12px; background: #eef7ed;
+}
+#detail-view .market-detail-price-label, #detail-view .market-detail-rate { color: #285646; font-size: .88rem; font-weight: 650; }
+#detail-view .market-detail-price {
+  margin: 0; color: #07513a; font-size: clamp(26px, 3.5vw, 38px);
+  line-height: 1.1; overflow-wrap: anywhere;
+}
+#detail-view .market-detail-seller {
+  padding: 12px 16px; border: 1px solid #d7e2d9; border-radius: 12px; background: #fff;
+}
+#detail-view .market-detail-seller h2 { margin: 0 0 7px; color: #315648; font-size: .87rem; }
+#detail-view .market-seller-name { display: block; color: #173f32; font-size: 1.06rem; overflow-wrap: anywhere; }
+#detail-view .market-seller-number { margin: 2px 0 0; color: #455c52; overflow-wrap: anywhere; }
+#detail-view .market-seller-number a {
+  display: inline-flex; align-items: center; min-height: 44px;
+  color: #07533b; font-weight: 750; text-decoration: underline; text-underline-offset: .18em;
+}
+#detail-view .market-detail-facts { margin: 0; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+#detail-view .market-detail-facts .listing-fact:last-child { grid-column: auto; }
+#detail-view .listing-fact, #detail-view .market-detail-description { overflow-wrap: anywhere; }
+#detail-view .market-detail-description { margin: 0; white-space: pre-wrap; }
+@container market-details (max-width: 650px) {
+  #detail-view .market-detail-layout {
+    grid-template-columns: minmax(0, 1fr); grid-template-areas: "heading" "image" "copy";
+  }
+  #detail-view .market-detail-image > :is(.listing-art, .listing-photo) { aspect-ratio: 16 / 10; }
+}

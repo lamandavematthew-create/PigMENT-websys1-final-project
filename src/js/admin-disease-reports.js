@@ -14,9 +14,33 @@
   const zoneList = document.querySelector("#zone-list");
   const zoneMessage = document.querySelector("#zone-message");
   const zoneMapElement = document.querySelector("#admin-zone-map");
+  const zoneView = document.querySelector("#zones");
+  const filters = [...document.querySelectorAll("[data-report-filter]")];
+  const search = document.querySelector("#review-search");
+  const reviewMessage = document.querySelector("#review-message");
+  const results = document.querySelector("#review-results");
+  const resultsCount = document.querySelector("#review-results-count");
+  const reportRetry = document.querySelector("#review-retry");
+  const zoneRetry = document.querySelector("#zone-retry");
+  const zoneCount = document.querySelector("#zone-count");
+  const zoneResults = document.querySelector("#zone-results");
+  const zoneListMessage = document.querySelector("#zone-list-message");
+  const zoneMapMessage = document.querySelector("#zone-map-message");
+  const drawBoundary = document.querySelector("#zone-draw");
+  const resetMap = document.querySelector("#zone-reset-map");
+  const resetDrawing = document.querySelector("#zone-reset-drawing");
+  const zoneCenter = [13.43, 121.96];
+  const zoneZoom = 10;
+  let filter = "pending";
+  let reportsLoaded = false;
+  let reportsRequest;
+  let zonesLoaded = false;
+  let zonesRequest;
+  let activeView;
   let reports = [];
   let zones = [];
   let selectedId = null;
+  let reportDecisionBusy = false;
   let zoneMap;
   let draftLayer;
   let savedLayers;
@@ -25,7 +49,7 @@
     return value ? new Date(`${value}T00:00:00`).toLocaleDateString("en-PH", { year: "numeric", month: "short", day: "numeric" }) : "Not provided";
   }
   function statusLabel(value) {
-    return { pending: "Pending Review", under_review: "Under Review", confirmed: "Confirmed", rejected: "Rejected" }[value] || value;
+    return { pending: "Pending review", under_review: "Under review", confirmed: "Confirmed", rejected: "Rejected" }[value] || value;
   }
   function geometryFromLayer(layer) {
     const editable = layer.getLatLngs ? layer : layer.getLayers()[0];
@@ -34,18 +58,69 @@
     return { type: "Polygon", coordinates: [coordinates] };
   }
 
-  function escapeHtml(value) { return String(value ?? "").replace(/[&<>"']/g, (ch) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch])); }
-  function renderReports() {
-    list.replaceChildren(...reports.map((report) => {
-      const row = document.createElement("tr");
-      row.innerHTML = `<td><button class="table-link" type="button" data-report-id="${report.report_id}">Report #${report.report_id}</button></td><td>${escapeHtml(report.municipality)}, ${escapeHtml(report.barangay)}</td><td>${dateLabel(report.incident_date)}</td><td><span class="status-label">${statusLabel(report.report_status)}</span></td><td><button class="button button-secondary button-small" type="button" data-report-id="${report.report_id}">Inspect</button></td>`;
-      return row;
-    }));
-    adminCount.textContent = `${reports.length} submitted report${reports.length === 1 ? "" : "s"}`;
+  function reportLocation(report) {
+    return [report.municipality, report.barangay].filter(Boolean).join(", ") || "Not provided";
   }
 
+  function renderReports() {
+    if (!reportsLoaded) return;
+    const words = search.value.toLowerCase().trim().split(/[\s,#]+/).filter(Boolean);
+    const counts = { all: reports.length, pending: 0, under_review: 0, confirmed: 0, rejected: 0 };
+    const matching = reports.filter(report => {
+      if (Object.hasOwn(counts, report.report_status) && report.report_status !== "all") counts[report.report_status]++;
+      const haystack = `report #${report.report_id} ${reportLocation(report)}`.toLowerCase();
+      return (filter === "all" || report.report_status === filter) && words.every(word => /^\d+$/.test(word) ? String(report.report_id) === word : haystack.includes(word));
+    }).sort((first, second) => Number(second.report_status === "pending") - Number(first.report_status === "pending"));
+    for (const button of filters) {
+      const key = button.dataset.reportFilter;
+      button.querySelector("span").textContent = counts[key];
+      button.setAttribute("aria-pressed", String(key === filter));
+    }
+    list.replaceChildren();
+    for (const report of matching) {
+      const row = list.insertRow();
+      row.classList.toggle("is-selected", dialog.open && Number(report.report_id) === selectedId);
+      const cell = (label, value) => {
+        const td = row.insertCell();
+        td.dataset.label = label;
+        if (value) td.textContent = value;
+        return td;
+      };
+      const identity = cell("Report");
+      const title = document.createElement("strong");
+      title.textContent = `Report #${report.report_id}`;
+      const disease = document.createElement("small");
+      disease.textContent = report.disease_type || "Not provided";
+      identity.append(title, disease);
+      cell("Location", reportLocation(report));
+      cell("Incident date", dateLabel(report.incident_date));
+      const badge = document.createElement("span");
+      badge.className = "review-status";
+      badge.dataset.status = report.report_status;
+      badge.textContent = statusLabel(report.report_status);
+      cell("Status").append(badge);
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "button button-primary review-open";
+      button.dataset.reportId = report.report_id;
+      button.textContent = "Review report";
+      button.setAttribute("aria-label", `Review report #${report.report_id}`);
+      cell("Action").append(button);
+    }
+    adminCount.textContent = `${reports.length} report${reports.length === 1 ? "" : "s"}`;
+    results.hidden = matching.length === 0;
+    reviewMessage.textContent = matching.length ? "" : !reports.length ? "No reports have been submitted." : "No reports match these filters.";
+    resultsCount.textContent = `Showing ${matching.length} of ${reports.length} reports`;
+  }
+
+  filters.forEach(button => button.addEventListener("click", () => {
+    filter = button.dataset.reportFilter;
+    renderReports();
+  }));
+  search.addEventListener("input", renderReports);
+
   function showReport(id) {
-    const report = reports.find((item) => item.report_id === id);
+    const report = reports.find((item) => Number(item.report_id) === id);
     if (!report) return;
     selectedId = id;
     detailTitle.textContent = `Report #${id} · ${report.disease_type}`;
@@ -55,10 +130,10 @@
     list.querySelectorAll("tr").forEach(row => row.classList.toggle("is-selected", Number(row.querySelector("[data-report-id]")?.dataset.reportId) === id));
     document.querySelector("#confirmation-section").open = false;
     document.querySelectorAll("#confirmation-section input, #confirmation-section textarea").forEach(field => field.value = "");
-    dialog.showModal();
+    if (!dialog.open) dialog.showModal();
     detailEmpty.hidden = true;
     detailContent.hidden = false;
-    document.querySelector("#detail-location").textContent = `${report.municipality}, ${report.barangay}`;
+    document.querySelector("#detail-location").textContent = reportLocation(report);
     document.querySelector("#detail-date").textContent = dateLabel(report.incident_date);
     document.querySelector("#detail-reporter").textContent = report.reporter_name || "Farmer";
     document.querySelector("#detail-description").textContent = report.description;
@@ -79,25 +154,68 @@
   dialog.addEventListener("click", (event) => { if (event.target === dialog) dialog.close(); });
   dialog.addEventListener("close", () => list.querySelectorAll("tr").forEach(row => row.classList.remove("is-selected")));
 
-  async function refresh() {
-    try {
-      [reports, zones] = await Promise.all([window.PigmentDiseaseStore.loadReports("admin"), window.PigmentDiseaseStore.loadZones("admin")]);
-      renderReports();
-      renderZones();
-      if (zoneMap && window.L) {
-        if (savedLayers) savedLayers.remove();
-        savedLayers = L.geoJSON(zones.filter(z=>z.geometry).map(z=>({type:'Feature',geometry:z.geometry,properties:{zone_id:z.zone_id}})), {onEachFeature: (feature, layer) => layer.on('click',()=>loadZone(zones.find(z=>z.zone_id===feature.properties.zone_id)))});
-        savedLayers.addTo(zoneMap);
-      }
-      const select=zoneForm.elements.incidentReportId;
-      const current=select.value;
-      select.replaceChildren(new Option('None', ''));
-      reports.filter(r=>r.report_status==='confirmed').forEach(r=>select.add(new Option(`Report #${r.report_id} · ${r.municipality}`,r.report_id)));
-      select.value=current;
-    } catch (error) {
-      message.textContent = error.message;
-    }
+  function populateIncidentChoices() {
+    const select = zoneForm.elements.incidentReportId;
+    const current = select.value;
+    select.replaceChildren(new Option("None", ""));
+    reports.filter(report => report.report_status === "confirmed").forEach(report => {
+      select.add(new Option(`Report #${report.report_id} · ${report.municipality}`, report.report_id));
+    });
+    if ([...select.options].some(option => option.value === current)) select.value = current;
   }
+
+  async function refreshReports() {
+    if (reportsRequest) return reportsRequest;
+    reviewMessage.textContent = "Loading reports…";
+    reportRetry.hidden = true;
+    reportsRequest = (async () => {
+      try {
+        reports = await window.PigmentDiseaseStore.loadReports("admin");
+        reportsLoaded = true;
+        renderReports();
+        populateIncidentChoices();
+        if (zonesLoaded) renderZones();
+        return true;
+      } catch (error) {
+        reviewMessage.textContent = error.message || "Reports could not be loaded.";
+        reportRetry.hidden = false;
+        return false;
+      } finally {
+        reportsRequest = null;
+      }
+    })();
+    return reportsRequest;
+  }
+
+  async function refreshZones() {
+    if (zonesRequest) return zonesRequest;
+    zoneRetry.hidden = true;
+    if (!zonesLoaded) zoneListMessage.textContent = "Loading zones…";
+    zonesRequest = (async () => {
+      try {
+        zones = await window.PigmentDiseaseStore.loadZones("admin");
+        zonesLoaded = true;
+        renderZones();
+        if (zoneMap) {
+          if (savedLayers) savedLayers.remove();
+          savedLayers = L.geoJSON(zones.filter(zone => zone.geometry).map(zone => ({
+            type: "Feature", geometry: zone.geometry, properties: { zone_id: zone.zone_id }
+          })), { onEachFeature: (feature, layer) => layer.on("click", () => loadZone(zones.find(zone => zone.zone_id === feature.properties.zone_id))) });
+          savedLayers.addTo(zoneMap);
+        }
+
+      } catch (error) {
+        zoneListMessage.textContent = error.message || "Zones could not be loaded.";
+        zoneRetry.hidden = false;
+      } finally {
+        zonesRequest = null;
+      }
+    })();
+    return zonesRequest;
+  }
+
+  reportRetry.addEventListener("click", refreshReports);
+  zoneRetry.addEventListener("click", refreshZones);
 
   list.addEventListener("click", (event) => {
     const target = event.target.closest("[data-report-id]");
@@ -106,8 +224,9 @@
 
   document.querySelector(".admin-actions").addEventListener("click", async (event) => {
     const action = event.target.closest("[data-action]")?.dataset.action;
-    if (!action || !selectedId) return;
-    const report = reports.find((item) => item.report_id === selectedId);
+    if (!action || !selectedId || reportDecisionBusy) return;
+    const reportId = selectedId;
+    const report = reports.find((item) => Number(item.report_id) === reportId);
     if (!report) return;
     const status = action === "publish" || action === "confirmed" ? "confirmed" : action === "under_review" ? "under_review" : "rejected";
     const remarks = adminRemarks.value.trim();
@@ -118,7 +237,6 @@
     if (action === "confirmed" && !["pending", "under_review", "confirmed"].includes(report.report_status)) {
       message.textContent = "Rejected reports cannot be confirmed without reopening review."; return;
     }
-    if (!window.confirm(`Apply ${action.replaceAll('_', ' ')} to Report #${selectedId}?`)) return;
     let confirmation = null;
     if (action === "confirmed") {
       confirmation = {
@@ -135,71 +253,141 @@
       }
     }
     if (action === "publish" && report.report_status !== "confirmed") { message.textContent = "Record verified confirmation before publishing."; return; }
+    const decisions = {
+      under_review: ["Accept for review", "This moves the report to Under review. It does not confirm or publish the incident."],
+      rejected: ["Reject report", "This marks the report as rejected and saves your reason."],
+      confirmed: ["Record confirmation", "This saves the authorized veterinary confirmation without publishing the incident."],
+      publish: ["Publish confirmed incident", "This makes the confirmed incident visible on the farmer map."]
+    };
+    const [label, explanation] = decisions[action];
+    reportDecisionBusy = true;
     try {
-      await window.PigmentDiseaseStore.updateReport(selectedId, {
+      const accepted = await window.PigmentModal.ask({
+        title: label + "?",
+        message: `Report #${reportId}\n${explanation}`,
+        accept: label,
+        tone: action === "rejected" ? "danger" : "default"
+      });
+      if (!accepted || !dialog.open || selectedId !== reportId) return;
+      await window.PigmentDiseaseStore.updateReport(reportId, {
         report_status: status,
         admin_remarks: remarks,
         confirmation,
         is_published: action === "publish"
       });
-      await refresh();
-      showReport(selectedId);
-      message.textContent = action === "publish" ? "Verified report published." : `Report marked ${statusLabel(status)}.`;
+      const refreshed = await refreshReports();
+      if (dialog.open && selectedId === reportId) {
+        if (refreshed) showReport(reportId);
+        message.textContent = refreshed
+          ? (action === "publish" ? "Verified report published." : `Report marked ${statusLabel(status)}.`)
+          : "Decision saved. Close the report and retry loading the queue.";
+      }
     } catch (error) {
       message.textContent = error.message;
+    } finally {
+      reportDecisionBusy = false;
     }
   });
 
-  function buttonZone(cell, text, handler) { const button=document.createElement('button'); button.type='button'; button.className='button button-secondary button-small'; button.textContent=text; button.addEventListener('click',handler); cell.append(button); }
-  function renderZones() {
-    zoneList.replaceChildren(...zones.map((zone) => {
-      const row = document.createElement("tr");
-      const edit = document.createElement("button");
-      edit.className = "button button-secondary button-small";
-      edit.type = "button";
-      edit.textContent = "Edit";
-      edit.addEventListener("click", () => loadZone(zone));
-      const cell = document.createElement("td");
-      cell.append(edit);
-      if (!zone.is_published) {
-        const publish = document.createElement("button");
-        publish.className = "button button-primary button-small";
-        publish.type = "button";
-        publish.textContent = "Publish";
-        publish.addEventListener("click", () => { if (window.confirm('Publish this zone? An officially confirmed linked incident is required.')) updateZone(zone, true); });
-        cell.append(publish);
-      }
-      row.innerHTML = `<td><strong>${escapeHtml(zone.zone_name)}</strong></td><td>${escapeHtml(zone.municipality)}, ${escapeHtml(zone.barangay || "")}</td><td>${escapeHtml(zone.disease_type)}</td><td>${escapeHtml(zone.severity)}</td><td>${zone.is_published ? "Published" : "Unpublished"}</td>`;
-      if (zone.is_published) { buttonZone(cell, 'Unpublish', () => updateZone(zone, false)); }
-      buttonZone(cell, 'Resolve', () => updateZone(zone, false, 'resolved'));
-      row.append(cell);
-      return row;
-    }));
+  function buttonZone(cell, text, handler, label) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "button button-secondary button-small";
+    button.textContent = text;
+    if (label) button.setAttribute("aria-label", label);
+    button.addEventListener("click", handler);
+    cell.append(button);
+    return button;
   }
 
-  function loadZone(zone) {
+  function renderZones() {
+    const confirmed = new Set(reports.filter(report => report.report_status === "confirmed").map(report => Number(report.report_id)));
+    zoneCount.hidden = false;
+    zoneCount.textContent = zones.length;
+    zoneResults.hidden = zones.length === 0;
+    zoneListMessage.textContent = zones.length ? "" : "No zones have been saved.";
+    zoneList.replaceChildren();
+    for (const zone of zones) {
+      const row = zoneList.insertRow();
+      const cell = (label, value) => {
+        const td = row.insertCell();
+        td.dataset.label = label;
+        if (value) td.textContent = value;
+        return td;
+      };
+      const name = document.createElement("strong");
+      name.textContent = zone.zone_name;
+      cell("Zone").append(name);
+      cell("Location", reportLocation(zone));
+      cell("Reported disease", zone.disease_type);
+      const badge = (state, text) => {
+        const el = document.createElement("span");
+        el.className = "zone-pill";
+        el.dataset.state = state;
+        el.textContent = text;
+        return el;
+      };
+      const severity = { low: "Low", moderate: "Moderate", high: "High" }[zone.severity] || "Not provided";
+      cell("Severity").append(badge(zone.severity, severity));
+      cell("Publication").append(badge(zone.is_published ? "published" : "unpublished", zone.is_published ? "Published" : "Unpublished"));
+      const actions = document.createElement("div");
+      actions.className = "zone-row-actions";
+      cell("Actions").append(actions);
+      buttonZone(actions, "Edit", () => loadZone(zone), `Edit ${zone.zone_name}`);
+      if (zone.is_published) {
+        buttonZone(actions, "Unpublish", () => updateZone(zone, false), `Unpublish ${zone.zone_name}`);
+      } else {
+        const publish = buttonZone(actions, "Publish", async () => {
+          if (await window.PigmentModal.ask({title: "Publish zone?", message: `Show ${zone.zone_name} on the farmer map?`, accept: "Publish zone"}) && !zoneView.hidden) await updateZone(zone, true);
+        }, `Publish ${zone.zone_name}`);
+        publish.classList.add("zone-publish");
+        const eligible = ["confirmed", "monitoring", "resolved"].includes(zone.zone_status);
+        publish.disabled = !eligible || !confirmed.has(Number(zone.report_id));
+        if (publish.disabled) {
+          const hint = document.createElement("small");
+          hint.textContent = !eligible ? "Set an eligible zone status first." : "Requires a confirmed linked report.";
+          actions.append(hint);
+        }
+      }
+      if (zone.zone_status !== "resolved") {
+        buttonZone(actions, "Resolve", async () => {
+          if (await window.PigmentModal.ask({title: "Resolve zone?", message: `Mark ${zone.zone_name} as resolved and remove it from the farmer map?`, accept: "Resolve zone"}) && !zoneView.hidden) await updateZone(zone, false, "resolved");
+        }, `Resolve ${zone.zone_name}`);
+      }
+    }
+  }
+
+  async function loadZone(zone) {
     if (!zone) return;
+    if (!zoneForm.hidden && !(await window.PigmentModal.ask({title: "Discard unsaved changes?", message: "The current zone edits will be lost if you open another zone.", accept: "Discard and edit", tone: "danger"}))) return;
+    if (zoneView.hidden) return;
+    clearZoneDraft();
+    zoneMap?.pm?.disableDraw();
+    zoneForm.hidden = false;
+    document.querySelector("#zone-editor-title").textContent = "Edit zone";
+    zoneMap?.invalidateSize({ pan: false });
     if (zoneMap && window.L && zone.geometry) {
       if (draftLayer) zoneMap.removeLayer(draftLayer);
       draftLayer = L.geoJSON(zone.geometry).getLayers()[0];
       draftLayer.addTo(zoneMap);
       if (draftLayer.pm) draftLayer.pm.enable();
       draftLayer.on('pm:edit',()=>{zoneForm.elements.geometry.value=JSON.stringify(geometryFromLayer(draftLayer));});
-      zoneMap.fitBounds(draftLayer.getBounds());
+      zoneMap.fitBounds(draftLayer.getBounds(), { padding: [30, 30], maxZoom: 15, animate: false });
     }
-    zoneForm.hidden = false;
     zoneForm.elements.zoneId.value = zone.zone_id;
     zoneForm.elements.name.value = zone.zone_name;
     zoneForm.elements.municipality.value = zone.municipality;
     zoneForm.elements.barangay.value = zone.barangay || "";
     zoneForm.elements.diseaseType.value = zone.disease_type;
     zoneForm.elements.severity.value = zone.severity;
-    zoneForm.elements.status.value = zone.zone_status === "suspected" ? "monitoring" : zone.zone_status;
+    zoneForm.elements.status.value = zone.zone_status;
     zoneForm.elements.description.value = zone.description || "";
     zoneForm.elements.geometry.value = JSON.stringify(zone.geometry);
     zoneForm.elements.isPublished.checked = Boolean(zone.is_published);
     zoneForm.elements.incidentReportId.value = zone.report_id || "";
-    zoneMessage.textContent = "Update the zone details or draw a new boundary before saving.";
+    zoneMessage.textContent = "Edit the zone details and save your changes.";
+    zoneForm.elements.name.focus({ preventScroll: true });
+    zoneForm.scrollIntoView({ block: "nearest" });
   }
 
   async function updateZone(zone, published, status = zone.zone_status) {
@@ -218,7 +406,7 @@
         is_published: published
       });
       zoneMessage.textContent = published ? "Zone published." : "Zone updated.";
-      await refresh();
+      await refreshZones();
     } catch (error) {
       zoneMessage.textContent = error.message;
     }
@@ -242,45 +430,126 @@
         report_id: values.incidentReportId || null,
         is_published: Boolean(zoneForm.elements.isPublished.checked)
       });
-      zoneForm.hidden = true;
+      clearZoneDraft();
       zoneMessage.textContent = "Zone saved.";
-      await refresh();
+      await refreshZones();
     } catch (error) {
       zoneMessage.textContent = error.message;
     }
   });
 
-  document.querySelector("#cancel-zone").addEventListener("click", () => {
+  function clearZoneDraft() {
     zoneForm.reset();
     zoneForm.hidden = true;
     if (draftLayer) {
       zoneMap.removeLayer(draftLayer);
       draftLayer = null;
     }
+    requestAnimationFrame(() => { if (!zoneView.hidden) zoneMap?.invalidateSize({ pan: false }); });
+  }
+
+  document.querySelector("#cancel-zone").addEventListener("click", () => {
+    clearZoneDraft();
+    zoneMessage.textContent = "";
   });
 
-  if (zoneMapElement && window.L) {
-    zoneMap = L.map(zoneMapElement).setView([13.43, 121.96], 10);
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18, attribution: "&copy; OpenStreetMap contributors" }).addTo(zoneMap);
-    if (zoneMap.pm) {
-      zoneMap.pm.addControls({ position: "topleft", drawText: false, drawCircle: false, drawCircleMarker: false, drawMarker: false, drawPolyline: false, drawRectangle: false });
-      zoneMap.on("pm:create", (event) => {
-        if (draftLayer) zoneMap.removeLayer(draftLayer);
-        draftLayer = event.layer;
-        zoneForm.hidden = false;
-        zoneForm.elements.geometry.value = JSON.stringify(geometryFromLayer(draftLayer));
-        zoneMessage.textContent = "Boundary drawn. Complete the form to save it.";
-      });
-      zoneMap.on("pm:edit", () => {
-        if (draftLayer) zoneForm.elements.geometry.value = JSON.stringify(geometryFromLayer(draftLayer));
-      });
+  drawBoundary.addEventListener("click", async () => {
+    if (!zoneMap?.pm) return;
+    if (!zoneForm.hidden && !(await window.PigmentModal.ask({title: "Discard unsaved changes?", message: "The current zone edits will be lost if you draw a new zone.", accept: "Discard and draw", tone: "danger"}))) return;
+    if (zoneView.hidden) return;
+    clearZoneDraft();
+    zoneMap.invalidateSize();
+    zoneMap.pm.enableDraw("Polygon");
+    zoneMessage.textContent = "Click on the map to add corners. Click the starting point to finish.";
+  });
+
+  resetDrawing.addEventListener("click", () => {
+    if (zoneView.hidden || resetDrawing.disabled || !zoneMap?.pm) return;
+    // Stop the unfinished Geoman polygon, then start with a fresh one.
+    zoneMap.pm.disableDraw("Polygon");
+    zoneMap.pm.enableDraw("Polygon");
+    zoneMessage.textContent = "Drawing cleared. Click the map to start a new boundary.";
+  });
+
+  resetMap.addEventListener("click", () => {
+    zoneMap?.invalidateSize({ pan: false });
+    zoneMap?.setView(zoneCenter, zoneZoom, { animate: false });
+  });
+
+  function initializeZoneMap() {
+    if (zoneMap || !zoneMapElement) return;
+    if (!window.L) {
+      zoneMapMessage.textContent = "The map could not load. Saved zones are still available below.";
+      return;
     }
-  }
-  window.PigmentAuth.requireAuth({adminOnly:true}).then((user) => {
-    if (!user) return;
-    refresh().then(() => {
-      const requested = Number(new URLSearchParams(window.location.search).get('report'));
-      if (requested && reports.some(r => r.report_id === requested)) showReport(requested);
+    zoneMap = L.map(zoneMapElement).setView(zoneCenter, zoneZoom);
+    resetMap.disabled = false;
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18, attribution: "&copy; OpenStreetMap contributors" }).addTo(zoneMap);
+    if (!zoneMap.pm) {
+      zoneMapMessage.textContent = "Boundary drawing tools could not load. Refresh the page to try again.";
+      return;
+    }
+    drawBoundary.disabled = false;
+    zoneMap.on("pm:drawstart", ({ shape }) => {
+      resetDrawing.disabled = shape !== "Polygon";
     });
+    zoneMap.on("pm:drawend", () => {
+      resetDrawing.disabled = true;
+    });
+    zoneMap.on("pm:create", (event) => {
+      resetDrawing.disabled = true;
+      if (draftLayer) zoneMap.removeLayer(draftLayer);
+      draftLayer = event.layer;
+      zoneForm.reset();
+      zoneForm.hidden = false;
+      document.querySelector("#zone-editor-title").textContent = "New zone";
+      zoneForm.elements.geometry.value = JSON.stringify(geometryFromLayer(draftLayer));
+      zoneMessage.textContent = "Boundary drawn. Complete the form to save the zone.";
+      requestAnimationFrame(() => {
+        if (zoneView.hidden || draftLayer !== event.layer) return;
+        zoneMap.invalidateSize({ pan: false });
+        zoneMap.fitBounds(draftLayer.getBounds(), { padding: [30, 30], maxZoom: 15, animate: false });
+      });
+      zoneForm.elements.name.focus({ preventScroll: true });
+    });
+  }
+
+  function switchView(section) {
+    activeView = section;
+    const inZones = section === "zones";
+    if (section !== "reports" && dialog.open) dialog.close();
+    if (!inZones) zoneMap?.pm?.disableDraw();
+    if (section !== "reports" && !inZones) return;
+    if (inZones) {
+      const firstOpen = !zoneMap;
+      initializeZoneMap();
+      requestAnimationFrame(() => {
+        if (zoneView.hidden || !zoneMap) return;
+        zoneMap.invalidateSize({ pan: false });
+        if (firstOpen) zoneMap.setView(zoneCenter, zoneZoom, { animate: false });
+      });
+      if (!zonesLoaded) refreshZones();
+      if (!reportsLoaded) refreshReports().then(ok => {
+        if (!ok && !zoneView.hidden && zoneRetry.hidden) zoneMessage.textContent = "Confirmed report choices could not be loaded. Open Review disease reports to retry.";
+      });
+    } else if (!reportsLoaded) refreshReports();
+  }
+
+  let inspectedDeepLink = false;
+  window.addEventListener("pigment:admin-view", async ({ detail }) => {
+    switchView(detail);
+    if (detail !== "reports" || inspectedDeepLink) return;
+    inspectedDeepLink = true;
+    const requested = Number(new URLSearchParams(window.location.search).get("report"));
+    if (!Number.isSafeInteger(requested) || requested < 1 || activeView !== "reports") return;
+    if (!(reportsLoaded || await refreshReports()) || activeView !== "reports") return;
+    const report = reports.find(item => Number(item.report_id) === requested);
+    if (report) {
+      if (report.report_status !== filter) filter = "all";
+      renderReports();
+      showReport(requested);
+    } else {
+      reviewMessage.textContent = `Report #${requested} was not found.`;
+    }
   });
 }());

@@ -1,154 +1,157 @@
-body{
-    background:#f5f8f5
+/* Admin-specific components layered over the shared PigMENT farmer shell. */
+html body.admin-workspace .admin-main { padding-bottom: 32px; }
+html body.admin-workspace .admin-main .admin-hero { min-height: 226px; margin-bottom: 22px; }
+html body.admin-workspace .admin-hero .dashboard-hero-copy { max-width: 57%; }
+.admin-hero .hero-register-button { margin-top: 15px; }
+.admin-hero .hero-register-button[hidden] { display: none !important; }
+.admin-hero .hero-register-button:disabled { opacity: .8; cursor: wait; }
+.admin-workspace .admin-metric-icon svg,
+.admin-hero .hero-register-button svg {
+  width: 1.3em; height: 1.3em; flex: none; fill: none; stroke: currentColor;
+  stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8;
 }
-.admin-shell{
-    display:grid;
-    grid-template-columns:245px minmax(0,1fr);
-    min-height:100vh
-}.admin-sidebar{
-    background:#fff;
-    border-right:1px solid #e1e9e2;
-    padding:24px 17px;
-    display:flex;
-    flex-direction:column;
-    gap:24px
+.admin-metrics {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px; margin: 0 0 22px;
 }
-.admin-sidebar .brand{
-    margin-bottom:12px
+.admin-metric, .admin-panel {
+  background: #fff; border: 1px solid #dce5de; border-radius: 16px;
+  box-shadow: 0 3px 12px #173d2810;
 }
-.admin-nav{
-    display:grid;gap:6px
+.admin-metric { display: flex; align-items: center; gap: 14px; min-height: 110px; padding: 16px; color: #075139; }
+.admin-metric-icon { display: flex; flex: none; border-right: 1px solid #d5e4db; padding-right: 13px; font-size: 24px; }
+.admin-metric dt { font-size: 13px; line-height: 1.3; color: #243b31; }
+.admin-metric dd { margin: 4px 0 0; font-size: clamp(24px, 2.8vw, 38px); font-weight: 800; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.admin-metric dd.is-unavailable { font-size: 14px; }
+.admin-metric.has-pending { color: #744300; border-color: #eac785; background: #fff3da; }
+.admin-metric.has-pending .admin-metric-icon { border-color: #eac785; }
+.admin-panel { padding: clamp(15px, 2vw, 25px); margin: 0 0 24px; }
+.admin-panel h2 { color: #103b2b; font-size: clamp(21px, 2.1vw, 29px); margin-bottom: 6px; }
+.admin-panel .muted { color: #475951; margin: 0 0 15px; }
+.admin-panel input { max-width: 370px; margin: 10px 10px 15px 0; }
+.admin-table-scroll { overflow-x: auto; }
+.admin-panel .data-table { min-width: 620px; }
+.admin-panel td { vertical-align: middle; }
+.admin-view[hidden], .attention-table[hidden] { display: none; }
+.admin-feedback:empty { display: none; }
+.admin-feedback:not(:empty) { margin: 0 0 15px; padding: 10px 14px; color: #264738; background: #eaf2e9; border-radius: 8px; }
+.attention-table { width: 100%; border-spacing: 0; overflow: hidden; border: 1px solid #dce5de; border-radius: 11px; }
+.attention-table th, .attention-table td { text-align: left; padding: 12px 14px; }
+.attention-table th { background: #e7f0e8; color: #173e2c; font-weight: 750; }
+.attention-table td { border-top: 1px solid #e5ebe5; overflow-wrap: anywhere; }
+.attention-table strong, .attention-table small { display: block; }
+.attention-table small { margin-top: 3px; color: #475951; }
+.attention-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; color: #664005; background: #ffedbd; font-weight: 700; font-size: .85rem; }
+.attention-badge.in-review { color: #285440; background: #e4f1e8; }
+html body.admin-workspace .attention-review { background: #07543b; color: #fff; border-color: #07543b; font-weight: 750; }
+html body.admin-workspace .attention-review:hover { background: #033c2a; }
+.attention-manage { display: inline-flex; gap: 8px; margin-top: 16px; color: #07543b; text-decoration: underline; font-weight: 750; }
+.attention-message { color: #475951; margin: 0; }
+.admin-farmer-map { display: inline-block; margin: 0 0 16px; }
+.admin-workspace :is(#reports, #zones) { scroll-margin-top: 88px; }
+@media (min-width: 801px) and (max-height: 640px) {
+  html body.admin-workspace .sidebar { overflow-y: auto; }
+  html body.admin-workspace .sidebar > * { flex-shrink: 0; }
 }
-.admin-nav a{
-    display:block;
-    padding:13px 15px;
-    border-radius:10px;
-    color:#314339;
-    text-decoration:none;
-    font-weight:600
+@media (max-width: 1100px) {
+  .admin-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
-.admin-nav a:hover,.admin-nav a.selected{
-    background:#e7f2e9;
-    color:#20583e
+@media (max-width: 800px) {
+  .admin-workspace .topbar-context { display: grid; }
+  html body.admin-workspace .admin-hero .dashboard-hero-copy { max-width: 63%; padding-bottom: 0; }
 }
-.admin-sidebar .auth-logout{
-    margin-top:auto
+@media (max-width: 600px) {
+  html body.admin-workspace .admin-main .admin-hero { align-items: flex-start; min-height: 275px; padding: 18px; }
+  html body.admin-workspace .admin-hero .dashboard-hero-copy { max-width: 100%; }
+  html body.admin-workspace .admin-hero .hero-art { top: 45%; }
+  html body.admin-workspace .admin-hero .hero-farm { width: 65%; }
+  html body.admin-workspace .admin-hero .hero-mascot { height: 100%; right: 4%; bottom: 0; }
+  html body.admin-workspace .admin-hero .hero-rays { top: 12%; }
+  .admin-metrics { gap: 9px; }
+  .admin-metric { gap: 8px; padding: 10px; min-height: 85px; }
+  .admin-metric-icon { font-size: 16px; padding-right: 7px; }
+  .admin-metric dt { font-size: 12px; }
+  .attention-table, .attention-table tbody, .attention-table td { display: block; }
+  .attention-table thead { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .attention-table tr { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: 9px; padding: 11px; }
+  .attention-table tr + tr { border-top: 1px solid #dce5de; }
+  .attention-table td { padding: 0; border: 0; }
+  .attention-table td:last-child { justify-self: end; }
+  .attention-review { min-height: 44px; font-size: 12px; }
 }
-.admin-main{
-    padding:38px;
-    max-width:1400px;
-    width:100%;margin:auto
+
+/* Marketplace admin view */
+@media (min-width: 601px) {
+  html body.admin-workspace .admin-main[data-current-view="marketplace"] .admin-hero { min-height: 176px; }
 }
-.admin-heading{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:15px;
-    margin-bottom:25px
-}.admin-heading h1{
-    margin:5px 0
+.admin-market :is(#listing-results, #listing-action-heading)[hidden] { display: none; }
+.market-admin-search svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.8; flex: none; }
+.market-filters { display: grid; grid-template-columns: minmax(0, 2fr) minmax(135px, 1fr) auto; align-items: center; gap: 10px; margin: 16px 0; }
+.market-admin-search { position: relative; min-width: 0; }
+.market-admin-search svg { position: absolute; top: 50%; left: 13px; transform: translateY(-50%); pointer-events: none; color: #486057; }
+.admin-market #listing-search, .admin-market #listing-status { width: 100%; max-width: none; min-height: 44px; padding: 8px 12px; margin: 0; border-radius: 9px; border: 1px solid #9db0a6; background: #fff; color: #233d32; font: inherit; }
+.admin-market #listing-search { padding-left: 40px; }
+html body.admin-workspace .market-admin-submit { min-height: 44px; padding-inline: 24px; color: #fff; background: #07543b; border-color: #07543b; font-weight: 750; }
+html body.admin-workspace .market-admin-submit:not(:disabled):hover { background: #033c2a; }
+.market-admin-results { border: 1px solid #dbe4dc; border-radius: 10px; }
+.admin-market .market-admin-table { min-width: 0; }
+.market-admin-table strong, .market-admin-table small { display: block; }
+.market-admin-table small, .market-admin-note, .market-listing-message { color: #475951; }
+.market-admin-table td { overflow-wrap: anywhere; }
+.market-admin-table td[data-label="Price"] { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.market-admin-badge { display: inline-block; width: fit-content; padding: 4px 9px; border-radius: 20px; background: #edf0ed; color: #36483e; font-size: 12px; font-weight: 700; }
+.market-admin-badge.is-active, .market-admin-badge.is-listed { background: #e0f0e0; color: #1e5738; }
+.market-admin-badge.is-hidden { background: #fff1d5; color: #604016; }
+.market-listing-message:empty, #listing-count:empty { display: none; }
+.market-admin-note { margin: 14px 0 0; font-size: 13px; }
+@media (max-width: 650px) {
+  .market-filters { grid-template-columns: minmax(0, 1fr) auto; }
+  .market-admin-search { grid-column: 1 / -1; }
+  .market-admin-table tbody { padding: 8px; }
 }
-.admin-metrics{
-    display:grid;
-    grid-template-columns:repeat(4,minmax(0,1fr));
-    gap:16px;margin-bottom:22px
+
+/* Farmer account directory */
+@media (min-width: 601px) {
+  html body.admin-workspace .admin-main[data-current-view="users"] .admin-hero { min-height: 176px; }
 }
-.admin-metrics article,.admin-panel{
-    background:#fff;
-    border:1px solid #dfe8df;
-    border-radius:14px;
-    padding:20px;
-    box-shadow:0 2px 8px #142c1909
+.admin-accounts :is(#user-results, #account-count)[hidden] { display: none; }
+.admin-accounts #user-search, .admin-accounts #user-status { width: 100%; max-width: none; min-height: 44px; padding: 8px 12px; margin: 0; border-radius: 9px; border: 1px solid #9db0a6; background: #fff; color: #233d32; font: inherit; }
+.admin-accounts #user-search { padding-left: 40px; }
+.account-status { display: inline-flex; align-items: center; gap: 7px; }
+.account-status::before { content: ""; width: 7px; height: 7px; flex: none; border-radius: 50%; background: currentColor; }
+.account-status.is-suspended { background: #f9e5e8; color: #8a2c40; }
+html body.admin-workspace .admin-accounts .account-action { min-height: 42px; min-width: 98px; font-weight: 750; color: #205e3b; border-color: #528569; background: #fff; }
+html body.admin-workspace .admin-accounts .account-action:hover:not(:disabled) { background: #e8f3e9; }
+html body.admin-workspace .admin-accounts .account-action.is-suspend { color: #8a2c40; border-color: #ab5867; }
+html body.admin-workspace .admin-accounts .account-action.is-suspend:hover:not(:disabled) { background: #fbecef; }
+.account-access-note { display: flex; align-items: center; gap: 9px; padding: 11px 13px; border-radius: 9px; margin: 15px 0 0; color: #304a3a; background: #edf2e5; }
+.account-access-note svg { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; }
+
+/* In-page farmer account confirmation */
+html body.admin-workspace .account-confirm-dialog {
+  width: min(460px, calc(100% - 28px));
+  max-height: calc(100% - 28px);
+  margin: auto;
+  padding: clamp(18px, 4vw, 26px);
+  border: 1px solid #d6e3da;
+  border-radius: 18px;
+  background: #fffdfa;
+  color: #233d32;
+  box-shadow: 0 24px 76px #0b2d2450;
+  overflow-y: auto;
 }
-.admin-metrics article span{
-    display:block;
-    color:#58685e;
-    font-size:14px
-}
-.admin-metrics article strong{
-    display:block;
-    font-size:34px;
-    margin-top:12px;
-    color:#21563e
-}
-.admin-panel{
-    margin-bottom:24px
-}
-.admin-panel h2{
-    margin:0 0 8px
-}
-.admin-panel input{
-    max-width:370px;
-    margin:10px 10px 15px 0
-}
-.admin-table-scroll{
-    overflow:auto
-}
-.admin-panel .data-table{
-    min-width:620px
-}.admin-panel td{
-    vertical-align:middle
-}.admin-panel .button{
-    margin:2px
-}
-.admin-view[hidden]{
-    display:none
-}.admin-panel .muted{
-    color:#56635d
-}
-.attention-row{
-    padding:14px;
-    border-bottom:1px solid #e5ebe5
-}
-.attention-row:last-child{
-    border-bottom:0
-}
-.admin-feedback:not(:empty){
-    padding:10px;
-    margin-bottom:14px
-}
-.admin-sidebar .brand img{
-    max-height:40px
-}
-    
-@media(max-width:900px){
-    .admin-shell{
-        grid-template-columns:1fr
-    }
-    .admin-sidebar{
-        border-right:0;
-        border-bottom:1px solid #ddd;
-        padding:14px
-    }
-    .admin-nav{
-        display:flex;
-        overflow-x:auto;
-        gap:5px
-    }
-    .admin-nav a{
-        white-space:nowrap
-    }
-    .admin-sidebar .auth-logout{
-        align-self:flex-start
-    }
-    .admin-main{
-        padding:18px
-    }
-    .admin-metrics{
-        grid-template-columns:repeat(2,1fr)
-    }
-    .admin-heading{
-        align-items:flex-start
-    }
-    .admin-heading .user-summary{
-        display:none}
-    }
-@media(max-width:480px){
-    .admin-metrics{
-        grid-template-columns:1fr 1fr
-    }
-    .admin-metrics article{
-        padding:13px
-    }
-    .admin-metrics article strong{
-        font-size:27px}}
+.account-confirm-dialog::backdrop { background: #102d24a6; }
+.account-confirm-heading { display: flex; align-items: center; gap: 13px; margin-bottom: 16px; }
+.account-confirm-heading .eyebrow { color: #4b675a; margin-bottom: 3px; }
+html body.admin-workspace .account-confirm-heading h2 { color: #173e2e; font-size: clamp(20px, 4vw, 24px); line-height: 1.2; }
+.account-confirm-icon { width: 45px; height: 45px; flex: none; display: grid; place-items: center; border-radius: 13px; background: #e0efe4; color: #155638; }
+.account-confirm-dialog[data-intent="suspend"] .account-confirm-icon { color: #8a2c40; background: #fae6e8; }
+.account-confirm-icon svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.7; }
+.account-confirm-identity { font-weight: 750; margin: 0 0 8px; overflow-wrap: anywhere; }
+.account-confirm-effect { color: #455a50; margin: 0 0 20px; }
+.account-confirm-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 9px; }
+.account-confirm-actions .button { min-height: 44px; }
+html body.admin-workspace .account-confirm-submit { color: #fff; background: #07543b; border-color: #07543b; }
+html body.admin-workspace .account-confirm-submit:hover { background: #033b29; border-color: #033b29; }
+html body.admin-workspace .account-confirm-dialog[data-intent="suspend"] .account-confirm-submit { color: #fff; background: #963d50; border-color: #963d50; }
+html body.admin-workspace .account-confirm-dialog[data-intent="suspend"] .account-confirm-submit:hover { background: #782b3b; border-color: #782b3b; }

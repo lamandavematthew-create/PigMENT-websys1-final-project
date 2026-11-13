@@ -16,14 +16,25 @@ html body.my-pigs-refresh .pig-card .pig-price {
   background: url("../../public/assets/registered-pigs-price/farm-landscape.svg") right bottom / auto 29px no-repeat, linear-gradient(135deg,#f0fae8,#e8f6de);
   overflow-wrap: anywhere;
 }
-.pig-price-rate { display:flex; align-items:center; gap:8px; }
-.pig-price-rate img { width:32px; height:32px; flex:none; }
+.pig-price-rate {
+  container-type: inline-size;
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr);
+  align-items:center;
+  gap:4px 6px;
+}
+.pig-price-rate img { width:24px; height:24px; }
 .pig-price span { display:block; font-size: .75rem; font-weight: 650; line-height: 1.25; }
 .pig-price strong { display:block; font-size: clamp(1rem, 1.35vw, 1.35rem); line-height: 1.17; font-weight: 850; }
+.pig-price .pig-price-rate strong {
+  grid-column:1 / -1;
+  white-space:nowrap;
+  font-size:clamp(.875rem, 8.8cqi, 1.35rem);
+}
 .pig-price-total { border-top: 1px solid #bad9ad; padding-top: 6px; }
 .pig-price-total strong { color:#176b33; }
 html body.my-pigs-refresh #pig-list > .pig-card {
-  grid-template-columns: minmax(74px,.9fr) minmax(108px,1.25fr) minmax(130px,1.3fr) minmax(270px,3.4fr) minmax(110px,1.35fr);
+  grid-template-columns: minmax(74px,.9fr) minmax(108px,1.25fr) minmax(176px,1.3fr) minmax(270px,3.4fr) minmax(110px,1.35fr);
   grid-template-areas: "illustration title price facts actions" "details details details details details";
   align-items:center; gap: 10px; padding: 12px; min-width:0;
 }
@@ -56,7 +67,7 @@ html body.my-pigs-refresh .pen-member-pigs > .pig-card {
 }
 @container pig-records (max-width: 850px) {
   html body.my-pigs-refresh #pig-list > .pig-card {
-    grid-template-columns: 95px minmax(0,1fr) minmax(135px, .8fr);
+    grid-template-columns: 95px minmax(0,1fr) minmax(176px, .8fr);
     grid-template-areas: "illustration title price" "facts facts facts" "actions actions actions" "details details details";
   }
   html body.my-pigs-refresh #pig-list > .pig-card .pig-card-facts { border:0; padding:0; }
