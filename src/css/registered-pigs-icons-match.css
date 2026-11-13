@@ -1,0 +1,92 @@
+/* Registered Pigs — user-supplied icon pack and compact screenshot layout.
+   All values and controls are still rendered by my-pigs.js from PHP APIs. */
+html body.my-pigs-refresh { --pig-icons: url('../../public/assets/registered-pigs-icons/PigMENT_Registered_Pigs_Icons/svg/pig-outline.svg'); }
+html body.my-pigs-refresh .records-panel {border-radius:15px;border-color:#e4e1d9;background:#fffdf9;}
+html body.my-pigs-refresh .records-heading.records-heading-compact {min-height:64px;padding:10px 16px;gap:14px;background:linear-gradient(100deg,#004631,#006b48 70%,#005d40);}
+html body.my-pigs-refresh .records-heading-compact::after {right:59%;bottom:-76px;width:210px;opacity:.55;}
+html body.my-pigs-refresh .records-pig-icon {width:38px;height:38px;filter:none;}
+html body.my-pigs-refresh .records-heading-title {gap:10px;}
+html body.my-pigs-refresh .records-heading-compact h2 {font-size:clamp(18px,1.6vw,24px);letter-spacing:-.02em;}
+html body.my-pigs-refresh .records-heading-compact .record-count {margin-left:auto;margin-right:8px;font-size:12px;color:#ecfff6;}
+html body.my-pigs-refresh .records-heading-compact .list-controls-inline {gap:14px;}
+html body.my-pigs-refresh .records-heading-compact .search-field {flex:0 1 278px;width:clamp(180px,23vw,278px);}
+html body.my-pigs-refresh .records-heading-compact .search-field input {height:34px;min-height:34px;padding-left:36px;border:1px solid #d7dfd2;background:#fffefa;font-size:12px;}
+html body.my-pigs-refresh .records-heading-compact .filter-field select {height:34px;min-height:34px;min-width:127px;padding-right:30px;border:1px solid #d7dfd2;background-color:#fffefa;font-size:12px;appearance:none;background-image:url('../../public/assets/registered-pigs-icons/PigMENT_Registered_Pigs_Icons/svg/chevron-down.svg');background-repeat:no-repeat;background-size:16px 16px;background-position:right 9px center;}
+html body.my-pigs-refresh .registered-search-icon {position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;background:url('../../public/assets/registered-pigs-icons/PigMENT_Registered_Pigs_Icons/svg/search.svg') center/contain no-repeat;pointer-events:none;}
+html body.my-pigs-refresh .pig-card-list {padding:12px;}
+html body.my-pigs-refresh .pig-card {grid-template-columns:132px minmax(190px,1.7fr) minmax(360px,3.8fr) minmax(150px,1.2fr);column-gap:14px;row-gap:10px;padding:12px;background:linear-gradient(100deg,#fff9f4,#fffdfb 55%,#fff8f3);border-color:#e6dcd0;}
+html body.my-pigs-refresh .pig-record-illustration {height:120px;width:132px;border:0;background:#e9efdf;}
+html body.my-pigs-refresh .pig-card-heading {gap:6px;}
+html body.my-pigs-refresh .pig-card-identity h3 {font-size:clamp(21px,2vw,27px);}
+html body.my-pigs-refresh .pig-card-identity .pig-attributes {display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:12px;font-size:11px;}
+html body.my-pigs-refresh .pig-breed-item,html body.my-pigs-refresh .pig-sex-item {display:inline-flex;align-items:center;gap:5px;white-space:nowrap;}
+html body.my-pigs-refresh .pig-breed-item::before,html body.my-pigs-refresh .pig-sex-item::before {content:'';display:inline-block;width:16px;height:16px;flex:none;background:center/contain no-repeat;}
+html body.my-pigs-refresh .pig-breed-item::before {background-image:url('../../public/assets/registered-pigs-icons/PigMENT_Registered_Pigs_Icons/svg/breed-layers.svg');}
+html body.my-pigs-refresh .pig-sex-item::before {background-image:url('../../public/assets/registered-pigs-icons/PigMENT_Registered_Pigs_Icons/svg/male.svg');}
+html body.my-pigs-refresh .pig-card .status-label {background:#cdf3b9;color:#175330;border:0;padding:4px 10px;}
+html body.my-pigs-refresh .pig-card-facts {grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;padding:0 13px;border-left:1px solid #e2ddd4;border-right:1px solid #e2ddd4;}
+html body.my-pigs-refresh .pig-card-fact {min-height:93px;padding:38px 11px 10px;background:#f0f2e8;border-radius:12px;}
+html body.my-pigs-refresh .pig-card-fact::before {width:21px;height:21px;top:10px;left:11px;}
+html body.my-pigs-refresh .pig-card-fact:nth-child(1)::before {background-image:url('../../public/assets/registered-pigs-icons/PigMENT_Registered_Pigs_Icons/svg/calendar.svg');}
+html body.my-pigs-refresh .pig-card-fact:nth-child(2)::before {background-image:url('../../public/assets/registered-pigs-icons/PigMENT_Registered_Pigs_Icons/svg/age-sprout.svg');}
+html body.my-pigs-refresh .pig-card-fact:nth-child(3)::before {background-image:url('../../public/assets/registered-pigs-icons/PigMENT_Registered_Pigs_Icons/svg/weight-scale.svg');}
+html body.my-pigs-refresh .pig-card-fact:nth-child(4)::before {background-image:url('../../public/assets/registered-pigs-icons/PigMENT_Registered_Pigs_Icons/svg/pen-house.svg');}
+html body.my-pigs-refresh .pig-card>.pen-card-actions>.button {background:#00583d;border-color:#00583d;min-height:39px;}
+html body.my-pigs-refresh .pig-card>.pen-card-actions>.button::before {background-image:url('../../public/assets/registered-pigs-icons/PigMENT_Registered_Pigs_Icons/svg/view-eye.svg');filter:none;}
+html body.my-pigs-refresh .pig-secondary-actions .pig-edit-action::before {background-image:url('../../public/assets/registered-pigs-icons/PigMENT_Registered_Pigs_Icons/svg/edit-pencil.svg');}
+html body.my-pigs-refresh .pig-secondary-actions .pig-delete-action::before {background-image:url('../../public/assets/registered-pigs-icons/PigMENT_Registered_Pigs_Icons/svg/delete-trash.svg');}
+html body.my-pigs-refresh .pig-secondary-actions {gap:7px;}
+html body.my-pigs-refresh .pig-secondary-actions .button {min-height:35px;}
+@media (max-width:1400px) and (min-width:1001px) {
+ html body.my-pigs-refresh .pig-card {grid-template-columns:105px minmax(145px,1.2fr) minmax(330px,3.2fr) minmax(125px,1.1fr);gap:9px;}
+ html body.my-pigs-refresh .pig-record-illustration {width:105px;height:109px;}
+ html body.my-pigs-refresh .pig-card-facts {padding:0 8px;gap:7px;}
+ html body.my-pigs-refresh .pig-card-fact {min-height:91px;padding-left:8px;padding-right:7px;}
+}
+@media (max-width:1150px) and (min-width:1001px) {
+ html body.my-pigs-refresh .pig-card {grid-template-columns:100px minmax(130px,1fr) minmax(230px,2fr) minmax(115px,.8fr);}
+ html body.my-pigs-refresh .pig-card-facts {grid-template-columns:repeat(2,minmax(0,1fr));}
+}
+@media (max-width:1000px) {
+ html body.my-pigs-refresh .pig-card {grid-template-columns:100px minmax(0,1fr);grid-template-areas:'illustration title' 'facts facts' 'actions actions' 'details details';}
+ html body.my-pigs-refresh .pig-record-illustration {width:100px;height:100px;}
+ html body.my-pigs-refresh .pig-card-facts {grid-template-columns:repeat(4,minmax(0,1fr));border:0;padding:0;}
+ html body.my-pigs-refresh .records-heading-compact .list-controls-inline {flex-wrap:wrap;}
+}
+@media (max-width:650px) {
+ html body.my-pigs-refresh .records-heading-compact .list-controls-inline {width:100%;flex-basis:100%;gap:8px;}
+ html body.my-pigs-refresh .records-heading-compact .record-count {width:100%;margin:0;}
+ html body.my-pigs-refresh .records-heading-compact .search-field {flex:1 1 155px;width:auto;}
+ html body.my-pigs-refresh .pig-card {grid-template-columns:76px minmax(0,1fr);}
+ html body.my-pigs-refresh .pig-record-illustration {width:76px;height:85px;}
+ html body.my-pigs-refresh .pig-card-facts {grid-template-columns:repeat(2,minmax(0,1fr));}
+ html body.my-pigs-refresh .pig-card-identity .pig-attributes {gap:7px;}
+}
+
+/* Registered Pigs action buttons — exact color/icon treatment from approved reference.
+   These selectors deliberately outrank the shared green primary button rule. */
+html body.my-pigs-refresh .pig-card > .pen-card-actions .pig-secondary-actions .button {
+  display:inline-flex; align-items:center; justify-content:center; gap:6px;
+  min-height:35px; padding:6px 8px; border-radius:8px;
+  width:100%; flex:1 1 0; font-size:12px; font-weight:750;
+  box-shadow:none; text-shadow:none;
+}
+html body.my-pigs-refresh .pig-card > .pen-card-actions .pig-secondary-actions .pig-edit-action {
+  background:#fafff6; color:#075b3d; border:1px solid #78bd69;
+}
+html body.my-pigs-refresh .pig-card > .pen-card-actions .pig-secondary-actions .pig-delete-action {
+  background:#fff8f9; color:#d52643; border:1px solid #f28ea1;
+}
+html body.my-pigs-refresh .pig-card > .pen-card-actions .pig-secondary-actions .pig-edit-action::before,
+html body.my-pigs-refresh .pig-card > .pen-card-actions .pig-secondary-actions .pig-delete-action::before {
+  content:""; display:inline-block; flex:0 0 16px; width:16px; height:16px;
+  margin:0; filter:none; background-size:contain; background-position:center; background-repeat:no-repeat;
+}
+html body.my-pigs-refresh .pig-card > .pen-card-actions .pig-secondary-actions .pig-edit-action::before {
+  background-image:url('../../public/assets/registered-pigs-icons/PigMENT_Registered_Pigs_Icons/svg/edit-pencil.svg');
+}
+html body.my-pigs-refresh .pig-card > .pen-card-actions .pig-secondary-actions .pig-delete-action::before {
+  background-image:url('../../public/assets/registered-pigs-icons/PigMENT_Registered_Pigs_Icons/svg/delete-trash.svg');
+}
+html body.my-pigs-refresh .pig-card > .pen-card-actions .pig-secondary-actions .pig-edit-action:hover {background:#edf9e9;}
+html body.my-pigs-refresh .pig-card > .pen-card-actions .pig-secondary-actions .pig-delete-action:hover {background:#ffedf0;}

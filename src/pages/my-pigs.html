@@ -6,12 +6,21 @@
   <meta name="description" content="View and manage pig records, growth estimates, and pens in PigMENT.">
   <title>My Pigs | PigMENT</title>
   <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/home-refresh.css">
+  <link rel="stylesheet" href="../css/my-pigs-refresh.css">
+  <link rel="stylesheet" href="../css/my-pigs-pens-match.css">
+  <link rel="stylesheet" href="../css/edit-pig-modal.css">
+
+  <link rel="stylesheet" href="../css/my-pigs-record-compact.css">
+  <link rel="stylesheet" href="../css/registered-pigs-icons-match.css">
+  <link rel="stylesheet" href="../css/my-pigs-expanded-pen-fix.css">
+  <link rel="stylesheet" href="../css/edit-pen-modal.css">
   <script src="../js/script.js" defer></script>
   <script src="../js/auth.js" defer></script>
   <script src="../js/weight-estimator.js" defer></script>
   <script src="../js/my-pigs.js" defer></script>
 </head>
-<body data-requires-auth="true" data-auth-pending="true" data-api-farm-page="true">
+<body class="home-refresh my-pigs-refresh" data-requires-auth="true" data-auth-pending="true" data-api-farm-page="true">
   <div class="app-shell">
     <aside class="sidebar" id="sidebar">
       <a class="brand" href="../index.html" aria-label="PigMENT dashboard">
@@ -78,48 +87,55 @@
         </div>
       </header>
 
-      <main class="main-content" id="my-pigs">
-        <div class="page-heading">
-          <div>
+      <main class="main-content dashboard-main" id="my-pigs">
+        <!-- Identical banner markup and image assets as the Home page; only the copy differs. -->
+        <div class="page-heading dashboard-hero">
+          <div class="dashboard-hero-copy">
             <p class="eyebrow">Growth monitoring</p>
             <h1>My Pigs</h1>
             <p class="page-description">View your pig records, keep track of growth, and update your farm list.</p>
           </div>
-          <div class="heading-actions">
-            <a class="button button-secondary" href="weight-calculator.html">Quick Weight Calculator</a>
-            <a class="button button-secondary" href="#pig-pens"><span class="ui-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 20V8l8-5 8 5v12M8 20v-6h8v6M3 20h18"/></svg></span> Manage Pig Pens</a>
-            <button class="button button-primary" id="open-registration" type="button"><span aria-hidden="true">＋</span> Register a Pig</button>
+          <div class="hero-art" aria-hidden="true">
+            <img class="hero-farm" src="../../public/assets/home-redesign/pig_farm_scene.png" alt="">
+            <img class="hero-mascot" src="../../public/assets/home-redesign/superhero_pig.png" alt="">
+            <img class="hero-rays" src="../../public/assets/home-redesign/gold_accent_rays.png" alt="">
           </div>
+        </div>
+        <div class="heading-actions my-pigs-quick-actions" aria-label="Pig management shortcuts">
+          <a class="button button-secondary" href="weight-calculator.html"><img src="../../public/assets/my-pigs-redesign/icons/svg/calculator.svg" alt="">Quick Weight Calculator <span aria-hidden="true">→</span></a>
+          <a class="button button-secondary" href="#pig-pens"><img src="../../public/assets/my-pigs-redesign/icons/svg/pen.svg" alt="">Manage Pig Pens <span aria-hidden="true">→</span></a>
+          <button class="button button-primary" id="open-registration" type="button"><img src="../../public/assets/my-pigs-redesign/icons/svg/plus.svg" alt="">Register a Pig <span aria-hidden="true">→</span></button>
         </div>
 
         <section class="records-panel" aria-labelledby="records-title">
           <p class="storage-warning" id="storage-warning" role="status" hidden>Browser session storage is unavailable. Changes will be lost when you leave this page.</p>
-          <div class="records-heading">
-            <div>
-              <p class="records-kicker">INDIVIDUAL RECORDS</p>
-              <h2 id="records-title">Registered pigs</h2>
-              <p class="record-intro">Each card is one pig saved to your farm account.</p>
-              <p id="record-count" class="record-count">Pig records</p>
+          <div class="records-heading records-heading-compact">
+            <div class="records-heading-title">
+              <img src="../../public/assets/registered-pigs-icons/PigMENT_Registered_Pigs_Icons/svg/pig-outline.svg" alt="" aria-hidden="true" class="records-pig-icon">
+              <div>
+                <h2 id="records-title">Registered Pigs</h2>
+                <p class="record-intro sr-only">Each card is one pig saved to your farm account.</p>
+              </div>
+            </div>
+            <div class="list-controls list-controls-inline">
+              <p id="record-count" class="record-count" aria-live="polite">Pig records</p>
+              <label class="search-field">
+                <span class="search-icon registered-search-icon" aria-hidden="true"></span>
+                <span class="sr-only">Search pigs by ID, name, or breed</span>
+                <input id="pig-search" type="search" placeholder="Search pigs by name or ID...">
+              </label>
+              <label class="filter-field">
+                <span class="sr-only">Filter by monitoring status</span>
+                <select id="status-filter" aria-label="Filter by monitoring status">
+                  <option value="all">All Statuses</option>
+                  <option value="active">Active</option>
+                  <option value="sold">Sold</option>
+                  <option value="deceased">Deceased</option>
+                </select>
+              </label>
             </div>
           </div>
           <p class="interaction-message" id="interaction-message" role="status" hidden></p>
-          <div class="list-controls">
-            <label class="search-field">
-              <span class="search-icon ui-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="5.5"/><path d="m15 15 5 5"/></svg></span>
-              <span class="sr-only">Search pigs by ID, name, or breed</span>
-              <input id="pig-search" type="search" placeholder="Search by name, ID, or breed">
-            </label>
-            <label class="filter-field">
-              <span>Status</span>
-              <select id="status-filter" aria-label="Filter by monitoring status">
-                <option value="all">All statuses</option>
-                <option value="active">Active</option>
-                <option value="sold">Sold</option>
-                <option value="deceased">Deceased</option>
-              </select>
-            </label>
-          </div>
-
           <div class="pig-card-list" id="pig-list" aria-live="polite"></div>
 
           <div class="empty-state" id="empty-state" hidden>
@@ -132,10 +148,10 @@
 
         <section class="pens-panel" id="pig-pens" aria-labelledby="pens-title">
           <div class="pens-heading">
-            <div><p class="pens-kicker">GROUPS & CAPACITY</p><h2 id="pens-title">Manage Pig Pens</h2><p>Each pen groups pigs together. See its capacity and estimated value at a glance.</p></div>
+            <div class="pens-heading-intro"><img class="pens-heading-icon" src="../../public/assets/my-pigs-redesign/icons/svg/pen.svg" alt="" aria-hidden="true"><div><p class="pens-kicker">GROUPS & CAPACITY</p><h2 id="pens-title">Manage Pig Pens</h2><p>Each pen groups pigs together. See its capacity and estimated value at a glance.</p></div></div>
             <div class="pen-header-actions">
-              <button class="button button-secondary" id="open-litter-form" type="button"><span aria-hidden="true">＋</span> Record a Litter</button>
-              <button class="button button-primary" id="open-pen-form" type="button"><span aria-hidden="true">＋</span> Create Pig Pen</button>
+              <button class="button button-secondary" id="open-litter-form" type="button"><span class="litter-icon" aria-hidden="true">♧</span> Record a Litter</button>
+              <button class="button button-primary" id="open-pen-form" type="button"><span class="pen-add-icon" aria-hidden="true">⊕</span> Create Pig Pen</button>
             </div>
           </div>
           <p class="interaction-message" id="pen-message" role="status" hidden></p>
@@ -146,12 +162,13 @@
             <button class="button button-primary" id="empty-create-pen" type="button"><span aria-hidden="true">＋</span> Create your first pen</button>
           </div>
           <div class="pen-list" id="pen-list" hidden></div>
-          <form class="form-panel pen-form" id="pen-form" hidden>
+          <div class="pen-modal-backdrop" id="pen-modal-backdrop" hidden aria-hidden="true"></div>
+          <form class="form-panel pen-form" id="pen-form" role="dialog" aria-modal="true" aria-labelledby="pen-form-title" aria-describedby="pen-form-description" tabindex="-1" hidden>
             <div class="form-heading">
               <div><p class="eyebrow">Farm record</p><h2 id="pen-form-title">Create a Pig Pen</h2></div>
               <button class="close-form" id="close-pen-form" type="button" aria-label="Close pig pen form">×</button>
             </div>
-            <p class="form-intro">Give the pen a name and set its maximum number of registered pigs.</p>
+            <p class="form-intro" id="pen-form-description">Give the pen a name and set its maximum number of registered pigs.</p>
             <div class="form-grid pen-form-grid">
               <label>Pen name or number <span class="required-mark" aria-hidden="true">*</span><input name="penName" type="text" maxlength="40" placeholder="e.g. Pen 04" required></label>
               <label>Pen type <span class="required-mark" aria-hidden="true">*</span>
@@ -169,6 +186,7 @@
               <label>Capacity <span class="field-unit">(animals, optional)</span><input name="capacity" type="number" min="1" step="1" placeholder="e.g. 10"></label>
               <label class="notes-field">Description <span class="field-unit">(optional)</span><textarea name="description" rows="2" maxlength="160" placeholder="What is this pen used for?"></textarea></label>
             </div>
+            <p class="pen-modal-error" id="pen-modal-error" role="alert" hidden></p>
             <div class="form-actions"><button class="button button-primary" id="pen-form-submit" type="submit">Create Pig Pen</button><button class="button button-secondary" id="cancel-pen-form" type="button">Cancel</button></div>
           </form>
 
@@ -188,6 +206,26 @@
             </div>
             <p class="form-error" id="litter-error" role="alert" hidden></p>
             <div class="form-actions"><button class="button button-primary" type="submit">Save Litter</button><button class="button button-secondary" id="cancel-litter-form" type="button">Cancel</button></div>
+          </form>
+        </section>
+
+        <div class="edit-pig-backdrop" id="edit-pig-backdrop" hidden aria-hidden="true"></div>
+        <section class="form-panel edit-pig-panel" id="edit-pig-panel" role="dialog" aria-modal="true" aria-labelledby="edit-pig-title" aria-describedby="edit-pig-description" tabindex="-1" hidden>
+          <div class="form-heading"><div><p class="eyebrow">Farm record</p><h2 id="edit-pig-title">Edit Pig</h2></div><button class="close-form" id="close-edit-pig" type="button" aria-label="Close edit form">×</button></div>
+          <p class="form-intro" id="edit-pig-description">Update this pig's registered information. Changes will be saved to your farm account.</p>
+          <form id="edit-pig-form">
+            <div class="form-grid">
+              <label>Pig ID / code <span class="required-mark">*</span><input name="pigCode" type="text" maxlength="50" required></label>
+              <label>Pig name <span class="required-mark">*</span><input name="pigName" type="text" maxlength="100" required></label>
+              <label>Breed <span class="required-mark">*</span><input name="breed" type="text" maxlength="100" required></label>
+              <label>Sex <span class="required-mark">*</span><select name="sex" required><option value="male">Male</option><option value="female">Female</option></select></label>
+              <label>Birth date <input name="birthDate" type="date"></label>
+              <label>Estimated age (months) <input name="ageMonths" type="number" min="0" max="999.99" step="0.01"></label>
+              <label>Status <select name="pigStatus"><option value="active">Active</option><option value="sold">Sold</option><option value="deceased">Deceased</option></select></label>
+              <label class="notes-field">Notes <textarea name="notes" rows="3" maxlength="240"></textarea></label>
+            </div>
+            <p class="edit-pig-error" id="edit-pig-error" role="alert" hidden></p>
+            <div class="form-actions"><button class="button button-primary" type="submit">Save Pig Changes</button><button class="button button-secondary" id="cancel-edit-pig" type="button">Cancel</button></div>
           </form>
         </section>
 

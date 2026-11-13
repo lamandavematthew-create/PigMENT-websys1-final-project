@@ -60,6 +60,58 @@
     }
   }
 
+  let editingPigId = null;
+  let editPigPreviousFocus = null;
+  function closeEditPig() {
+    editingPigId = null;
+    $("#edit-pig-form").reset();
+    $("#edit-pig-error").hidden = true;
+    $("#edit-pig-panel").hidden = true;
+    $("#edit-pig-backdrop").hidden = true;
+    document.body.classList.remove("edit-pig-modal-open");
+    if (editPigPreviousFocus && editPigPreviousFocus.isConnected) editPigPreviousFocus.focus({preventScroll:true});
+    editPigPreviousFocus = null;
+  }
+  function openEditPig(pig) {
+    const panel = $("#edit-pig-panel");
+    const form = $("#edit-pig-form");
+    editPigPreviousFocus = document.activeElement;
+    editingPigId = pig.pig_id;
+    form.elements.pigCode.value = pig.pig_code || "";
+    form.elements.pigName.value = pig.pig_name || "";
+    form.elements.breed.value = pig.breed || "";
+    form.elements.sex.value = pig.sex || "male";
+    form.elements.birthDate.value = pig.birth_date || "";
+    form.elements.ageMonths.value = pig.estimated_age_months || "";
+    form.elements.pigStatus.value = pig.pig_status || "active";
+    form.elements.notes.value = pig.notes || "";
+    $("#edit-pig-title").textContent = `Edit ${pigName(pig)}`;
+    $("#edit-pig-error").hidden = true;
+    $("#edit-pig-backdrop").hidden = false;
+    panel.hidden = false;
+    document.body.classList.add("edit-pig-modal-open");
+    panel.scrollTop = 0;
+    form.elements.pigName.focus({preventScroll:true});
+  }
+  $("#edit-pig-backdrop").addEventListener("click", closeEditPig);
+  document.addEventListener("keydown", (event) => {
+    const panel = $("#edit-pig-panel");
+    if (panel.hidden) return;
+    if (event.key === "Escape") {
+      if (panel.querySelector('button[type="submit"]').disabled) return;
+      event.preventDefault();
+      closeEditPig();
+      return;
+    }
+    if (event.key !== "Tab") return;
+    const focusable = [...panel.querySelectorAll('button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href]')].filter((element) => element.getClientRects().length > 0);
+    if (!focusable.length) {event.preventDefault();panel.focus();return;}
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && (document.activeElement === first || document.activeElement === panel)) {event.preventDefault();last.focus();}
+    else if (!event.shiftKey && document.activeElement === last) {event.preventDefault();first.focus();}
+  });
+
   function renderPigCard(pig) {
     const card = document.createElement("article");
     card.className = "pig-card";
@@ -70,12 +122,28 @@
     const name = document.createElement("h3");
     text(name, pigName(pig));
     const sub = document.createElement("p");
-    text(sub, `${pig.pig_code} · ${pig.breed} · ${pig.sex}`);
-    identity.append(name, sub);
+    text(sub, `ID: ${pig.pig_code}`);
+    const attributes = document.createElement("p");
+    attributes.className = "pig-attributes";
+    const breedItem = document.createElement("span");
+    breedItem.className = "pig-breed-item";
+    const breedText = document.createElement("span");
+    text(breedText, `Breed: ${pig.breed || "Not recorded"}`);
+    breedItem.append(breedText);
+    const sexItem = document.createElement("span");
+    sexItem.className = "pig-sex-item";
+    const sexText = document.createElement("span");
+    text(sexText, `Sex: ${pig.sex || "Not recorded"}`);
+    sexItem.append(sexText);
+    attributes.append(breedItem, sexItem);
     const status = document.createElement("span");
     status.className = "status-label status-label-monitoring";
     text(status, pig.pig_status || "active");
-    heading.append(identity, status);
+    const titleRow = document.createElement("div");
+    titleRow.className = "pig-title-row";
+    titleRow.append(name, status);
+    identity.append(titleRow, sub, attributes);
+    heading.append(identity);
     const facts = document.createElement("dl");
     facts.className = "pig-card-facts";
     [["Birth date", formatDate(pig.birth_date)], ["Age", pig.estimated_age_months ? `${pig.estimated_age_months} months` : "Not recorded"],
@@ -99,7 +167,40 @@
     detailsButton.textContent = "View Details";
     detailsButton.addEventListener("click", () => showPigDetails(pig, card, detailsButton));
     actions.append(detailsButton);
-    card.append(heading, facts, actions);
+    const secondary = document.createElement("div");
+    secondary.className = "pig-secondary-actions";
+    const edit = document.createElement("button");
+    edit.type = "button";
+    edit.className = "button pig-edit-action";
+    edit.textContent = "Edit";
+    edit.addEventListener("click", () => openEditPig(pig));
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.className = "button pig-delete-action";
+    remove.textContent = "Delete";
+    remove.addEventListener("click", async () => {
+      if (!window.confirm(`Delete ${pigName(pig)} (${pig.pig_code}) permanently? This cannot be undone.`)) return;
+      remove.disabled = true;
+      try {
+        await api(`pigs.php?id=${encodeURIComponent(pig.pig_id)}`, {method:"DELETE"});
+        message(`${pigName(pig)} was deleted.`);
+        await load();
+      } catch(error) {
+        message(error.message || "The pig could not be deleted. It may have linked farm records.", true);
+        remove.disabled = false;
+      }
+    });
+    secondary.append(edit, remove);
+    actions.append(secondary);
+    // Generic illustrated icon: record images are not part of the current pig API.
+    const illustration = document.createElement("div");
+    illustration.className = "pig-record-illustration";
+    illustration.setAttribute("aria-hidden", "true");
+    const pigIcon = document.createElement("img");
+    pigIcon.src = "../../public/assets/my-pigs-redesign/illustrations/record-placeholder-pig.webp";
+    pigIcon.alt = ""; // Decorative placeholder, not a photo uploaded for this animal.
+    illustration.append(pigIcon);
+    card.append(illustration, heading, facts, actions);
     return card;
   }
 
@@ -181,14 +282,27 @@
       const ids = assignedPigIds(pen.pen_id);
       const card = document.createElement("article");
       card.className = "pen-card";
+      if (state.expandedPen === pen.pen_id) card.classList.add("is-expanded");
       const toggle = document.createElement("button");
       toggle.type = "button";
       toggle.className = "pen-card-toggle";
       toggle.setAttribute("aria-expanded", String(state.expandedPen === pen.pen_id));
-      toggle.innerHTML = `<span class="pen-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 13v-2a2 2 0 0 1 2-2h1l2-3h6l2 3h1a2 2 0 0 1 2 2v2"/><path d="M5 13h14l1 3a2 2 0 0 1-2 2h-1M6 17H5a2 2 0 0 1-2-2l1-2"/><circle cx="8" cy="15" r="1"/><circle cx="16" cy="15" r="1"/></svg></span><span class="pen-card-details"><strong></strong><small></small></span><span class="pen-card-count"></span><span aria-hidden="true">⌄</span>`;
-      text(toggle.querySelector("strong"), pen.pen_name);
-      text(toggle.querySelector("small"), `Pen ID: ${pen.pen_id} · ${pen.pen_type || "General"}`);
-      text(toggle.querySelector(".pen-card-count"), `${ids.length}${pen.capacity ? ` / ${pen.capacity}` : ""} pigs`);
+      // Compact pen summary matches the approved PigMENT design; values are from the API.
+      toggle.innerHTML = `<span class="pen-card-image" aria-hidden="true"><img src="../../public/assets/my-pigs-redesign/illustrations/pig-pen-scene.png" alt=""></span>
+        <span class="pen-card-main"><span class="pen-card-title"><strong class="pen-card-name"></strong><span class="pen-card-status"></span></span>
+          <span class="pen-card-metrics"><span class="pen-card-pigs"><img src="../../public/assets/my-pigs-redesign/icons/svg/pig-outline.svg" alt="" aria-hidden="true"><span class="pen-card-pig-count"></span></span>
+          <span class="pen-card-weight"><img src="../../public/assets/my-pigs-redesign/icons/svg/weight.svg" alt="" aria-hidden="true"><span class="pen-card-weight-value"></span></span></span>
+        </span><span class="pen-card-chevron" aria-hidden="true">›</span>`;
+      text(toggle.querySelector(".pen-card-name"), pen.pen_name);
+      const status = toggle.querySelector(".pen-card-status");
+      const isInactive = pen.pen_status && String(pen.pen_status).toLowerCase() !== "active";
+      status.classList.add(isInactive ? "is-inactive" : (ids.length === 0 ? "is-empty" : "is-active"));
+      status.textContent = isInactive ? "Inactive" : (ids.length ? "Active" : "Empty");
+      text(toggle.querySelector(".pen-card-pig-count"), `${ids.length} ${ids.length === 1 ? "pig" : "pigs"}`);
+      const capacityValue = Number(pen.capacity);
+      const hasCapacity = Number.isFinite(capacityValue) && capacityValue > 0;
+      text(toggle.querySelector(".pen-card-weight-value"), hasCapacity ? `${ids.length}/${capacityValue} capacity` : "No capacity set");
+      toggle.setAttribute("aria-label", `${pen.pen_name}: ${ids.length} ${ids.length === 1 ? "pig" : "pigs"}${hasCapacity ? `, capacity ${capacityValue}` : ""}, ${status.textContent}. ${state.expandedPen === pen.pen_id ? "Collapse" : "Expand"} pen details`);
       toggle.addEventListener("click", () => { state.expandedPen = state.expandedPen === pen.pen_id ? null : pen.pen_id; renderPens(); });
       card.append(toggle);
       if (state.expandedPen === pen.pen_id) {
@@ -198,9 +312,12 @@
         heading.textContent = "Pigs inside";
         content.append(heading);
         if (!ids.length) { const empty = document.createElement("p"); empty.textContent = "No pigs assigned to this pen yet."; content.append(empty); }
-        ids.map(getPig).filter(Boolean).forEach((pig) => content.append(renderPigCard(pig)));
+        const memberGrid = document.createElement("div");
+        memberGrid.className = "pen-member-pigs";
+        ids.map(getPig).filter(Boolean).forEach((pig) => memberGrid.append(renderPigCard(pig)));
+        if (memberGrid.childElementCount) content.append(memberGrid);
         const assign = document.createElement("form");
-        assign.className = "inline-record-form";
+        assign.className = "inline-record-form pen-assign-form";
         const select = document.createElement("select");
         option(select, "", "Choose a pig to assign or transfer");
         state.pigs.filter((pig) => pig.pig_status === "active").forEach((pig) => option(select, pig.pig_id, `${pigName(pig)} · ${pig.pig_code}`));
@@ -220,7 +337,7 @@
           } catch (error) { penMessage(error.message, true); }
         });
         const actions = document.createElement("div");
-        actions.className = "pen-card-actions";
+        actions.className = "pen-card-actions pen-management-actions";
         const edit = document.createElement("button");
         edit.className = "button button-secondary";
         edit.type = "button";
@@ -260,16 +377,36 @@
 
   $("#pig-search").addEventListener("input", renderPigs);
   $("#status-filter").addEventListener("change", renderPigs);
-  $("#open-registration").addEventListener("click", () => { $("#registration-panel").hidden = false; $("#registration-panel").scrollIntoView({ behavior: "smooth" }); });
+  const openRegistration = () => { $("#registration-panel").hidden = false; $("#registration-panel").scrollIntoView({ behavior: "smooth" }); };
+  $("#open-registration").addEventListener("click", openRegistration);
+  const heroRegisterButton = $("#hero-register");
+  if (heroRegisterButton) heroRegisterButton.addEventListener("click", openRegistration);
   $("#empty-register").addEventListener("click", () => { $("#registration-panel").hidden = false; });
   $("#close-registration").addEventListener("click", () => { $("#registration-panel").hidden = true; });
   $("#cancel-registration").addEventListener("click", () => { $("#registration-panel").hidden = true; });
+  // Mount the pen dialog directly beneath <body> so the farm section's
+  // layout/stacking contexts cannot trap a fixed-position modal.
+  const penDialogElement = $("#pen-form");
+  const penBackdropElement = $("#pen-modal-backdrop");
+  document.body.append(penBackdropElement, penDialogElement);
+
+  let penPreviousFocus = null;
+  function showPenFormError(errorText) {
+    const errorBox = $("#pen-modal-error");
+    errorBox.textContent = errorText || "Unable to save the pig pen. Please try again.";
+    errorBox.hidden = false;
+  }
   function openPenForm(pen = null) {
     state.editingPenId = pen ? Number(pen.pen_id) : null;
     const form = $("#pen-form");
+    penPreviousFocus = document.activeElement;
     form.reset();
     $("#pen-form-title").textContent = pen ? "Edit Pig Pen" : "Create a Pig Pen";
+    $("#pen-form-description").textContent = pen
+      ? "Update the pen's information and capacity. Changes will be saved to your farm account."
+      : "Give the pen a name and set its maximum number of registered pigs.";
     $("#pen-form-submit").textContent = pen ? "Save Pen Changes" : "Create Pig Pen";
+    $("#pen-modal-error").hidden = true;
     if (pen) {
       form.elements.penName.value = pen.pen_name || "";
       form.elements.penType.value = pen.pen_type || "General";
@@ -277,17 +414,45 @@
       form.elements.capacity.value = pen.capacity || "";
       form.elements.description.value = pen.description || "";
     }
+    $("#pen-modal-backdrop").hidden = false;
     form.hidden = false;
-    form.scrollIntoView({ behavior: "smooth", block: "start" });
-    form.elements.penName.focus();
+    document.body.classList.add("pen-modal-open");
+    form.scrollTop = 0;
+    form.elements.penName.focus({ preventScroll: true });
   }
   function closePenForm() {
     state.editingPenId = null;
     $("#pen-form").reset();
     $("#pen-form-title").textContent = "Create a Pig Pen";
     $("#pen-form-submit").textContent = "Create Pig Pen";
+    $("#pen-modal-error").hidden = true;
     $("#pen-form").hidden = true;
+    $("#pen-modal-backdrop").hidden = true;
+    document.body.classList.remove("pen-modal-open");
+    if (penPreviousFocus?.isConnected) penPreviousFocus.focus({ preventScroll: true });
+    penPreviousFocus = null;
   }
+  $("#pen-modal-backdrop").addEventListener("click", closePenForm);
+  document.addEventListener("keydown", (event) => {
+    const panel = $("#pen-form");
+    if (panel.hidden) return;
+    if (event.key === "Escape") {
+      if ($("#pen-form-submit").disabled) return;
+      event.preventDefault();
+      closePenForm();
+      return;
+    }
+    if (event.key !== "Tab") return;
+    const focusable = [...panel.querySelectorAll('button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled])')]
+      .filter((element) => element.getClientRects().length > 0);
+    if (!focusable.length) { event.preventDefault(); panel.focus(); return; }
+    const first = focusable[0], last = focusable[focusable.length - 1];
+    if (event.shiftKey && (document.activeElement === first || document.activeElement === panel)) {
+      event.preventDefault(); last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault(); first.focus();
+    }
+  });
   $("#open-pen-form").addEventListener("click", () => openPenForm());
   $("#empty-create-pen").addEventListener("click", () => openPenForm());
   $("#close-pen-form").addEventListener("click", closePenForm);
@@ -295,6 +460,35 @@
   $("#open-litter-form").addEventListener("click", () => { updateLitterOptions(); $("#litter-form").hidden = false; });
   $("#close-litter-form").addEventListener("click", () => { $("#litter-form").hidden = true; });
   $("#cancel-litter-form").addEventListener("click", () => { $("#litter-form").hidden = true; });
+
+  $("#close-edit-pig").addEventListener("click", closeEditPig);
+  $("#cancel-edit-pig").addEventListener("click", closeEditPig);
+  $("#edit-pig-form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!editingPigId) return;
+    const form = new FormData(event.currentTarget);
+    const save = event.currentTarget.querySelector('button[type="submit"]');
+    save.disabled = true;
+    try {
+      await api(`pigs.php?id=${encodeURIComponent(editingPigId)}`, { method: "PUT", body: json({
+        pig_code: String(form.get("pigCode") || "").trim(),
+        pig_name: String(form.get("pigName") || "").trim(),
+        breed: String(form.get("breed") || "").trim(),
+        sex: form.get("sex"), birth_date: form.get("birthDate"),
+        estimated_age_months: form.get("ageMonths"),
+        pig_status: form.get("pigStatus"), notes: String(form.get("notes") || "").trim()
+      }) });
+      closeEditPig();
+      message("Pig record updated successfully.");
+      await load();
+    } catch(error) {
+      const errorBox = $("#edit-pig-error");
+      errorBox.textContent = error.message || "Pig changes could not be saved.";
+      errorBox.hidden = false;
+      errorBox.scrollIntoView({block:"nearest"});
+    }
+    finally { save.disabled = false; }
+  });
 
   const registrationForm = $("#pig-form");
   const updateRegistrationEstimate = () => {
@@ -364,7 +558,7 @@
       String(pen.pen_name).trim().toLowerCase() === penName.toLowerCase()
     );
     if (duplicate) {
-      penMessage("A pen with this name already exists. Choose a different name.", true);
+      showPenFormError("A pen with this name already exists. Choose a different name.");
       return;
     }
     try {
@@ -373,7 +567,7 @@
       closePenForm();
       penMessage(editingId ? "Pen changes saved successfully." : "Pen created successfully.");
       await load();
-    } catch (error) { penMessage(error.message, true); }
+    } catch (error) { showPenFormError(error.message); }
   });
 
   $("#litter-form").addEventListener("submit", async (event) => {
