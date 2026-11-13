@@ -15,10 +15,12 @@
   <link rel="stylesheet" href="../css/registered-pigs-icons-match.css">
   <link rel="stylesheet" href="../css/my-pigs-expanded-pen-fix.css">
   <link rel="stylesheet" href="../css/edit-pen-modal.css">
+  <link rel="stylesheet" href="../css/register-pig-modal.css">
+  <link rel="stylesheet" href="../css/registered-pigs-price.css?v=2">
   <script src="../js/script.js" defer></script>
   <script src="../js/auth.js" defer></script>
   <script src="../js/weight-estimator.js" defer></script>
-  <script src="../js/my-pigs.js" defer></script>
+  <script src="../js/my-pigs.js?v=2" defer></script>
 </head>
 <body class="home-refresh my-pigs-refresh" data-requires-auth="true" data-auth-pending="true" data-api-farm-page="true">
   <div class="app-shell">
@@ -229,55 +231,76 @@
           </form>
         </section>
 
-        <section class="form-panel" id="registration-panel" aria-labelledby="form-title" hidden>
-          <div class="form-heading">
-            <div><p class="eyebrow">Farm record</p><h2 id="form-title">Register a pig</h2></div>
+        <!-- The registration dialog is mounted under <body> by my-pigs.js. -->
+        <div class="register-pig-backdrop" id="register-pig-backdrop" hidden aria-hidden="true"></div>
+        <section class="form-panel register-pig-dialog" id="registration-panel" role="dialog" aria-modal="true" aria-labelledby="form-title" aria-describedby="registration-intro" tabindex="-1" hidden>
+          <div class="form-heading register-dialog-header">
+            <div class="register-dialog-title">
+              <p class="eyebrow">FARM RECORD</p>
+              <h2 id="form-title">Register a Pig</h2>
+              <p class="form-intro" id="registration-intro">Add a new pig to your farm records.</p>
+            </div>
             <button class="close-form" id="close-registration" type="button" aria-label="Close registration form">×</button>
           </div>
-          <p class="form-intro">Enter the pig information supported by your farm records.</p>
           <form id="pig-form">
-            <div class="form-grid">
-              <label>Pig ID / code <span class="required-mark" aria-hidden="true">*</span>
-                <input name="pigCode" type="text" maxlength="50" placeholder="e.g. PG-025" required>
-              </label>
-              <label>Pig name <span class="required-mark" aria-hidden="true">*</span>
-                <input name="pigName" type="text" maxlength="100" placeholder="e.g. Rosie" required>
-              </label>
-              <label>Breed <span class="required-mark" aria-hidden="true">*</span>
-                <input name="breed" type="text" maxlength="40" placeholder="e.g. Native cross" required>
-              </label>
-              <label>Sex <span class="required-mark" aria-hidden="true">*</span>
-                <select name="sex" required>
-                  <option value="">Select sex</option>
-                  <option value="female">Female</option>
-                  <option value="male">Male</option>
-                </select>
-              </label>
-              <label>Date of birth <span class="field-unit">(optional)</span>
-                <input name="birthDate" type="date">
-              </label>
-              <label>Estimated age <span class="field-unit">(months, optional)</span>
-                <input name="ageMonths" type="number" min="0" max="999.99" step="0.01" placeholder="e.g. 8">
-              </label>
-              <div class="weight-entry-section">
-                <p class="form-section-label">Weight &amp; measurements <span class="field-unit">(optional)</span></p>
+            <div class="register-dialog-body">
+              <section class="register-form-section" aria-labelledby="reg-info-title">
+                <h3 id="reg-info-title"><span class="reg-section-icon" aria-hidden="true">▦</span> Pig Information</h3>
+                <p class="reg-section-caption">Fields marked * are required.</p>
+                <div class="form-grid register-info-grid">
+                  <label><span class="register-label-text">Pig ID / code <span class="required-mark" aria-hidden="true">*</span></span>
+                    <input name="pigCode" type="text" maxlength="50" placeholder="e.g. PG-025" required autocomplete="off">
+                  </label>
+                  <label><span class="register-label-text">Pig name <span class="required-mark" aria-hidden="true">*</span></span>
+                    <input name="pigName" type="text" maxlength="100" placeholder="e.g. Rosie" required>
+                  </label>
+                  <label><span class="register-label-text">Breed <span class="required-mark" aria-hidden="true">*</span></span>
+                    <input name="breed" type="text" maxlength="40" placeholder="e.g. Native cross" required>
+                  </label>
+                  <label><span class="register-label-text">Sex <span class="required-mark" aria-hidden="true">*</span></span>
+                    <select name="sex" required>
+                      <option value="">Select sex</option>
+                      <option value="female">Female</option>
+                      <option value="male">Male</option>
+                    </select>
+                  </label>
+                  <label><span class="register-label-text">Date of birth <span class="field-unit">(optional)</span></span>
+                    <input name="birthDate" type="date">
+                  </label>
+                  <label><span class="register-label-text">Estimated age <span class="field-unit">(months, optional)</span></span>
+                    <input name="ageMonths" type="number" min="0" max="999.99" step="0.01" placeholder="e.g. 8">
+                  </label>
+                </div>
+                <p class="reg-field-guidance">You may enter the birth date or estimated age based on your farm records.</p>
+              </section>
+              <section class="register-form-section register-measure-section" aria-labelledby="reg-measure-title">
+                <h3 id="reg-measure-title"><span class="reg-section-icon" aria-hidden="true">↔</span> Weight &amp; Measurements <span class="field-unit">(optional)</span></h3>
+                <p class="reg-section-caption">Heart girth is measured around the chest behind the front legs; body length runs from the shoulder to the base of the tail.</p>
                 <div class="weight-entry-grid">
-                  <label>Heart girth (cm)<input name="girth" type="number" min="0.01" step="0.01"></label>
-                  <label>Body length (cm)<input name="length" type="number" min="0.01" step="0.01"></label>
-                  <label>Estimated weight (kg)<input name="estimatedWeight" type="number" min="0.01" step="0.01" readonly></label>
-                  <label>Price per kilogram (PHP/kg, optional)<input name="pricePerKg" type="number" min="0.01" step="0.01"></label>
+                  <label>Heart girth (cm)<input name="girth" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="Enter measurement"></label>
+                  <label>Body length (cm)<input name="length" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="Enter measurement"></label>
+                  <label>Price per kilogram (PHP/kg, optional)<input name="pricePerKg" type="number" min="0.01" max="99999999.99" step="0.01" inputmode="decimal" placeholder="e.g. 180"></label>
+                  <div class="register-weight-preview" aria-live="polite">
+                    <label for="register-estimated-weight">Estimated weight (kg)</label>
+                    <div class="register-weight-display"><strong id="registration-weight-display">— kg</strong><span>Calculated estimate</span></div>
+                    <input id="register-estimated-weight" name="estimatedWeight" type="number" min="0.01" step="0.01" readonly tabindex="-1" aria-label="Calculated estimated weight in kilograms">
+                  </div>
                 </div>
                 <p class="weight-entry-message" id="weight-entry-message">Enter heart girth and body length to calculate an estimate.</p>
                 <p class="weight-entry-value" id="weight-entry-value" hidden></p>
-              </div>
-              <label class="notes-field">Notes
-                <textarea name="notes" rows="3" maxlength="240" placeholder="Optional observations or care notes"></textarea>
-              </label>
+              </section>
+              <section class="register-form-section register-notes-section" aria-labelledby="reg-notes-title">
+                <h3 id="reg-notes-title"><span class="reg-section-icon" aria-hidden="true">✎</span> Additional Notes <span class="field-unit">(optional)</span></h3>
+                <label class="notes-field"><span class="sr-only">Notes</span>
+                  <textarea name="notes" rows="2" maxlength="240" placeholder="Observations or care notes about this pig"></textarea>
+                </label>
+              </section>
+              <p class="measurement-note">Records are saved to your authenticated farm account.</p>
+              <p class="register-form-error" id="register-form-error" role="alert" hidden></p>
             </div>
-            <p class="measurement-note">Records are saved to your authenticated farm account.</p>
-            <div class="form-actions">
-              <button class="button button-primary" type="submit">Register a Pig</button>
+            <div class="form-actions register-dialog-footer">
               <button class="button button-secondary" id="cancel-registration" type="button">Cancel</button>
+              <button class="button button-primary" type="submit">Register a Pig</button>
             </div>
           </form>
         </section>

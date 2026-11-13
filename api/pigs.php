@@ -130,6 +130,47 @@ try {
         sendResponse(400, 'error', 'Invalid JSON request.');
     }
 
+    $hasPrice = array_key_exists('price_per_kg', $data);
+    $pricePerKg = $data['price_per_kg'] ?? null;
+    if ($pricePerKg === '') {
+        $pricePerKg = null;
+    }
+    if ($pricePerKg !== null) {
+        if ((!is_string($pricePerKg) && !is_int($pricePerKg) && !is_float($pricePerKg)) ||
+            !preg_match('/^[0-9]{1,8}(?:\.[0-9]{1,2})?$/D', (string) $pricePerKg) ||
+            (float) $pricePerKg <= 0) {
+            sendResponse(422, 'error', 'Enter a positive price per kilogram with up to two decimal places.');
+        }
+    }
+
+    // Save only the price from View Details. Do not overwrite other pig fields.
+    if ($method === 'PUT' && ($_GET['action'] ?? '') === 'price') {
+        $pigId = filter_var(
+            $_GET['id'] ?? null,
+            FILTER_VALIDATE_INT,
+            ['options' => ['min_range' => 1]]
+        );
+        if (!$pigId || !$hasPrice) {
+            sendResponse(422, 'error', 'A valid pig ID and price field are required.');
+        }
+
+        $stmt = $pdo->prepare(
+            "UPDATE pigs SET price_per_kg = ? WHERE pig_id = ? AND owner_id = ?"
+        );
+        $stmt->execute([$pricePerKg, $pigId, $ownerId]);
+
+        // MySQL also reports zero affected rows for an unchanged price.
+        if ($stmt->rowCount() === 0) {
+            $stmt = $pdo->prepare("SELECT pig_id FROM pigs WHERE pig_id = ? AND owner_id = ?");
+            $stmt->execute([$pigId, $ownerId]);
+            if (!$stmt->fetch()) {
+                sendResponse(404, 'error', 'Pig not found.');
+            }
+        }
+
+        sendResponse(200, 'success', 'Price saved.', ['price_per_kg' => $pricePerKg]);
+    }
+
     // Read pig information
     $pigCode = $data['pig_code'] ?? '';
     $pigName = $data['pig_name'] ?? '';
@@ -138,7 +179,6 @@ try {
     $birthDate = $data['birth_date'] ?? null;
     $age = $data['estimated_age_months'] ?? null;
     $notes = $data['notes'] ?? '';
-
     // Check text field types
     if (
         !is_string($pigCode) ||
@@ -233,8 +273,9 @@ try {
                 sex,
                 birth_date,
                 estimated_age_months,
+                price_per_kg,
                 notes
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
 
         $stmt->execute([
@@ -245,6 +286,7 @@ try {
             $sex,
             $birthDate,
             $age,
+            $pricePerKg,
             $notes ?: null
         ]);
 
@@ -306,6 +348,7 @@ try {
                  sex = ?,
                  birth_date = ?,
                  estimated_age_months = ?,
+                 price_per_kg = CASE WHEN ? = 1 THEN ? ELSE price_per_kg END,
                  notes = ?,
                  pig_status = ?
              WHERE pig_id = ? AND owner_id = ?"
@@ -318,6 +361,8 @@ try {
             $sex,
             $birthDate,
             $age,
+            $hasPrice ? 1 : 0,
+            $pricePerKg,
             $notes ?: null,
             $pigStatus,
             $pigId,
